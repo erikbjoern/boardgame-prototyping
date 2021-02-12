@@ -2,7 +2,7 @@
   <div>
     <div style="margin-left: 15vw">
       <label htmlFor="rows">Rader</label>
-      <input id="rows" type="number" min="7" step="2" v-model="rows" />
+      <input id="rows" type="number" min="7" max="21" v-model="actualRows" />
 
       <!-- DENNA GÅR INTE ATT ÄNDRA FÖRRÄN MAN FÅR SASS-VARIABELN TILL JAVASCRIPT -->
       <!-- <label htmlFor="columns">Kolumner</label>
@@ -41,7 +41,7 @@ export default {
   data() {
     return {
       columns: 19, //ska alltid vara ett udda tal - se till att ändra i CSS-variabeln också om denna ska ändras
-      rows: 7, //ska alltid vara ett udda tal
+      actualRows: 7, //ska alltid egentligen alltid vara ett udda tal, men vår method kringgår det
       villageDistance: 2, //kan vara 2-4 ungefär
       colors: [
         "#67A05A",
@@ -86,6 +86,9 @@ export default {
 
       return array;
     },
+    rows() {
+      return this.actualRows % 2 == 1 ? this.actualRows : this.actualRows - 1;
+    },
   },
   methods: {
     hexCount() {
@@ -95,13 +98,12 @@ export default {
       return this.colors[Math.floor(Math.random() * this.colors.length)];
     },
     isOverflowing(hex) {
-      return (
-        hex >= this.hexCount() - this.columns &&
-        hex % 2 !== this.columns % 2
-      );
+      return this.actualRows % 2 == 1
+        ? hex >= this.hexCount() - this.columns && hex % 2 !== this.columns % 2
+        : false;
     },
     isVillageHex(hex) {
-      const halfCount = Math.floor(this.hexCount() / 2);
+      const halfCount = Math.floor((this.hexCount()) / 2);
       const dist = this.villageDistance;
 
       return [
