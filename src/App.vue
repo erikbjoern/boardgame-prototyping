@@ -17,17 +17,17 @@
     <input id="columns" type="number" min="7" step="2" v-model="columns" /> -->
     </div>
     <ul class="hex-grid__list">
-      <li v-for="hex in hexes" :key="hex" class="hex-grid__item">
+      <li v-for="hex in hexes" :key="hex.number" class="hex-grid__item">
         <div
           class="hex-grid__content"
-          :style="`background-color: ${randomColor()}9a`"
+          :style="`background-color: ${hex.color}9a`"
           :class="{
-            center: isCenter(hex),
-            hidden: isOverflowing(hex),
-            village: isVillageHex(hex),
+            center: isCenter(hex.number),
+            hidden: isOverflowing(hex.number),
+            village: isVillageHex(hex.number),
           }"
         >
-          {{ hex }}
+          {{ hex.number }}
         </div>
       </li>
     </ul>
@@ -36,10 +36,7 @@
 
 <script>
 import { colors } from "@/helpers/colors";
-import {
-  isCenter,
-  isVillage,
-} from "@/helpers/tilePositions";
+import { isCenter, isVillage } from "@/helpers/tilePositions";
 
 export default {
   name: "App",
@@ -47,21 +44,13 @@ export default {
     return {
       columns: 19, //se till att ändra i CSS-variabeln också om denna ska ändras
       colors: colors,
-      visibleRows: 16,
+      hexes: [],
+      hexStash: [],
+      visibleRows: 18,
       villageDistance: 2, //kan vara 2-4 ungefär
     };
   },
   computed: {
-    hexes() {
-      const array = new Array(this.hexCount);
-      let i = array.length;
-
-      while (i--) {
-        array[i] = i + 1;
-      }
-
-      return array;
-    },
     rows() {
       return Math.ceil(this.visibleRows / 2);
     },
@@ -97,6 +86,26 @@ export default {
     },
   },
   watch: {
+    hexCount: {
+      handler(newValue, oldValue = 0) {
+        const difference = Math.abs(newValue - oldValue);
+        const { hexes, hexStash } = this;
+
+        if (newValue > oldValue) {
+          for (let i = 1; i <= difference; i++) {
+            hexStash.length > 0
+              ? hexes.push(hexStash[hexStash.length - 1]) && hexStash.pop()
+              : hexes.push({ number: oldValue + i, color: this.randomColor() });
+          }
+        } else {
+          for (let i = 1; i <= difference; i++) {
+            hexStash.push(hexes[oldValue - i]);
+            hexes.pop();
+          }
+        }
+      },
+      immediate: true,
+    },
     visibleRows(newValue, oldValue) {
       if (this.villageDistance > this.villageDistanceMaximum)
         this.villageDistance = this.villageDistanceMaximum;
@@ -121,7 +130,7 @@ body {
 
 input {
   width: 30px;
-  margin-left: 5px;
+  margin: 0 5px;
 }
 
 .hidden {
@@ -129,7 +138,7 @@ input {
 }
 
 .center {
-  background-color: #9e0007 !important; 
+  background-color: #9e0007 !important;
 }
 
 .village {
@@ -138,10 +147,10 @@ input {
 
 .hex-grid__list {
   display: grid;
-  gap: 0.5vw 0.1vw;
+  gap: 0.2vw 0;
   grid-template-columns: repeat(auto-fill, 2vw);
   list-style-type: none;
-  margin: 5vh calc(8vw - 30px);
+  margin: 2vh calc(10vw - 30px);
 }
 
 .hex-grid__item {
