@@ -11,6 +11,7 @@
         :max="villageDistanceMaximum"
         v-model="villageDistance"
       />
+      <button @click="reset">Reset</button>
 
       <!-- DENNA GÅR INTE ATT ÄNDRA FÖRRÄN MAN FÅR SASS-VARIABELN TILL JAVASCRIPT -->
       <!-- <label htmlFor="columns">Kolumner</label>
@@ -46,8 +47,8 @@ export default {
       colors: colors,
       hexes: [],
       hexStash: [],
-      visibleRows: 18,
-      villageDistance: 2, //kan vara 2-4 ungefär
+      visibleRows: null, //sätts i created()
+      villageDistance: null, //sätts i created()
     };
   },
   computed: {
@@ -84,27 +85,46 @@ export default {
 
       return isVillage({ hex, halfHexCount, dist, rows, columns });
     },
+    layOutHexes(amount, oldValue = 0) {
+      const { hexes, hexStash } = this;
+
+      for (let i = 1; i <= amount; i++) {
+        hexStash.length > 0
+          ? hexes.push(hexStash[hexStash.length - 1]) && hexStash.pop()
+          : hexes.push({ number: oldValue + i, color: this.randomColor() });
+      }
+
+      localStorage.setItem("hexData", JSON.stringify({ hexes, hexStash }));
+    },
+    reset() {
+      localStorage.removeItem("hexData");
+      localStorage.removeItem("rowCount");
+      localStorage.removeItem("villageDistance");
+      window.location.reload();
+    },
   },
   watch: {
     hexCount: {
-      handler(newValue, oldValue = 0) {
+      handler(newValue, oldValue) {
+        if (oldValue == 0) return;
+
         const difference = Math.abs(newValue - oldValue);
         const { hexes, hexStash } = this;
 
         if (newValue > oldValue) {
-          for (let i = 1; i <= difference; i++) {
-            hexStash.length > 0
-              ? hexes.push(hexStash[hexStash.length - 1]) && hexStash.pop()
-              : hexes.push({ number: oldValue + i, color: this.randomColor() });
-          }
+          this.layOutHexes(difference, oldValue);
         } else {
           for (let i = 1; i <= difference; i++) {
             hexStash.push(hexes[oldValue - i]);
             hexes.pop();
           }
+
+          localStorage.setItem("hexData", JSON.stringify({ hexes, hexStash }));
         }
       },
-      immediate: true,
+    },
+    villageDistance(newValue) {
+      localStorage.setItem("villageDistance", newValue.toString());
     },
     visibleRows(newValue, oldValue) {
       if (this.villageDistance > this.villageDistanceMaximum)
@@ -112,7 +132,24 @@ export default {
 
       if (newValue > oldValue && oldValue == 8 && this.villageDistance == 1)
         this.villageDistance = 2;
+
+      localStorage.setItem("rowCount", newValue.toString());
     },
+  },
+  created() {
+    const savedHexData = JSON.parse(localStorage.getItem("hexData"));
+    const savedVillageDistance = localStorage.getItem("villageDistance");
+    const savedRowCount = parseInt(localStorage.getItem("rowCount"));
+
+    this.villageDistance = savedVillageDistance || 2;
+    this.visibleRows = savedRowCount || 17;
+
+    if (savedHexData) {
+      this.hexes = savedHexData.hexes;
+      this.hexStash = savedHexData.hexStash;
+    } else {
+      this.layOutHexes(this.hexCount);
+    }
   },
 };
 </script>
