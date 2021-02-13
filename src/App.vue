@@ -2,15 +2,14 @@
   <div>
     <div style="margin-left: 15vw">
       <label htmlFor="rows">Rader</label>
-      <input id="rows" type="number" min="7" max="21" v-model="actualRows" />
+      <input id="rows" type="number" min="7" max="21" v-model="visibleRows" />
+      <label htmlFor="distance" min="1">Distans</label>
+      <input id="distance" type="number" :max="villageDistanceMaximum" v-model="villageDistance" />
 
       <!-- DENNA GÅR INTE ATT ÄNDRA FÖRRÄN MAN FÅR SASS-VARIABELN TILL JAVASCRIPT -->
       <!-- <label htmlFor="columns">Kolumner</label>
     <input id="columns" type="number" min="7" step="2" v-model="columns" /> -->
 
-      <!-- DENNA GÅR INTE ATT ÄNDRA JUST NU - FÄRGERNA/KLASSEN UPPDATERAS INTE -->
-      <!-- <label htmlFor="distance" min="1">Distans</label>
-    <input id="distance" type="number" :max="Math.floor(rows / 2)" v-model="villageDistance" /> -->
     </div>
     <ul class="hex-grid__list">
       <li v-for="hex in hexes" :key="hex" class="hex-grid__item">
@@ -18,9 +17,7 @@
           class="hex-grid__content"
           :style="
             `background-color: ${
-              hex == Math.floor(hexCount() / 2)
-                ? '#9e0007'
-                : `${randomColor()}9a`
+              isCenter(hex) ? '#9e0007' : `${randomColor()}9a`
             };`
           "
           :class="{
@@ -40,9 +37,9 @@ export default {
   name: "App",
   data() {
     return {
-      columns: 19, //ska alltid vara ett udda tal - se till att ändra i CSS-variabeln också om denna ska ändras
-      actualRows: 7, //ska alltid egentligen alltid vara ett udda tal, men vår method kringgår det
-      villageDistance: 2, //kan vara 2-4 ungefär
+      columns: 19, //se till att ändra i CSS-variabeln också om denna ska ändras
+      visibleRows: 18,
+      villageDistance: 4, //kan vara 2-4 ungefär
       colors: [
         "#67A05A",
         "#8baf97",
@@ -87,8 +84,11 @@ export default {
       return array;
     },
     rows() {
-      return this.actualRows % 2 == 1 ? this.actualRows : this.actualRows - 1;
+      return Math.ceil(this.visibleRows / 2);
     },
+    villageDistanceMaximum() {
+      return Math.ceil(this.visibleRows / 4 - 1)
+    }
   },
   methods: {
     hexCount() {
@@ -97,23 +97,44 @@ export default {
     randomColor() {
       return this.colors[Math.floor(Math.random() * this.colors.length)];
     },
+    isCenter(hex) {
+      return this.rows % 2 
+        ? hex == Math.floor(this.hexCount() / 2) 
+        : [
+          Math.floor(this.hexCount() / 2) - Math.ceil(this.columns / 2),
+          Math.floor(this.hexCount() / 2) - Math.ceil(this.columns / 2) + 1,
+          Math.floor(this.hexCount() / 2) - Math.ceil(this.columns / 2) - 1,
+          Math.floor(this.hexCount() / 2) + Math.floor(this.columns / 2),
+        ].some(n => n == hex);
+    },
     isOverflowing(hex) {
-      return this.actualRows % 2 == 1
-        ? hex >= this.hexCount() - this.columns && hex % 2 !== this.columns % 2
-        : false;
+      return this.visibleRows % 2 == 1
+        ? hex >= this.hexCount() - this.columns && hex % 2 !== this.rows % 2
+        : false
     },
     isVillageHex(hex) {
-      const halfCount = Math.floor((this.hexCount()) / 2);
-      const dist = this.villageDistance;
+      const halfCount = Math.floor(this.hexCount() / 2);
+      const dist = parseInt(this.villageDistance)
 
-      return [
-        halfCount - this.columns * (dist - 1) - dist,
-        halfCount - this.columns * dist,
-        halfCount - this.columns * (dist - 1) + dist,
-        halfCount + this.columns * (dist - 1 - (dist % 2)) + dist,
-        halfCount + this.columns * dist,
-        halfCount + this.columns * (dist - 1 - (dist % 2)) - dist,
-      ].some((n) => n == hex);
+      return this.rows % 2 == 1 
+        ? [
+
+            halfCount - this.columns * (Math.floor(dist / 2) + (dist % 2)) - dist,
+            // halfCount - this.columns * (dist - 1) - dist,
+            halfCount - this.columns * dist,
+            halfCount - this.columns * (Math.floor(dist / 2) + (dist % 2)) + dist,
+            halfCount + this.columns * (Math.floor(dist / 2)) + dist,
+            halfCount + this.columns * dist,
+            halfCount + this.columns * (Math.floor(dist / 2)) - dist,
+          ].some((n) => n == hex)
+        : [
+            halfCount - Math.ceil(this.columns * (dist + 1 - (dist % 2)) / 2) - (dist + 1),
+            halfCount - Math.ceil(this.columns * (2 * dist + 1) / 2),
+            halfCount - Math.ceil(this.columns * (dist + 1 - (dist % 2)) / 2) + (dist + 1),
+            halfCount + Math.floor(this.columns * (dist - 1 + (dist % 2)) / 2) + (dist + 1),
+            halfCount + Math.floor(this.columns * (2 * dist + 1) / 2),
+            halfCount + Math.floor(this.columns * (dist - 1 + (dist % 2)) / 2) - (dist + 1),
+        ].some((n) => n == hex)
     },
   },
   filters: {
@@ -121,6 +142,16 @@ export default {
       return hex > 184 && (hex - 184) % 2 == 0 ? 184 + (hex - 184) / 2 : hex;
     },
   },
+  watch: {
+    visibleRows(newValue, oldValue) {
+
+      if (this.villageDistance > this.villageDistanceMaximum) 
+        this.villageDistance = this.villageDistanceMaximum
+
+      if (newValue > oldValue && oldValue == 8 && this.villageDistance == 1)
+        this.villageDistance = 2
+    }
+  }
 };
 </script>
 
@@ -193,5 +224,6 @@ input {
   height: 100%;
   width: 100%;
   clip-path: polygon(75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%, 25% 0);
+  font-size: 1vw;
 }
 </style>
