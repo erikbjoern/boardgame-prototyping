@@ -23,12 +23,15 @@
           class="hex-grid__content"
           :style="`background-color: ${hex.color}9a`"
           :class="{
-            center: isCenter(hex.number),
+            center: isCenterHex(hex.number),
             hidden: isOverflowing(hex.number),
             village: isVillageHex(hex.number),
           }"
         >
-          {{ hex.number }}
+          <span>{{ hex.number }}</span>
+          <CityTile v-if="isCenterHex(hex.number)" />
+          <VillageTile v-else-if="isVillageHex(hex.number)" />
+          <ResourceTile v-else :resources="hex.resources" />
         </div>
       </li>
     </ul>
@@ -38,9 +41,17 @@
 <script>
 import { colors } from "@/helpers/colors";
 import { isCenter, isVillage } from "@/helpers/tilePositions";
+import ResourceTile from "@/components/ResourceTile"
+import CityTile from '@/components/CityTile.vue';
+import VillageTile from '@/components/VillageTile.vue';
 
 export default {
   name: "App",
+  components: {
+    ResourceTile,
+    CityTile,
+    VillageTile,
+  },
   data() {
     return {
       columns: 19, //se till att ändra i CSS-variabeln också om denna ska ändras
@@ -63,10 +74,15 @@ export default {
     },
   },
   methods: {
+    getResource() {
+      const chance = 25
+      const range = 9
+      return Math.floor(Math.random() * 100 / chance) == 0 ? Math.ceil(Math.random() * range) : 0
+    },
     randomColor() {
       return this.colors[Math.floor(Math.random() * this.colors.length)];
     },
-    isCenter(hex) {
+    isCenterHex(hex) {
       const halfHexCount = Math.ceil(this.hexCount / 2);
       const { rows, columns } = this;
       return isCenter({ hex, halfHexCount, rows, columns });
@@ -91,7 +107,15 @@ export default {
       for (let i = 1; i <= amount; i++) {
         hexStash.length > 0
           ? hexes.push(hexStash[hexStash.length - 1]) && hexStash.pop()
-          : hexes.push({ number: oldValue + i, color: this.randomColor() });
+          : hexes.push({ 
+            number: oldValue + i, 
+            color: this.randomColor(),
+            resources: {
+              stone: this.getResource(),
+              wood: this.getResource(),
+              wheat: this.getResource()
+            }
+          });
       }
 
       localStorage.setItem("hexData", JSON.stringify({ hexes, hexStash }));
@@ -218,7 +242,9 @@ input {
 
 .hex-grid__content {
   align-items: center;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   display: flex;
   position: absolute;
@@ -227,6 +253,12 @@ input {
   height: 100%;
   width: 100%;
   clip-path: polygon(75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%, 25% 0);
-  font-size: 1vw;
+  font-size: .7vw;
 }
+
+.hex-grid__content > * {
+  position: relative;
+  bottom: .2vw;
+}
+
 </style>
