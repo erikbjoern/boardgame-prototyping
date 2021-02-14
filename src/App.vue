@@ -29,8 +29,8 @@
           }"
         >
           <span>{{ hex.number }}</span>
-          <CityTile v-if="isCenterHex(hex.number)" />
-          <VillageTile v-else-if="isVillageHex(hex.number)" />
+          <PopulatedTile v-if="isCenterHex(hex.number)" type="town" />
+          <PopulatedTile v-else-if="isVillageHex(hex.number)" type="village" />
           <ResourceTile v-else :resources="hex.resources" />
         </div>
       </li>
@@ -42,15 +42,13 @@
 import { colors } from "@/helpers/colors";
 import { isCenter, isVillage } from "@/helpers/tilePositions";
 import ResourceTile from "@/components/ResourceTile"
-import CityTile from '@/components/CityTile.vue';
-import VillageTile from '@/components/VillageTile.vue';
+import PopulatedTile from '@/components/PopulatedTile.vue';
 
 export default {
   name: "App",
   components: {
     ResourceTile,
-    CityTile,
-    VillageTile,
+    PopulatedTile,
   },
   data() {
     return {
