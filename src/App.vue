@@ -56,6 +56,10 @@ export default {
       colors: colors,
       hexRowsEven: [],
       hexRowsOdd: [],
+      hexStash: {
+        rowsEven: [],
+        rowsOdd: [],
+      },
       rows: null, //sätts i created()
       // villageDistance: null, //sätts i created()
     };
@@ -111,6 +115,15 @@ export default {
 
       // localStorage.setItem("hexData", JSON.stringify({ hexRowsEven, hexRowsOdd }));
     },
+    removeHexRows(difference, oldRowTotal) {
+      const m = oldRowTotal % 2
+      
+      for (let i = m; i < difference + m; i++) {
+        i % 2 == 0
+          ? this.hexRowsOdd.pop()
+          : this.hexRowsEven.pop()
+      }
+    },
     reset() {
       // localStorage.removeItem("hexData");
       localStorage.removeItem("rowCount");
@@ -125,21 +138,18 @@ export default {
         oldValue = parseInt(oldValue);
 
         const difference = Math.abs(newValue - oldValue);
-        // const { hexRowsEven, hexRowsOdd } = this;
+        const { hexRowsEven, hexRowsOdd } = this;
 
         if (newValue > oldValue) {
           this.addHexRows(difference, oldValue);
-        } // else {
-        //   for (let i = 1; i <= difference; i++) {
-        //     hexStash.push(hexes[oldValue - i]);
-        //     hexes.pop();
-        //   }
+        } else {
+          this.removeHexRows(difference, oldValue);
 
-        // localStorage.setItem(
-        //   "hexData",
-        //   JSON.stringify({ hexRowsEven, hexRowsOdd })
-        // );
-        // }
+          localStorage.setItem(
+            "hexData",
+            JSON.stringify({ hexRowsEven, hexRowsOdd })
+          );
+        }
 
       localStorage.setItem("rowCount", newValue.toString());
       },
