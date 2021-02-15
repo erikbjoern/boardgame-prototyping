@@ -23,7 +23,7 @@
             (columns % 2)}, 4.5vw);`
         "
       >
-        <div v-for="hex in hexRowsEven.flat()" :key="hex.number">
+        <div v-for="hex in hexes.rowsOdd.flat()" :key="hex.number">
           <ResourceTile :hex="hex" />
         </div>
       </div>
@@ -33,7 +33,7 @@
           `grid-template-columns: repeat(${Math.ceil(columns / 2)}, 4.5vw);`
         "
       >
-        <div v-for="hex in hexRowsOdd.flat()" :key="hex.number">
+        <div v-for="hex in hexes.rowsEven.flat()" :key="hex.number">
           <ResourceTile :hex="hex" />
         </div>
       </div>
@@ -54,20 +54,17 @@ export default {
     return {
       columns: 13,
       colors: colors,
-      hexRowsEven: [],
-      hexRowsOdd: [],
-      hexStash: {
-        rowsEven: [],
+      hexes: {
         rowsOdd: [],
+        rowsEven: [],
+        stashRowsOdd: [],
+        stashRowsEven: [],
       },
       rows: null, //sätts i created()
       // villageDistance: null, //sätts i created()
     };
   },
   computed: {
-    // hexCount() {
-    //   return this.rows * this.columns - Math.ceil(this.rows / 2);
-    // },
     villageDistanceMaximum() {
       return Math.ceil(this.rows / 4 - 1);
     },
@@ -84,44 +81,52 @@ export default {
       return this.colors[Math.floor(Math.random() * this.colors.length)];
     },
     addHexRows(difference, oldRowTotal) {
-      const { hexRowsEven, hexRowsOdd } = this;
+      const { rowsOdd, rowsEven, stashRowsOdd, stashRowsEven } = this.hexes;
       const columns = parseInt(this.columns);
       const newRowTotal = oldRowTotal + difference;
-      const previouslyHighestHexNumber = 
-        Math.ceil(((oldRowTotal / 2) * (2 * columns - (columns % 2))) / 2);
+      const previouslyHighestHexNumber = Math.ceil(
+        ((oldRowTotal / 2) * (2 * columns - (columns % 2))) / 2
+      );
       let hexNumber = previouslyHighestHexNumber + 1;
 
       for (let i = oldRowTotal + 1; i <= newRowTotal; i++) {
-        const tileRow = [];
+        let tileRow = [];
         const tileCount = Math.ceil(columns / 2) - (i % 2);
 
-        for (let t = 0; t < tileCount; t++, hexNumber++) {
-          const tile = {
-            number: hexNumber,
-            color: this.randomColor(),
-            resources: {
-              stone: this.getResource(),
-              wood: this.getResource(),
-              wheat: this.getResource(),
-            },
-          };
-          tileRow.push(tile);
+        if (i % 2 == 1 && stashRowsOdd.length) {
+          tileRow = stashRowsOdd.pop()
+        } else if (i % 2 == 0 && stashRowsEven.length) {
+          tileRow = stashRowsEven.pop()
+        } else {
+          for (let t = 0; t < tileCount; t++, hexNumber++) {
+            const tile = {
+              number: hexNumber,
+              color: this.randomColor(),
+              resources: {
+                stone: this.getResource(),
+                wood: this.getResource(),
+                wheat: this.getResource(),
+              },
+            };
+            tileRow.push(tile);
+          }
         }
 
-        i % 2 == 0
-          ? (hexRowsOdd[Math.floor(i / 2)] = tileRow)
-          : (hexRowsEven[Math.floor(i / 2)] = tileRow);
+        i % 2 == 1
+          ? (rowsOdd[Math.floor(i / 2)] = tileRow)
+          : (rowsEven[Math.floor(i / 2)] = tileRow);
       }
 
-      // localStorage.setItem("hexData", JSON.stringify({ hexRowsEven, hexRowsOdd }));
+      // localStorage.setItem("hexData", JSON.stringify({ rowsEven, rowsOdd }));
     },
     removeHexRows(difference, oldRowTotal) {
-      const m = oldRowTotal % 2
-      
+      const m = oldRowTotal % 2;
+      const { rowsOdd, rowsEven, stashRowsOdd, stashRowsEven } = this.hexes;
+
       for (let i = m; i < difference + m; i++) {
-        i % 2 == 0
-          ? this.hexRowsOdd.pop()
-          : this.hexRowsEven.pop()
+        i % 2 == 1
+          ? stashRowsOdd.push(rowsOdd.pop())
+          : stashRowsEven.push(rowsEven.pop());
       }
     },
     reset() {
@@ -138,7 +143,7 @@ export default {
         oldValue = parseInt(oldValue);
 
         const difference = Math.abs(newValue - oldValue);
-        const { hexRowsEven, hexRowsOdd } = this;
+        const { rowsEven, rowsOdd } = this;
 
         if (newValue > oldValue) {
           this.addHexRows(difference, oldValue);
@@ -147,11 +152,11 @@ export default {
 
           localStorage.setItem(
             "hexData",
-            JSON.stringify({ hexRowsEven, hexRowsOdd })
+            JSON.stringify({ rowsEven, rowsOdd })
           );
         }
 
-      localStorage.setItem("rowCount", newValue.toString());
+        localStorage.setItem("rowCount", newValue.toString());
       },
     },
     villageDistance(newValue) {
