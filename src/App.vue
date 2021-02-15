@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div style="margin: 5px 15vw">
+    <div class="input-bar">
       <label htmlFor="rows">Rader</label>
       <input id="rows" type="number" min="7" max="23" v-model="visibleRows" />
       <label htmlFor="distance">Distans</label>
@@ -11,7 +11,27 @@
         :max="villageDistanceMaximum"
         v-model="villageDistance"
       />
-      <button @click="reset">Reset</button>
+      <div
+        v-for="resource in resourceParameters"
+        :key="resource.type"
+        class="resource-input"
+        :style="
+          `background-color: ${(resource.type === 'stone' && '#252627') ||
+            (resource.type === 'wood' && '#553a2d') ||
+            (resource.type === 'wheat' && '#928d5c')}`
+        "
+      >
+        <div>
+          <label> max</label>
+          <input type="number" v-model="resource.max" />
+        </div>
+        <div>
+          <label> chans</label>
+          <input type="number" v-model="resource.chance" />
+          <span>%</span>
+        </div>
+      </div>
+      <button @click="reset" style="margin-left: auto;">Reset</button>
 
       <!-- DENNA GÅR INTE ATT ÄNDRA FÖRRÄN MAN FÅR SASS-VARIABELN TILL JAVASCRIPT -->
       <!-- <label htmlFor="columns">Kolumner</label>
@@ -41,8 +61,8 @@
 <script>
 import { colors } from "@/helpers/colors";
 import { isCenter, isVillage } from "@/helpers/tilePositions";
-import ResourceTile from "@/components/ResourceTile"
-import PopulatedTile from '@/components/PopulatedTile.vue';
+import ResourceTile from "@/components/ResourceTile";
+import PopulatedTile from "@/components/PopulatedTile.vue";
 
 export default {
   name: "App",
@@ -58,6 +78,24 @@ export default {
       hexStash: [],
       visibleRows: null, //sätts i created()
       villageDistance: null, //sätts i created()
+      resourceParameters: [
+        {
+          type: "stone",
+          max: 9,
+          chance: 25,
+        },
+        {
+          type: "wood",
+          max: 9,
+          chance: 25,
+        },
+        {
+          type: "wheat",
+          max: 9,
+          chance: 25,
+        },
+      ],
+      previousResourceParameters: []
     };
   },
   computed: {
@@ -72,10 +110,17 @@ export default {
     },
   },
   methods: {
-    getResource() {
-      const chance = 25
-      const range = 9
-      return Math.floor(Math.random() * 100 / chance) == 0 ? Math.ceil(Math.random() * range) : 0
+    getResources() {
+      const resources = {};
+
+      for (const resource of this.resourceParameters) {
+        resources[resource.type] =
+          Math.floor((Math.random() * 100) / resource.chance) == 0
+            ? Math.ceil(Math.random() * resource.max)
+            : 0;
+      }
+
+      return resources;
     },
     randomColor() {
       return this.colors[Math.floor(Math.random() * this.colors.length)];
@@ -105,23 +150,20 @@ export default {
       for (let i = 1; i <= amount; i++) {
         hexStash.length > 0
           ? hexes.push(hexStash[hexStash.length - 1]) && hexStash.pop()
-          : hexes.push({ 
-            number: oldValue + i, 
-            color: this.randomColor(),
-            resources: {
-              stone: this.getResource(),
-              wood: this.getResource(),
-              wheat: this.getResource()
-            }
-          });
+          : hexes.push({
+              number: oldValue + i,
+              color: this.randomColor(),
+              resources: this.getResources(),
+            });
       }
 
       localStorage.setItem("hexData", JSON.stringify({ hexes, hexStash }));
     },
     reset() {
-      localStorage.removeItem("hexData");
-      localStorage.removeItem("rowCount");
       localStorage.removeItem("villageDistance");
+      localStorage.removeItem("rowCount");
+      localStorage.removeItem("hexData");
+      localStorage.removeItem("resourceParameters");
       window.location.reload();
     },
   },
@@ -145,6 +187,24 @@ export default {
         }
       },
     },
+    resources: {
+      handler(newValue) {
+        let detectedChange;
+        newValue.forEach((resource) =>
+          Object.entries(resource).forEach(([k, v], index, resource) => {
+            if (typeof v === "string" && k !== "type") {
+              detectedChange = { resource, index };
+              return;
+            }
+          })
+        );
+
+        debugger;
+
+        localStorage.setItem("resourceParameters", JSON.stringify(newValue));
+      },
+      deep: true,
+    },
     villageDistance(newValue) {
       localStorage.setItem("villageDistance", newValue.toString());
     },
@@ -159,9 +219,12 @@ export default {
     },
   },
   created() {
-    const savedHexData = JSON.parse(localStorage.getItem("hexData"));
     const savedVillageDistance = localStorage.getItem("villageDistance");
     const savedRowCount = parseInt(localStorage.getItem("rowCount"));
+    const savedHexData = JSON.parse(localStorage.getItem("hexData"));
+    const savedResourceParameters = JSON.parse(
+      localStorage.getItem("resourceParameters")
+    );
 
     this.villageDistance = savedVillageDistance || 2;
     this.visibleRows = savedRowCount || 17;
@@ -171,6 +234,10 @@ export default {
       this.hexStash = savedHexData.hexStash;
     } else {
       this.layOutHexes(this.hexCount);
+    }
+
+    if (savedResourceParameters) {
+      this.resourceParameters = savedResourceParameters;
     }
   },
 };
@@ -190,6 +257,11 @@ body {
 input {
   width: 30px;
   margin: 0 5px;
+}
+
+input,
+button {
+  font-size: 1vw;
 }
 
 .hidden {
@@ -251,12 +323,40 @@ input {
   height: 100%;
   width: 100%;
   clip-path: polygon(75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%, 25% 0);
-  font-size: .7vw;
+  font-size: 0.7vw;
 }
 
 .hex-grid__content > * {
   position: relative;
-  bottom: .2vw;
+  bottom: 0.2vw;
 }
 
+.input-bar {
+  display: flex;
+  font-size: 1vw;
+  margin: 5px 11.5vw;
+  width: 76vw;
+}
+
+.resource-input {
+  border-radius: 2px;
+  color: white;
+  display: flex;
+  padding: 0 2px;
+  margin: 0 4px;
+
+  & span {
+    margin-left: -4px;
+  }
+
+  & input {
+    width: 15px;
+  }
+
+  & input::-webkit-inner-spin-button,
+  & input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
 </style>

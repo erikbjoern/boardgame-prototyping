@@ -1,14 +1,14 @@
 <template>
-  <div class="resourceContainer">
-    <div v-if="resources.wood > 0" class="resourceItem wood">
+  <div class="resource-container">
+    <div v-if="resources.wood > 0" class="resource-item wood">
       <WoodIcon /> 
       <span>{{ resources.wood }}</span>
     </div>
-    <div v-if="resources.stone > 0" class="resourceItem stone">
+    <div v-if="resources.stone > 0" class="resource-item stone">
       <StoneIcon /> 
       <span>{{ resources.stone }}</span>
     </div>
-    <div v-if="resources.wheat > 0" class="resourceItem wheat">
+    <div v-if="resources.wheat > 0" class="resource-item wheat">
       <WheatIcon /> 
       <span>{{ resources.wheat }}</span>
     </div>
@@ -51,8 +51,8 @@ svg path:last-child {
 }
 
 .wood {
-  background-color: #47352c;
-  fill: #47352c;
+  background-color: #553a2d;
+  fill: #553a2d;
 }
 
 .wheat {
@@ -65,7 +65,7 @@ svg {
   height: .75vw !important;
 }
 
-.resourceContainer {
+.resource-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -75,14 +75,7 @@ svg {
   font-size: 1vw;
 }
 
-
-.resourceContainer:hover {
-  cursor: pointer;
-  transform: scale(1.5);
-  z-index: 10;
-}
-
-.resourceItem {
+.resource-item {
   display: flex;
   justify-content: space-evenly;
   align-items: center;
