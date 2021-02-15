@@ -89,14 +89,14 @@ export default {
       );
       let hexNumber = previouslyHighestHexNumber + 1;
 
-      for (let i = oldRowTotal + 1; i <= newRowTotal; i++) {
+      for (let i = oldRowTotal; i < newRowTotal; i++) {
         let tileRow = [];
-        const tileCount = Math.ceil(columns / 2) - (i % 2);
+        const tileCount = Math.floor(columns / 2) + (i % 2);
 
-        if (i % 2 == 1 && stashRowsOdd.length) {
-          tileRow = stashRowsOdd.pop()
-        } else if (i % 2 == 0 && stashRowsEven.length) {
-          tileRow = stashRowsEven.pop()
+        if (i % 2 == 0 && stashRowsOdd.length) {
+          tileRow = stashRowsOdd.pop();
+        } else if (i % 2 == 1 && stashRowsEven.length) {
+          tileRow = stashRowsEven.pop();
         } else {
           for (let t = 0; t < tileCount; t++, hexNumber++) {
             const tile = {
@@ -112,12 +112,17 @@ export default {
           }
         }
 
-        i % 2 == 1
-          ? (rowsOdd[Math.floor(i / 2)] = tileRow)
-          : (rowsEven[Math.floor(i / 2)] = tileRow);
+        const index = Math.floor(i / 2)
+
+        i % 2 == 0
+          ? (rowsOdd[index] = tileRow)
+          : (rowsEven[index] = tileRow);
       }
 
-      // localStorage.setItem("hexData", JSON.stringify({ rowsEven, rowsOdd }));
+      localStorage.setItem(
+        "hexRows",
+        JSON.stringify({ rowsOdd, rowsEven, stashRowsOdd, stashRowsEven })
+      );
     },
     removeHexRows(difference, oldRowTotal) {
       const m = oldRowTotal % 2;
@@ -128,9 +133,14 @@ export default {
           ? stashRowsOdd.push(rowsOdd.pop())
           : stashRowsEven.push(rowsEven.pop());
       }
+
+      localStorage.setItem(
+        "hexRows",
+        JSON.stringify({ rowsOdd, rowsEven, stashRowsOdd, stashRowsEven })
+      );
     },
     reset() {
-      // localStorage.removeItem("hexData");
+      localStorage.removeItem("hexRows");
       localStorage.removeItem("rowCount");
       // localStorage.removeItem("villageDistance");
       window.location.reload();
@@ -140,20 +150,14 @@ export default {
     rows: {
       handler(newValue, oldValue) {
         if (oldValue == 0 || oldValue == null) return;
-        oldValue = parseInt(oldValue);
 
+        oldValue = parseInt(oldValue);
         const difference = Math.abs(newValue - oldValue);
-        const { rowsEven, rowsOdd } = this;
 
         if (newValue > oldValue) {
           this.addHexRows(difference, oldValue);
         } else {
           this.removeHexRows(difference, oldValue);
-
-          localStorage.setItem(
-            "hexData",
-            JSON.stringify({ rowsEven, rowsOdd })
-          );
         }
 
         localStorage.setItem("rowCount", newValue.toString());
@@ -171,19 +175,18 @@ export default {
     // },
   },
   created() {
-    // const savedHexData = JSON.parse(localStorage.getItem("hexData"));
+    const savedHexRows = JSON.parse(localStorage.getItem("hexRows"));
     // const savedVillageDistance = localStorage.getItem("villageDistance");
     const savedRowCount = parseInt(localStorage.getItem("rowCount"));
 
     // this.villageDistance = savedVillageDistance || 2;
     this.rows = savedRowCount || 17;
 
-    // if (savedHexData) {
-    //   this.hexes = savedHexData.hexes;
-    //   this.hexStash = savedHexData.hexStash;
-    // } else {
-    this.addHexRows(this.rows, 0);
-    // }
+    if (savedHexRows) {
+      this.hexes = savedHexRows
+    } else {
+      this.addHexRows(this.rows, 0);
+    }
   },
 };
 </script>
