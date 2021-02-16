@@ -139,8 +139,13 @@ export default {
           tileRow = stashRowsOdd.pop();
         } else if (i % 2 == 1 && stashRowsEven.length) {
           tileRow = stashRowsEven.pop();
-        } else {
-          for (let t = 0; t < tileCount; t++) {
+        }
+
+        const rowLength = tileRow.length
+        const needsUpdate = rowLength != 0 && rowLength != tileCount
+        
+        if (rowLength < tileCount) {
+          for (let t = rowLength; t < tileCount; t++) {
             const tile = {
               number: ++this.hexNumber,
               color: this.getRandomColor(),
@@ -152,11 +157,16 @@ export default {
             };
             tileRow.push(tile);
           }
+        } else if (rowLength > tileCount) {
+          for (let t = rowLength; t > tileCount; t--) {
+            tileRow.pop()
+          }
         }
 
         const index = Math.floor(i / 2);
 
         i % 2 == 0 ? (rowsOdd[index] = tileRow) : (rowsEven[index] = tileRow);
+        needsUpdate && this.updateTileNumbers()
       }
 
       localStorage.setItem(
