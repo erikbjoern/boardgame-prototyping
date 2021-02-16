@@ -71,12 +71,6 @@ svg {
   font-size: 1vw;
 }
 
-.resourceContainer:hover {
-  cursor: pointer;
-  transform: scale(1.5);
-  z-index: 10;
-}
-
 .resourceItem {
   display: flex;
   justify-content: space-evenly;

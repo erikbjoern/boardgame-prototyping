@@ -2,9 +2,13 @@
   <div class="main-container">
     <div class="input-bar">
       <label htmlFor="rows">Rader</label>
-      <input id="rows" type="number" min="9" max="23" v-model="rows" />
+      <input id="rows" type="number" min="1" max="23" v-model="rows" />
       <label htmlFor="columns">Kolumner</label>
-      <input id="columns" type="number" min="11" max="30" v-model="columns" />
+      <input id="columns" type="number" min="1" max="30" v-model="columns" />
+      <label htmlFor="tile-size">Storlek</label>
+      <input id="tile-size" type="number" min="1" max="50" v-model="tileSize" />
+      <label htmlFor="gap">Mellanrum</label>
+      <input id="gap" type="number" min="0" max="10" v-model="gap" />
       <!-- <label htmlFor="distance">Distans</label>
       <input
         id="distance"
@@ -16,23 +20,12 @@
       <button @click="reset">Reset</button>
     </div>
     <div class="grid-container">
-      <div
-        class="odd-rows-grid"
-        :style="
-          `grid-template-columns: repeat(${Math.ceil(columns / 2) -
-            (columns % 2)}, 4.5vw);`
-        "
-      >
+      <div :style="{ ...gridRowsClass, ...gridRowsOddClass }">
         <div v-for="hex in hexes.rowsOdd.flat()" :key="hex.number">
           <ResourceTile :hex="hex" />
         </div>
       </div>
-      <div
-        class="even-rows-grid"
-        :style="
-          `grid-template-columns: repeat(${Math.ceil(columns / 2)}, 4.5vw);`
-        "
-      >
+      <div :style="{ ...gridRowsClass, ...gridRowsEvenClass }">
         <div v-for="hex in hexes.rowsEven.flat()" :key="hex.number">
           <ResourceTile :hex="hex" />
         </div>
@@ -52,6 +45,8 @@ export default {
   },
   data() {
     return {
+      tileSize: 13,
+      gap: 4,
       columnCount: null,
       rowCount: null,
       colors: colors,
@@ -66,6 +61,29 @@ export default {
     };
   },
   computed: {
+    gridRowsClass() {
+      return {
+        display: "grid",
+        "grid-auto-rows": `${this.tileSize * 0.3}vw`,
+        gap: `${this.gap / 10}vw`,
+      };
+    },
+    gridRowsOddClass() {
+      return {
+        "grid-template-columns": `repeat(${Math.ceil(this.columns / 2) -
+          (this.columns % 2)}, ${this.tileSize * 0.45}vw)`,
+      };
+    },
+    gridRowsEvenClass() {
+      return {
+        "grid-template-columns": `repeat(${Math.ceil(
+          this.columns / 2
+        )}, ${this.tileSize * 0.45}vw)`,
+        position: "absolute",
+        top: `${this.tileSize * 0.15 + this.gap / 20}vw`,
+        left: `${- this.tileSize * 0.225 - this.gap / 20 }vw`,
+      };
+    },
     columns: {
       get() {
         return this.columnCount;
@@ -186,11 +204,12 @@ export default {
       window.location.reload();
     },
     updateLocalStorage() {
-      const { rows, columns } = this;
+      const { rows, columns, tileSize, gap } = this;
       const { rowsOdd, rowsEven, stashRowsOdd, stashRowsEven } = this.hexes;
 
       localStorage.setItem("rowCount", rows);
       localStorage.setItem("columnCount", columns);
+      localStorage.setItem("style", JSON.stringify({ tileSize, gap }))
       localStorage.setItem(
         "hexRows",
         JSON.stringify({ rowsOdd, rowsEven, stashRowsOdd, stashRowsEven })
@@ -247,6 +266,8 @@ export default {
       this.updateTileNumbers({ updateAll: true });
       this.updateLocalStorage();
     },
+    tileSize: 'updateLocalStorage',
+    gap: 'updateLocalStorage',
     // villageDistance(newValue) {
     //   localStorage.setItem("villageDistance", newValue.toString());
     // },
@@ -263,16 +284,16 @@ export default {
     // const savedVillageDistance = localStorage.getItem("villageDistance");
     const savedRowCount = parseInt(localStorage.getItem("rowCount"));
     const savedColumnCount = parseInt(localStorage.getItem("columnCount"));
+    const savedStyle = JSON.parse(localStorage.getItem("style"));
 
     // this.villageDistance = savedVillageDistance || 2;
     this.rows = savedRowCount || 17;
     this.columns = savedColumnCount || 13;
 
-    if (savedHexRows) {
-      this.hexes = savedHexRows;
-    } else {
-      this.addHexRows(this.rows, 0);
-    }
+    savedStyle && (this.tileSize = savedStyle.tileSize, this.gap = savedStyle.gap)
+    savedHexRows
+      ? this.hexes = savedHexRows
+      : this.addHexRows(this.rows, 0);
 
     this.updateLocalStorage();
   },
@@ -288,6 +309,7 @@ export default {
 
 .input-bar {
   margin: 10px auto -40px;
+  z-index: 10;
 }
 
 .grid-container {
@@ -295,19 +317,6 @@ export default {
   height: min-content;
   width: min-content;
   margin: auto;
-}
-
-.even-rows-grid,
-.odd-rows-grid {
-  display: grid;
-  grid-auto-rows: 3vw;
-  gap: 1vw;
-}
-
-.even-rows-grid {
-  position: absolute;
-  top: 2vw;
-  left: -2.75vw;
 }
 
 body {
