@@ -97,43 +97,42 @@ export default {
     getRandomColor() {
       return this.colors[Math.floor(Math.random() * this.colors.length)];
     },
-    addHexColumns(difference, oldColumnTotal) {
-      const { rowsOdd, rowsEven, stashRowsOdd, stashRowsEven } = this.hexes;
+    buildHexRow(tileRow, iterator) {
+      const columns = this.columns;
+      const rowLength = tileRow.length;
+      const tileCount =
+        Math.floor(columns / 2) + (((columns % 2) * iterator) % 2);
 
-      for (let i = 0; i < this.rows; i++) {
-        const tileCount =
-          Math.floor(difference / 2) +
-          (difference % 2) * ((i + (oldColumnTotal % 2)) % 2);
-        const index = Math.floor(i / 2);
-        const tileRow = i % 2 == 0 ? rowsOdd[index] : rowsEven[index];
-
-        for (let t = 0; t < tileCount; t++) {
-          const tile = {
-            number: ++this.hexNumber,
-            color: this.getRandomColor(),
-            resources: {
-              stone: this.getResource(),
-              wood: this.getResource(),
-              wheat: this.getResource(),
-            },
-          };
-          tileRow.push(tile);
-        }
+      for (let t = rowLength; t < tileCount; t++) {
+        const tile = {
+          number: ++this.hexNumber,
+          color: this.getRandomColor(),
+          resources: {
+            stone: this.getResource(),
+            wood: this.getResource(),
+            wheat: this.getResource(),
+          },
+        };
+        tileRow.push(tile);
       }
 
-      localStorage.setItem(
-        "hexRows",
-        JSON.stringify({ rowsOdd, rowsEven, stashRowsOdd, stashRowsEven })
-      );
+      return tileRow;
+    },
+    addHexColumns() {
+      const { rowsOdd, rowsEven } = this.hexes;
+
+      for (let i = 0; i < this.rows; i++) {
+        const index = Math.floor(i / 2);
+        const targetRow = i % 2 == 0 ? rowsOdd[index] : rowsEven[index];
+        this.buildHexRow(targetRow, i);
+      }
     },
     addHexRows(difference, oldRowTotal) {
       const { rowsOdd, rowsEven, stashRowsOdd, stashRowsEven } = this.hexes;
-      const columns = this.columns;
       const newRowTotal = oldRowTotal + difference;
 
       for (let i = oldRowTotal; i < newRowTotal; i++) {
         let tileRow = [];
-        const tileCount = Math.floor(columns / 2) + (((columns % 2) * i) % 2);
 
         if (i % 2 == 0 && stashRowsOdd.length) {
           tileRow = stashRowsOdd.pop();
@@ -141,38 +140,24 @@ export default {
           tileRow = stashRowsEven.pop();
         }
 
-        const rowLength = tileRow.length
-        const needsUpdate = rowLength != 0 && rowLength != tileCount
-        
+        const columns = this.columns;
+        const rowLength = tileRow.length;
+        const tileCount = Math.floor(columns / 2) + (((columns % 2) * i) % 2);
+        const needsUpdate = rowLength != 0 && rowLength != tileCount;
+
         if (rowLength < tileCount) {
-          for (let t = rowLength; t < tileCount; t++) {
-            const tile = {
-              number: ++this.hexNumber,
-              color: this.getRandomColor(),
-              resources: {
-                stone: this.getResource(),
-                wood: this.getResource(),
-                wheat: this.getResource(),
-              },
-            };
-            tileRow.push(tile);
-          }
+          tileRow = this.buildHexRow(tileRow, i);
         } else if (rowLength > tileCount) {
           for (let t = rowLength; t > tileCount; t--) {
-            tileRow.pop()
+            tileRow.pop();
           }
         }
 
         const index = Math.floor(i / 2);
 
         i % 2 == 0 ? (rowsOdd[index] = tileRow) : (rowsEven[index] = tileRow);
-        needsUpdate && this.updateTileNumbers()
+        needsUpdate && this.updateTileNumbers({ updateAll: false });
       }
-
-      localStorage.setItem(
-        "hexRows",
-        JSON.stringify({ rowsOdd, rowsEven, stashRowsOdd, stashRowsEven })
-      );
     },
     removeHexColumns(difference, oldColumnTotal) {
       const { rowsOdd, rowsEven } = this.hexes;
@@ -192,11 +177,6 @@ export default {
           ? stashRowsOdd.push(rowsOdd.pop())
           : stashRowsEven.push(rowsEven.pop());
       }
-
-      localStorage.setItem(
-        "hexRows",
-        JSON.stringify({ rowsOdd, rowsEven, stashRowsOdd, stashRowsEven })
-      );
     },
     reset() {
       localStorage.removeItem("hexRows");
@@ -205,29 +185,38 @@ export default {
       // localStorage.removeItem("villageDistance");
       window.location.reload();
     },
-    updateTileNumbers() {
+    updateLocalStorage() {
       const { rows, columns } = this;
       const { rowsOdd, rowsEven, stashRowsOdd, stashRowsEven } = this.hexes;
 
-      const hexTotal = Math.floor((rows * columns) / 2);
-      let hexNumber = hexTotal
+      localStorage.setItem("rowCount", rows);
+      localStorage.setItem("columnCount", columns);
+      localStorage.setItem(
+        "hexRows",
+        JSON.stringify({ rowsOdd, rowsEven, stashRowsOdd, stashRowsEven })
+      );
+    },
+    updateTileNumbers({ updateAll }) {
+      const { rows, columns } = this;
+      const { rowsOdd, rowsEven } = this.hexes;
 
-      for (let i = rows; i > 0; i--) {
-        const index = Math.floor((i - 1) / 2);
-        const hexRows = i % 2 == 1 ? rowsOdd : rowsEven;
+      const hexTotal = Math.floor((rows * columns) / 2);
+      let hexNumber = hexTotal;
+      let targetRow = rows;
+
+      do {
+        const index = Math.floor((targetRow - 1) / 2);
+        const hexRows = targetRow % 2 == 1 ? rowsOdd : rowsEven;
 
         hexRows[index].reverse().map((tile) => {
           tile.number = hexNumber--;
         });
         hexRows[index].reverse();
-      }
 
-      this.hexNumber = hexTotal
+        targetRow--;
+      } while (targetRow > 0 && updateAll);
 
-      localStorage.setItem(
-        "hexRows",
-        JSON.stringify({ rowsOdd, rowsEven, stashRowsOdd, stashRowsEven })
-      );
+      this.hexNumber = hexTotal;
     },
   },
   watch: {
@@ -242,7 +231,7 @@ export default {
         this.removeHexRows(difference, oldValue);
       }
 
-      localStorage.setItem("rowCount", newValue.toString());
+      this.updateLocalStorage();
     },
     columns(newValue, oldValue) {
       if (oldValue == 0 || oldValue == null) return;
@@ -250,17 +239,17 @@ export default {
       const difference = Math.abs(newValue - oldValue);
 
       if (newValue > oldValue) {
-        this.addHexColumns(difference, oldValue);
+        this.addHexColumns();
       } else {
         this.removeHexColumns(difference, oldValue);
       }
 
-      this.updateTileNumbers();
-      localStorage.setItem("columnCount", newValue.toString());
+      this.updateTileNumbers({ updateAll: true });
+      this.updateLocalStorage();
     },
-    villageDistance(newValue) {
-      localStorage.setItem("villageDistance", newValue.toString());
-    },
+    // villageDistance(newValue) {
+    //   localStorage.setItem("villageDistance", newValue.toString());
+    // },
     // rows(newValue, oldValue) {
     //   if (this.villageDistance > this.villageDistanceMaximum)
     //     this.villageDistance = this.villageDistanceMaximum;
@@ -284,6 +273,8 @@ export default {
     } else {
       this.addHexRows(this.rows, 0);
     }
+
+    this.updateLocalStorage();
   },
 };
 </script>
