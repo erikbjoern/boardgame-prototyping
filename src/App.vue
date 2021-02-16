@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div style="margin: 5px 15vw">
+  <div class="main-container">
+    <div class="input-bar">
       <label htmlFor="rows">Rader</label>
       <input id="rows" type="number" min="9" max="23" v-model="rows" />
       <label htmlFor="columns">Kolumner</label>
@@ -61,6 +61,7 @@ export default {
         stashRowsOdd: [],
         stashRowsEven: [],
       },
+      hexNumber: 0,
       // villageDistance: null, //sätts i created()
     };
   },
@@ -93,15 +94,11 @@ export default {
         ? Math.ceil(Math.random() * range)
         : 0;
     },
-    randomColor() {
+    getRandomColor() {
       return this.colors[Math.floor(Math.random() * this.colors.length)];
     },
     addHexColumns(difference, oldColumnTotal) {
       const { rowsOdd, rowsEven, stashRowsOdd, stashRowsEven } = this.hexes;
-      const previouslyHighestHexNumber = Math.floor(
-        (oldColumnTotal / 2) * this.rows
-      );
-      let hexNumber = previouslyHighestHexNumber + 1;
 
       for (let i = 0; i < this.rows; i++) {
         const tileCount =
@@ -110,10 +107,10 @@ export default {
         const index = Math.floor(i / 2);
         const tileRow = i % 2 == 0 ? rowsOdd[index] : rowsEven[index];
 
-        for (let t = 0; t < tileCount; t++, hexNumber++) {
+        for (let t = 0; t < tileCount; t++) {
           const tile = {
-            number: hexNumber,
-            color: this.randomColor(),
+            number: ++this.hexNumber,
+            color: this.getRandomColor(),
             resources: {
               stone: this.getResource(),
               wood: this.getResource(),
@@ -133,10 +130,6 @@ export default {
       const { rowsOdd, rowsEven, stashRowsOdd, stashRowsEven } = this.hexes;
       const columns = this.columns;
       const newRowTotal = oldRowTotal + difference;
-      const previouslyHighestHexNumber = Math.floor(
-        (oldRowTotal * columns) / 2
-      );
-      let hexNumber = previouslyHighestHexNumber + 1;
 
       for (let i = oldRowTotal; i < newRowTotal; i++) {
         let tileRow = [];
@@ -147,10 +140,10 @@ export default {
         } else if (i % 2 == 1 && stashRowsEven.length) {
           tileRow = stashRowsEven.pop();
         } else {
-          for (let t = 0; t < tileCount; t++, hexNumber++) {
+          for (let t = 0; t < tileCount; t++) {
             const tile = {
-              number: hexNumber,
-              color: this.randomColor(),
+              number: ++this.hexNumber,
+              color: this.getRandomColor(),
               resources: {
                 stone: this.getResource(),
                 wood: this.getResource(),
@@ -170,6 +163,15 @@ export default {
         "hexRows",
         JSON.stringify({ rowsOdd, rowsEven, stashRowsOdd, stashRowsEven })
       );
+    },
+    removeHexColumns(difference, oldColumnTotal) {
+      const { rowsOdd, rowsEven } = this.hexes;
+
+      for (let i = 0; i < Math.ceil(difference / 2); i++) {
+        (i + oldColumnTotal) % 2 == 0
+          ? rowsOdd.forEach((a) => a.pop())
+          : rowsEven.forEach((a) => a.pop());
+      }
     },
     removeHexRows(difference, oldRowTotal) {
       const m = oldRowTotal % 2;
@@ -193,6 +195,30 @@ export default {
       // localStorage.removeItem("villageDistance");
       window.location.reload();
     },
+    updateTileNumbers() {
+      const { rows, columns } = this;
+      const { rowsOdd, rowsEven, stashRowsOdd, stashRowsEven } = this.hexes;
+
+      const hexTotal = Math.floor((rows * columns) / 2);
+      let hexNumber = hexTotal
+
+      for (let i = rows; i > 0; i--) {
+        const index = Math.floor((i - 1) / 2);
+        const hexRows = i % 2 == 1 ? rowsOdd : rowsEven;
+
+        hexRows[index].reverse().map((tile) => {
+          tile.number = hexNumber--;
+        });
+        hexRows[index].reverse();
+      }
+
+      this.hexNumber = hexTotal
+
+      localStorage.setItem(
+        "hexRows",
+        JSON.stringify({ rowsOdd, rowsEven, stashRowsOdd, stashRowsEven })
+      );
+    },
   },
   watch: {
     rows(newValue, oldValue) {
@@ -215,8 +241,11 @@ export default {
 
       if (newValue > oldValue) {
         this.addHexColumns(difference, oldValue);
+      } else {
+        this.removeHexColumns(difference, oldValue);
       }
 
+      this.updateTileNumbers();
       localStorage.setItem("columnCount", newValue.toString());
     },
     villageDistance(newValue) {
@@ -250,10 +279,21 @@ export default {
 </script>
 
 <style lang="scss">
+.main-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.input-bar {
+  margin: 10px auto -40px;
+}
+
 .grid-container {
   position: relative;
+  height: min-content;
   width: min-content;
-  margin: 0 auto;
+  margin: auto;
 }
 
 .even-rows-grid,
