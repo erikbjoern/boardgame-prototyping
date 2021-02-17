@@ -1,33 +1,59 @@
 <template>
-  <div class="main-container">
+  <div>
     <div class="input-bar">
-      <label htmlFor="rows">Rader</label>
-      <input id="rows" type="number" min="1" max="23" v-model="rows" />
-      <label htmlFor="columns">Kolumner</label>
-      <input id="columns" type="number" min="1" max="30" v-model="columns" />
-      <label htmlFor="tile-size">Storlek</label>
-      <input id="tile-size" type="number" min="1" max="50" v-model="tileSize" />
-      <label htmlFor="gap">Mellanrum</label>
-      <input id="gap" type="number" min="0" max="10" v-model="gap" />
+      <div>
+        <label>Rader</label>
+        <div class="input-buttons">
+          <div @click="rows < 23 && (rows += 1)" :class="{disabled: rows == 23}"><span>+</span></div>
+          <div @click="rows > 3 && (rows -= 1)" :class="{disabled: rows == 3}"><span>−</span></div>
+        </div>
+        <input readonly type="number" min="3" max="23" v-model="rows" />
+      </div>
+      <div>
+        <label>Kolumner</label>
+        <div class="input-buttons">
+          <div @click="columns < 23 && (columns += 1)" :class="{disabled: columns == 23}"><span>+</span></div>
+          <div @click="columns > 3 && (columns -= 1)" :class="{disabled: columns == 3}"><span>−</span></div>
+        </div>
+        <input readonly type="number" min="3" max="30" v-model="columns" />
+      </div>
+      <div>
+        <label htmlFor="tile-size">Storlek</label>
+        <input
+          id="tile-size"
+          type="range"
+          min="5"
+          max="50"
+          v-model.number="tileSize"
+        />
+      </div>
+      <div>
+        <label htmlFor="gap">Mellanrum</label>
+        <input id="gap" type="range" min="0" max="20" v-model.number="gap" />
+      </div>
+      <div>
+        <label htmlFor="border">Bård</label>
+        <input id="border" type="range" min="0" max="20" v-model.number="borderWidth" />
+      </div>
       <!-- <label htmlFor="distance">Distans</label>
       <input
         id="distance"
         type="number"
         min="1"
         :max="villageDistanceMaximum"
-        v-model="villageDistance"
+        v-model.number="villageDistance"
       /> -->
       <button @click="reset">Reset</button>
     </div>
     <div class="grid-container">
       <div :style="{ ...gridRowsClass, ...gridRowsOddClass }">
         <div v-for="hex in hexes.rowsOdd.flat()" :key="hex.number">
-          <ResourceTile :hex="hex" />
+          <ResourceTile :hex="hex" :size="tileSize" :borderWidth="borderWidth" />
         </div>
       </div>
       <div :style="{ ...gridRowsClass, ...gridRowsEvenClass }">
         <div v-for="hex in hexes.rowsEven.flat()" :key="hex.number">
-          <ResourceTile :hex="hex" />
+          <ResourceTile :hex="hex" :size="tileSize" :borderWidth="borderWidth" />
         </div>
       </div>
     </div>
@@ -47,8 +73,9 @@ export default {
     return {
       tileSize: 13,
       gap: 4,
-      columnCount: null,
-      rowCount: null,
+      borderWidth: 4,
+      columns: null,
+      rows: null,
       colors: colors,
       hexes: {
         rowsOdd: [],
@@ -76,29 +103,12 @@ export default {
     },
     gridRowsEvenClass() {
       return {
-        "grid-template-columns": `repeat(${Math.ceil(
-          this.columns / 2
-        )}, ${this.tileSize * 0.45}vw)`,
+        "grid-template-columns": `repeat(${Math.ceil(this.columns / 2)}, ${this
+          .tileSize * 0.45}vw)`,
         position: "absolute",
         top: `${this.tileSize * 0.15 + this.gap / 20}vw`,
-        left: `${- this.tileSize * 0.225 - this.gap / 20 }vw`,
+        left: `${-this.tileSize * 0.225 - this.gap / 20}vw`,
       };
-    },
-    columns: {
-      get() {
-        return this.columnCount;
-      },
-      set(value) {
-        this.columnCount = parseInt(value);
-      },
-    },
-    rows: {
-      get() {
-        return this.rowCount;
-      },
-      set(value) {
-        this.rowCount = parseInt(value);
-      },
     },
     villageDistanceMaximum() {
       return Math.ceil(this.rows / 4 - 1);
@@ -200,16 +210,17 @@ export default {
       localStorage.removeItem("hexRows");
       localStorage.removeItem("rowCount");
       localStorage.removeItem("columnCount");
+      localStorage.removeItem("style");
       // localStorage.removeItem("villageDistance");
       window.location.reload();
     },
     updateLocalStorage() {
-      const { rows, columns, tileSize, gap } = this;
+      const { rows, columns, tileSize, gap, borderWidth } = this;
       const { rowsOdd, rowsEven, stashRowsOdd, stashRowsEven } = this.hexes;
 
       localStorage.setItem("rowCount", rows);
       localStorage.setItem("columnCount", columns);
-      localStorage.setItem("style", JSON.stringify({ tileSize, gap }))
+      localStorage.setItem("style", JSON.stringify({ tileSize, gap, borderWidth }));
       localStorage.setItem(
         "hexRows",
         JSON.stringify({ rowsOdd, rowsEven, stashRowsOdd, stashRowsEven })
@@ -266,8 +277,9 @@ export default {
       this.updateTileNumbers({ updateAll: true });
       this.updateLocalStorage();
     },
-    tileSize: 'updateLocalStorage',
-    gap: 'updateLocalStorage',
+    tileSize: "updateLocalStorage",
+    gap: "updateLocalStorage",
+    borderWidth: "updateLocalStorage",
     // villageDistance(newValue) {
     //   localStorage.setItem("villageDistance", newValue.toString());
     // },
@@ -287,13 +299,13 @@ export default {
     const savedStyle = JSON.parse(localStorage.getItem("style"));
 
     // this.villageDistance = savedVillageDistance || 2;
-    this.rows = savedRowCount || 17;
+    this.rows = savedRowCount || 13;
     this.columns = savedColumnCount || 13;
+    this.tileSize = savedStyle?.tileSize || 20;
+    this.gap = savedStyle?.gap || 0;
+    this.borderWidth = savedStyle?.borderWidth || 6
 
-    savedStyle && (this.tileSize = savedStyle.tileSize, this.gap = savedStyle.gap)
-    savedHexRows
-      ? this.hexes = savedHexRows
-      : this.addHexRows(this.rows, 0);
+    savedHexRows ? (this.hexes = savedHexRows) : this.addHexRows(this.rows, 0);
 
     this.updateLocalStorage();
   },
@@ -301,31 +313,105 @@ export default {
 </script>
 
 <style lang="scss">
-.main-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+body {
+  background-color: #efefef;
+  margin: 0;
+  padding: calc(3vw + 30px) 8vw 8vw;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .input-bar {
-  margin: 10px auto -40px;
-  z-index: 10;
+  background-color: #efefef55;
+  border-radius: 5px;
+  display: inline-flex;
+  font-family: -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu,
+    Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  gap: 10px;
+  left: 50%;
+  padding: 0.5vw;
+  position: fixed;
+  top: 1vw;
+  transform: translateX(-50%);
+  z-index: 1000;
+
+  & > div {
+    align-items: center;
+    background-color: #aaaaaa55;
+    border-radius: 3px;
+    display: inline-flex;
+    gap: 5px;
+    padding: 3px;
+  }
+}
+
+.input-buttons {
+  display: inline-flex;
+  gap: 2px;
+
+  & > div {
+    background-color: #eeeeee;
+    border-radius: 4px;
+    border: outset;
+    cursor: pointer;
+    height: .8em;
+    padding: 0 2px;
+    user-select: none;
+
+    & > span {
+      bottom: .2em;
+      position: relative;
+    }
+
+    &:hover {
+    background-color: #ffffffff;
+    }
+
+    &:active {
+      border: inset;
+    }
+
+    &.disabled {
+      opacity: .6;
+      pointer-events: none;
+    }
+  }
 }
 
 .grid-container {
   position: relative;
-  height: min-content;
   width: min-content;
-  margin: auto;
+  margin: 0 auto;
 }
 
-body {
-  background-color: #ddd;
-  margin: 0;
+input,
+button {
+  background-color: #eef1ef;
+  border-radius: 3px;
+  border: 1px solid #999;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
-input {
-  width: 30px;
-  margin: 0 5px;
+button:hover {
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+input[type="range"]:not(#tile-size) {
+  width: 60px;
+}
+
+input[type="number"] {
+  width: 20px;
+  text-align: center;
+
+  &::-webkit-inner-spin-button {
+    display: none;
+  }
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
 </style>

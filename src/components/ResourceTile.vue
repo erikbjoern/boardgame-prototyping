@@ -1,22 +1,29 @@
 <template>
-<div class="hex-grid__item"> 
-  <div class="hex-grid__content" :style="`background-color: ${hex.color}9a`">
-    <span>{{ hex.number }}</span>
-    <div class="resourceContainer">
-      <div v-if="hex.resources.wood > 0" class="resourceItem wood">
-        <WoodIcon />
-        <span>{{ hex.resources.wood }}</span>
-      </div>
-      <div v-if="hex.resources.stone > 0" class="resourceItem stone">
-        <StoneIcon />
-        <span>{{ hex.resources.stone }}</span>
-      </div>
-      <div v-if="hex.resources.wheat > 0" class="resourceItem wheat">
-        <WheatIcon />
-        <span>{{ hex.resources.wheat }}</span>
+  <div class="hex-grid__item" :style="`z-index: ${hex.number}`">
+    <div class="hex-grid-item__background">
+      <div class="hex-grid__content" :style="hexGridItemContent">
+        <span :style="{ position: 'relative', bottom: `${0.01 * size}vw` }">{{
+          hex.number
+        }}</span>
+        <div
+          class="resourceContainer"
+          :style="{ fontSize: `${0.03 * size }vw`, gap: `${0.3 * size}px` }"
+        >
+          <div v-if="hex.resources.wood > 0" class="resourceItem wood">
+            <WoodIcon v-if="size > 19" />
+            <span>{{ hex.resources.wood }}</span>
+          </div>
+          <div v-if="hex.resources.stone > 0" class="resourceItem stone">
+            <StoneIcon v-if="size > 19" />
+            <span>{{ hex.resources.stone }}</span>
+          </div>
+          <div v-if="hex.resources.wheat > 0" class="resourceItem wheat">
+            <WheatIcon v-if="size > 19" />
+            <span>{{ hex.resources.wheat }}</span>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -32,7 +39,30 @@ export default {
     StoneIcon,
     WheatIcon,
   },
-  props: ['hex']
+  computed: {
+    hexGridItemContent() {
+      return {
+        "background-color": `${this.hex.color}9a`,
+        fontSize: `${0.02 * this.size}vw`,
+        height: `${100 - this.borderWidth}%`,
+        width: `${100 - this.borderWidth}%`,
+      };
+    },
+  },
+  props: {
+    hex: {
+      color: String,
+      number: Number,
+      resources: {
+        stone: Number,
+        wood: Number,
+        wheat: Number,
+      },
+      required: true,
+    },
+    size: Number,
+    borderWidth: Number,
+  },
 };
 </script>
 
@@ -57,18 +87,18 @@ svg path:last-child {
 }
 
 svg {
-  width: 0.75vw !important;
-  height: 0.75vw !important;
+  width: inherit !important;
+  height: inherit !important;
 }
 
 .resourceContainer {
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.1vw;
-  height: 70%;
+  align-content: flex-start;
+  height: 75%;
   width: 66%;
-  font-size: 1vw;
 }
 
 .resourceItem {
@@ -82,13 +112,22 @@ svg {
   box-shadow: 0.5px 0.5px 2px #44444499;
 }
 
-
 .hex-grid__item {
   position: relative;
   height: 100%;
   width: percentage($number: 2/3);
   margin: 0 auto;
-  filter: drop-shadow(1px 1px 2px rgba(50, 50, 0, 0.5));
+  filter: drop-shadow(2px 2px 5px rgba(22, 22, 22, 0.2));
+}
+
+.hex-grid-item__background {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #efefef;
+  height: 100%;
+  width: 100%;
+  clip-path: polygon(75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%, 25% 0);
 }
 
 .hex-grid__content {
@@ -98,18 +137,7 @@ svg {
   flex-direction: column;
   justify-content: center;
   display: flex;
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 100%;
+  font-size: 0.7vw;
   clip-path: polygon(75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%, 25% 0);
-  font-size: .7vw;
 }
-
-.hex-grid__content > * {
-  position: relative;
-  bottom: .2vw;
-}
-
 </style>
