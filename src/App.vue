@@ -4,16 +4,36 @@
       <div>
         <label>Rader</label>
         <div class="input-buttons">
-          <div @click="rows < 23 && (rows += 1)" :class="{disabled: rows == 23}"><span>+</span></div>
-          <div @click="rows > 3 && (rows -= 1)" :class="{disabled: rows == 3}"><span>−</span></div>
+          <div
+            @click="rows < 23 && (rows += 1)"
+            :class="{ disabled: rows == 23 }"
+          >
+            <span>+</span>
+          </div>
+          <div
+            @click="rows > 3 && (rows -= 1)"
+            :class="{ disabled: rows == 3 }"
+          >
+            <span>−</span>
+          </div>
         </div>
         <input readonly type="number" min="3" max="23" v-model="rows" />
       </div>
       <div>
         <label>Kolumner</label>
         <div class="input-buttons">
-          <div @click="columns < 23 && (columns += 1)" :class="{disabled: columns == 23}"><span>+</span></div>
-          <div @click="columns > 3 && (columns -= 1)" :class="{disabled: columns == 3}"><span>−</span></div>
+          <div
+            @click="columns < 23 && (columns += 1)"
+            :class="{ disabled: columns == 23 }"
+          >
+            <span>+</span>
+          </div>
+          <div
+            @click="columns > 3 && (columns -= 1)"
+            :class="{ disabled: columns == 3 }"
+          >
+            <span>−</span>
+          </div>
         </div>
         <input readonly type="number" min="3" max="30" v-model="columns" />
       </div>
@@ -33,7 +53,13 @@
       </div>
       <div>
         <label htmlFor="border">Bård</label>
-        <input id="border" type="range" min="0" max="20" v-model.number="borderWidth" />
+        <input
+          id="border"
+          type="range"
+          min="0"
+          max="20"
+          v-model.number="borderWidth"
+        />
       </div>
       <!-- <label htmlFor="distance">Distans</label>
       <input
@@ -45,15 +71,25 @@
       /> -->
       <button @click="reset">Reset</button>
     </div>
-    <div class="grid-container">
-      <div :style="{ ...gridRowsClass, ...gridRowsOddClass }">
-        <div v-for="hex in hexes.rowsOdd.flat()" :key="hex.number">
-          <ResourceTile :hex="hex" :size="tileSize" :borderWidth="borderWidth" />
+    <div class="mainContainer" ref="mainContainer">
+      <div class="grid-container">
+        <div :style="{ ...gridRowsClass, ...gridRowsOddClass }">
+          <div v-for="hex in hexes.rowsOdd.flat()" :key="hex.number">
+            <ResourceTile
+              :hex="hex"
+              :size="tileSize"
+              :borderWidth="borderWidth"
+            />
+          </div>
         </div>
-      </div>
-      <div :style="{ ...gridRowsClass, ...gridRowsEvenClass }">
-        <div v-for="hex in hexes.rowsEven.flat()" :key="hex.number">
-          <ResourceTile :hex="hex" :size="tileSize" :borderWidth="borderWidth" />
+        <div :style="{ ...gridRowsClass, ...gridRowsEvenClass }">
+          <div v-for="hex in hexes.rowsEven.flat()" :key="hex.number">
+            <ResourceTile
+              :hex="hex"
+              :size="tileSize"
+              :borderWidth="borderWidth"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -62,7 +98,9 @@
 
 <script>
 import { colors } from "@/helpers/colors";
-import ResourceTile from "./components/ResourceTile.vue";
+import ResourceTile from "@/components/ResourceTile.vue";
+import { scrollToCenter } from "@/helpers/scroll.js";
+import { dragToScrollStart, dragToScroll } from "@/helpers/scroll.js";
 
 export default {
   name: "App",
@@ -71,9 +109,9 @@ export default {
   },
   data() {
     return {
-      tileSize: 13,
-      gap: 4,
-      borderWidth: 4,
+      tileSize: null,
+      gap: null,
+      borderWidth: null,
       columns: null,
       rows: null,
       colors: colors,
@@ -84,6 +122,7 @@ export default {
         stashRowsEven: [],
       },
       hexNumber: 0,
+      mousePosition: { x: 0, y: 0 },
       // villageDistance: null, //sätts i created()
     };
   },
@@ -115,6 +154,24 @@ export default {
     },
   },
   methods: {
+    scrollToCenter,
+    dragToScrollStart,
+    dragToScroll,
+    mouseMoveHandler(e) {
+      this.dragToScroll.bind(this)(e);
+    },
+    mouseUpHandler() {
+      this.$refs.mainContainer.style.cursor = "grab";
+
+      document.removeEventListener("mousemove", this.mouseMoveHandler);
+      document.removeEventListener("mouseup", this.mouseUpHandler);
+    },
+    mouseDownHandler(e) {
+      this.dragToScrollStart.bind(this)(e);
+
+      document.addEventListener("mousemove", this.mouseMoveHandler);
+      document.addEventListener("mouseup", this.mouseUpHandler);
+    },
     getResource() {
       const chance = 25;
       const range = 9;
@@ -217,14 +274,13 @@ export default {
     updateLocalStorage() {
       const { rows, columns, tileSize, gap, borderWidth } = this;
       const { rowsOdd, rowsEven, stashRowsOdd, stashRowsEven } = this.hexes;
+      const style = { tileSize, gap, borderWidth };
+      const hexRows = { rowsOdd, rowsEven, stashRowsOdd, stashRowsEven };
 
       localStorage.setItem("rowCount", rows);
       localStorage.setItem("columnCount", columns);
-      localStorage.setItem("style", JSON.stringify({ tileSize, gap, borderWidth }));
-      localStorage.setItem(
-        "hexRows",
-        JSON.stringify({ rowsOdd, rowsEven, stashRowsOdd, stashRowsEven })
-      );
+      localStorage.setItem("style", JSON.stringify(style));
+      localStorage.setItem("hexRows", JSON.stringify(hexRows));
     },
     updateTileNumbers({ updateAll }) {
       const { rows, columns } = this;
@@ -303,22 +359,40 @@ export default {
     this.columns = savedColumnCount || 13;
     this.tileSize = savedStyle?.tileSize || 20;
     this.gap = savedStyle?.gap || 0;
-    this.borderWidth = savedStyle?.borderWidth || 6
+    this.borderWidth = savedStyle?.borderWidth || 6;
 
     savedHexRows ? (this.hexes = savedHexRows) : this.addHexRows(this.rows, 0);
 
     this.updateLocalStorage();
+    this.scrollToCenter();
+
+    window.addEventListener("resize", this.scrollToCenter);
+  },
+  mounted() {
+    const mainContainer = this.$refs.mainContainer;
+    mainContainer.addEventListener("mousedown", this.mouseDownHandler);
+  },
+  destroyed() {
+    document.removeEventListener("mousedown", this.mouseDownHandler);
+    document.removeEventListener("mousemove", this.mouseMoveHandler);
+    document.removeEventListener("mouseup", this.mouseUpHandler);
   },
 };
 </script>
 
 <style lang="scss">
 body {
-  background-color: #efefef;
   margin: 0;
-  padding: calc(3vw + 30px) 0 8vw;
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+.mainContainer {
+  cursor: grab;
+  background-color: #efefef;
+  height: 200vh;
+  width: 200vw;
+  padding: calc(3vw + 30px) 0;
 }
 
 .input-bar {
@@ -354,17 +428,17 @@ body {
     border-radius: 4px;
     border: outset;
     cursor: pointer;
-    height: .8em;
+    height: 0.8em;
     padding: 0 2px;
     user-select: none;
 
     & > span {
-      bottom: .2em;
+      bottom: 0.2em;
       position: relative;
     }
 
     &:hover {
-    background-color: #ffffffff;
+      background-color: #ffffffff;
     }
 
     &:active {
@@ -372,7 +446,7 @@ body {
     }
 
     &.disabled {
-      opacity: .6;
+      opacity: 0.6;
       pointer-events: none;
     }
   }
@@ -381,7 +455,8 @@ body {
 .grid-container {
   position: relative;
   width: min-content;
-  margin: 0 auto;
+  margin: 50vh auto;
+  padding-bottom: 10vh;
 }
 
 input,
