@@ -316,7 +316,7 @@ export default {
 body {
   background-color: #efefef;
   margin: 0;
-  padding: calc(3vw + 30px) 8vw 8vw;
+  padding: calc(3vw + 30px) 0 8vw;
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
