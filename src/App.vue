@@ -167,6 +167,7 @@ export default {
       document.removeEventListener("mouseup", this.mouseUpHandler);
     },
     mouseDownHandler(e) {
+      if (e.button !== 0 || e.which !== 1) return
       this.dragToScrollStart.bind(this)(e);
 
       document.addEventListener("mousemove", this.mouseMoveHandler);
