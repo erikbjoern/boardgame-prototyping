@@ -67,7 +67,7 @@ export default {
   computed: {
     tileSize: {
       get() {
-        return this.$store.state.tileSize;
+        return this.$store.state.style.tileSize;
       },
       set(value) {
         this.$store.commit("setTileSize", value);
@@ -75,7 +75,7 @@ export default {
     },
     gap: {
       get() {
-        return this.$store.state.gap;
+        return this.$store.state.style.gap;
       },
       set(value) {
         this.$store.commit("setGap", value);
@@ -83,7 +83,7 @@ export default {
     },
     borderWidth: {
       get() {
-        return this.$store.state.borderWidth;
+        return this.$store.state.style.borderWidth;
       },
       set(value) {
         this.$store.commit("setBorderWidth", value);

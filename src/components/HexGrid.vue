@@ -2,18 +2,19 @@
   <div class="grid-container">
     <div :style="{ ...gridRowsStyle, ...gridRowsOddStyle }">
       <div v-for="hex in hexRows.rowsOdd.flat()" :key="hex.number">
-        <HexGridTile :hex="hex" :size="tileSize" :borderWidth="borderWidth" />
+        <HexGridTile :hex="hex" />
       </div>
     </div>
     <div :style="{ ...gridRowsStyle, ...gridRowsEvenStyle }">
       <div v-for="hex in hexRows.rowsEven.flat()" :key="hex.number">
-        <HexGridTile :hex="hex" :size="tileSize" :borderWidth="borderWidth" />
+        <HexGridTile :hex="hex" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapState } from "vuex";
 import { colors } from "@/helpers/colors";
 import HexGridTile from "@/components/HexGridTile.vue";
 
@@ -32,48 +33,39 @@ export default {
     gridRowsStyle() {
       return {
         display: "grid",
-        "grid-auto-rows": `${this.tileSize * 0.3}vw`,
+        gridAutoRows: `${this.tileSize * 0.3}vw`,
         gap: `${this.gap / 10}vw`,
       };
     },
     gridRowsOddStyle() {
       return {
-        "grid-template-columns": `repeat(${Math.ceil(this.columns / 2) -
+        gridTemplateColumns: `repeat(${Math.ceil(this.columns / 2) -
           (this.columns % 2)}, ${this.tileSize * 0.45}vw)`,
       };
     },
     gridRowsEvenStyle() {
       return {
-        "grid-template-columns": `repeat(${Math.ceil(this.columns / 2)}, ${this
-          .tileSize * 0.45}vw)`,
+        gridTemplateColumns: `repeat(${Math.ceil(this.columns / 2)}, 
+          ${this.tileSize * 0.45}vw)`,
         position: "absolute",
         top: `${this.tileSize * 0.15 + this.gap / 20}vw`,
         left: `${-this.tileSize * 0.225 - this.gap / 20}vw`,
       };
     },
-    tileSize() {
-      return this.$store.state.tileSize;
-    },
-    gap() {
-      return this.$store.state.gap;
-    },
-    borderWidth() {
-      return this.$store.state.borderWidth;
-    },
-    columns() {
-      return this.$store.state.columns;
-    },
-    rows() {
-      return this.$store.state.rows;
-    },
+    ...mapState({
+      tileSize: state => state.style.tileSize,
+      gap: state => state.style.gap,
+      rows: state => state.rows,
+      columns: state => state.columns,
+    }),
     hexRows: {
       get() {
-        return this.$store.state.hexRows
+        return this.$store.state.hexRows;
       },
       set(value) {
-        this.$store.commit('setHexRows', value)
+        this.$store.commit("setHexRows", value);
       },
-    }
+    },
   },
   methods: {
     getResource() {
@@ -145,7 +137,7 @@ export default {
         const index = Math.floor(i / 2);
 
         i % 2 == 0 ? (rowsOdd[index] = tileRow) : (rowsEven[index] = tileRow);
-        this.hexRows = { ...this.hexRows }
+        this.hexRows = { ...this.hexRows };
         needsUpdate && this.updateTileNumbers({ updateAll: false });
       }
     },
@@ -218,9 +210,9 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('setStateFromLocalStorage')
+    this.$store.dispatch("setStateFromLocalStorage");
 
-    !this.hexRows.rowsOdd.length && (this.addHexRows(this.rows, 0))
+    !this.hexRows.rowsOdd.length && this.addHexRows(this.rows, 0);
   },
 };
 </script>

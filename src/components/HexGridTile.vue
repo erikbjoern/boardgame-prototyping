@@ -1,7 +1,7 @@
 <template>
-  <div class="hex-grid__item" :style="`z-index: ${hex.number}`">
+  <div class="hex-grid__item" :style="{zIndex: hex.number}">
     <div class="hex-grid-item__background">
-      <div class="hex-grid__content" :style="hexGridItemContent">
+      <div class="hex-grid-item__content" :style="tileContentStyle">
         <span :style="{ position: 'relative', bottom: `${0.01 * size}vw` }">{{
           hex.number
         }}</span>
@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex"
 import WoodIcon from "@/assets/icons/log.svg";
 import StoneIcon from "@/assets/icons/stone-block.svg";
 import WheatIcon from "@/assets/icons/wheat.svg";
@@ -40,9 +41,13 @@ export default {
     WheatIcon,
   },
   computed: {
-    hexGridItemContent() {
+    ...mapState({
+      size: state => state.style.tileSize,
+      borderWidth: state => state.style.borderWidth
+    }),
+    tileContentStyle() {
       return {
-        "background-color": `${this.hex.color}9a`,
+        backgroundColor: `${this.hex.color}9a`,
         fontSize: `${0.02 * this.size}vw`,
         height: `${100 - this.borderWidth}%`,
         width: `${100 - this.borderWidth}%`,
@@ -60,8 +65,6 @@ export default {
       },
       required: true,
     },
-    size: Number,
-    borderWidth: Number,
   },
 };
 </script>
@@ -130,7 +133,7 @@ svg {
   clip-path: polygon(75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%, 25% 0);
 }
 
-.hex-grid__content {
+.hex-grid-item__content {
   align-items: center;
   color: rgba(255, 255, 255, 0.6);
   display: flex;

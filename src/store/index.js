@@ -5,9 +5,11 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
   state: {
-    tileSize: 20,
-    gap: 0,
-    borderWidth: 6,
+    style: {
+      tileSize: 20,
+      gap: 0,
+      borderWidth: 6,
+    },
     columns: 13,
     rows: 13,
     hexRows: {
@@ -19,13 +21,13 @@ const store = new Vuex.Store({
   },
   mutations: {
     setTileSize(state, payload) {
-      state.tileSize = payload;
+      state.style.tileSize = payload;
     },
     setGap(state, payload) {
-      state.gap = payload;
+      state.style.gap = payload;
     },
     setBorderWidth(state, payload) {
-      state.borderWidth = payload;
+      state.style.borderWidth = payload;
     },
     setColumns(state, payload) {
       state.columns = payload;
@@ -44,30 +46,20 @@ const store = new Vuex.Store({
       const savedColumnCount = parseInt(localStorage.getItem("columnCount"));
       const savedHexRows = JSON.parse(localStorage.getItem("hexRows"));
 
-      const tileSize = savedStyle?.tileSize || context.state.tileSize;
-      const gap = savedStyle?.gap || context.state.gap;
-      const borderWidth = savedStyle?.borderWidth || context.state.borderWidth;
+      const style = savedStyle || context.state.style;
       const rows = savedRowCount || context.state.rows;
       const columns = savedColumnCount || context.state.columns;
       const hexRows = savedHexRows || context.state.hexRows;
 
-      context.commit("setTileSize", tileSize)
-      context.commit("setGap", gap)
-      context.commit("setBorderWidth", borderWidth)
-      context.commit("setRows", rows)
-      context.commit("setColumns", columns)
-      context.commit("setHexRows", hexRows)
+      context.commit("setTileSize", style.tileSize);
+      context.commit("setGap", style.gap);
+      context.commit("setBorderWidth", style.borderWidth);
+      context.commit("setRows", rows);
+      context.commit("setColumns", columns);
+      context.commit("setHexRows", hexRows);
     },
     updateLocalStorage(context) {
-      const {
-        tileSize,
-        gap,
-        borderWidth,
-        rows,
-        columns,
-        hexRows,
-      } = context.state;
-      const style = { tileSize, gap, borderWidth };
+      const { style, rows, columns, hexRows } = context.state;
 
       localStorage.setItem("style", JSON.stringify(style));
       localStorage.setItem("rowCount", rows);
@@ -85,8 +77,11 @@ const store = new Vuex.Store({
   modules: {},
 });
 
-store.watch((state) => ({ ...state }), () => {
-  store.dispatch('updateLocalStorage')
-})
+store.watch(
+  (state) => ({ ...state }),
+  () => {
+    store.dispatch("updateLocalStorage");
+  }
+);
 
-export default store
+export default store;
