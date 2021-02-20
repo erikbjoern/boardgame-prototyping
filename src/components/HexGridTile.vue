@@ -1,24 +1,22 @@
 <template>
-  <div class="hex-grid__item" :style="{zIndex: hex.number}">
+  <div class="hex-grid__item" :style="{ zIndex: hex.number }">
     <div class="hex-grid-item__background">
       <div class="hex-grid-item__content" :style="tileContentStyle">
-        <span :style="{ position: 'relative', bottom: `${0.01 * size}vw` }">{{
-          hex.number
-        }}</span>
+        {{ hex.number }}
         <div
           class="resourceContainer"
-          :style="{ fontSize: `${0.03 * size }vw`, gap: `${0.3 * size}px` }"
+          :style="{ fontSize: `${size / 10}vw`, gap: `${size / 40}vw` }"
         >
           <div v-if="hex.resources.wood > 0" class="resourceItem wood">
-            <WoodIcon v-if="size > 19" />
+            <WoodIcon v-if="size > 6" />
             <span>{{ hex.resources.wood }}</span>
           </div>
           <div v-if="hex.resources.stone > 0" class="resourceItem stone">
-            <StoneIcon v-if="size > 19" />
+            <StoneIcon v-if="size > 6" />
             <span>{{ hex.resources.stone }}</span>
           </div>
           <div v-if="hex.resources.wheat > 0" class="resourceItem wheat">
-            <WheatIcon v-if="size > 19" />
+            <WheatIcon v-if="size > 6" />
             <span>{{ hex.resources.wheat }}</span>
           </div>
         </div>
@@ -28,7 +26,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapState } from "vuex";
 import WoodIcon from "@/assets/icons/log.svg";
 import StoneIcon from "@/assets/icons/stone-block.svg";
 import WheatIcon from "@/assets/icons/wheat.svg";
@@ -42,13 +40,15 @@ export default {
   },
   computed: {
     ...mapState({
-      size: state => state.style.tileSize,
-      borderWidth: state => state.style.borderWidth
+      size: (state) => state.style.tileSize,
+      borderWidth: (state) => state.style.borderWidth,
     }),
     tileContentStyle() {
       return {
+        display: "flex",
+        gap: `${this.size / 40}vw`,
         backgroundColor: `${this.hex.color}9a`,
-        fontSize: `${0.02 * this.size}vw`,
+        fontSize: `${0.06 * this.size}vw`,
         height: `${100 - this.borderWidth}%`,
         width: `${100 - this.borderWidth}%`,
       };
@@ -100,7 +100,7 @@ svg {
   flex-wrap: wrap;
   justify-content: center;
   align-content: flex-start;
-  height: 75%;
+  height: 85%;
   width: 66%;
 }
 
@@ -110,8 +110,7 @@ svg {
   align-items: center;
   padding: 1px;
   border-radius: 5px;
-  width: 44%;
-  height: min-content;
+  width: 40%;
   box-shadow: 0.5px 0.5px 2px #44444499;
 }
 

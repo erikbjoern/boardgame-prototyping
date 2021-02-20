@@ -33,31 +33,38 @@ export default {
     gridRowsStyle() {
       return {
         display: "grid",
-        gridAutoRows: `${this.tileSize * 0.3}vw`,
-        gap: `${this.gap / 10}vw`,
+        gridAutoRows: `${this.tileSize}vw`,
+        gap: `${this.gap}vw`,
       };
     },
     gridRowsOddStyle() {
       return {
-        gridTemplateColumns: `repeat(${Math.ceil(this.columns / 2) -
-          (this.columns % 2)}, ${this.tileSize * 0.45}vw)`,
+        gridTemplateColumns: `repeat(${this.rowsOddLength}, ${this.tileSpaceX}vw)`,
       };
     },
     gridRowsEvenStyle() {
       return {
-        gridTemplateColumns: `repeat(${Math.ceil(this.columns / 2)}, 
-          ${this.tileSize * 0.45}vw)`,
+        gridTemplateColumns: `repeat(${this.rowsEvenLength}, ${this.tileSpaceX}vw)`,
         position: "absolute",
-        top: `${this.tileSize * 0.15 + this.gap / 20}vw`,
-        left: `${-this.tileSize * 0.225 - this.gap / 20}vw`,
+        top: `${this.tileSize / 2 + this.gap / 2}vw`,
+        left: `${-this.tileSpaceX / 2 - this.gap / 2}vw`,
       };
     },
     ...mapState({
-      tileSize: state => state.style.tileSize,
-      gap: state => state.style.gap,
-      rows: state => state.rows,
-      columns: state => state.columns,
+      tileSize: (state) => state.style.tileSize,
+      gap: (state) => state.style.gap,
+      rows: (state) => state.rows,
+      columns: (state) => state.columns,
     }),
+    rowsOddLength() {
+      return Math.ceil(this.columns / 2) - (this.columns % 2);
+    },
+    rowsEvenLength() {
+      return Math.ceil(this.columns / 2);
+    },
+    tileSpaceX() {
+      return this.tileSize * 1.5;
+    },
     hexRows: {
       get() {
         return this.$store.state.hexRows;
@@ -110,6 +117,7 @@ export default {
     },
     addHexRows(difference, oldRowTotal) {
       const { rowsOdd, rowsEven, rowsOddStash, rowsEvenStash } = this.hexRows;
+      const { rowsOddLength, rowsEvenLength } = this
       const newRowTotal = oldRowTotal + difference;
 
       for (let i = oldRowTotal; i < newRowTotal; i++) {
@@ -121,9 +129,8 @@ export default {
           tileRow = rowsEvenStash.pop();
         }
 
-        const columns = this.columns;
         const rowLength = tileRow.length;
-        const tileCount = Math.floor(columns / 2) + (((columns % 2) * i) % 2);
+        const tileCount = i % 2 == 0 ? rowsOddLength : rowsEvenLength
         const needsUpdate = rowLength != 0 && rowLength != tileCount;
 
         if (rowLength < tileCount) {

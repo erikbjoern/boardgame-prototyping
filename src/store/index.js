@@ -6,7 +6,7 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
     style: {
-      tileSize: 20,
+      tileSize: 6,
       gap: 0,
       borderWidth: 6,
     },
@@ -27,7 +27,7 @@ const store = new Vuex.Store({
       state.style.gap = payload;
     },
     setBorderWidth(state, payload) {
-      state.style.borderWidth = payload;
+      state.style.borderWidth = payload; 
     },
     setColumns(state, payload) {
       state.columns = payload;

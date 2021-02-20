@@ -39,7 +39,7 @@
         id="tile-size"
         type="range"
         min="5"
-        max="50"
+        max="40"
         v-model.number="tileSize"
       />
     </div>
@@ -67,18 +67,18 @@ export default {
   computed: {
     tileSize: {
       get() {
-        return this.$store.state.style.tileSize;
+        return this.$store.state.style.tileSize * 2
       },
       set(value) {
-        this.$store.commit("setTileSize", value);
+        this.$store.commit("setTileSize", value / 2);
       },
     },
     gap: {
       get() {
-        return this.$store.state.style.gap;
+        return this.$store.state.style.gap * 10
       },
       set(value) {
-        this.$store.commit("setGap", value);
+        this.$store.commit("setGap", value / 10);
       },
     },
     borderWidth: {
