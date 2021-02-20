@@ -1,23 +1,23 @@
 <template>
-  <div class="hex-grid__item" :style="{ zIndex: hex.number }">
+  <div class="hex-grid__item" :style="{ zIndex: tile.number }">
     <div class="hex-grid-item__background">
       <div class="hex-grid-item__content" :style="tileContentStyle">
-        {{ hex.number }}
+        {{ tile.number }}
         <div
           class="resourceContainer"
-          :style="{ fontSize: `${size / 10}vw`, gap: `${size / 40}vw` }"
+          :style="{ fontSize: `clamp(10px, ${size / 10}vw, 40px`, gap: `${size / 40}vw` }"
         >
-          <div v-if="hex.resources.wood > 0" class="resourceItem wood">
+          <div v-if="tile.resources.wood > 0" class="resourceItem wood">
             <WoodIcon v-if="size > 6" />
-            <span>{{ hex.resources.wood }}</span>
+            <span>{{ tile.resources.wood }}</span>
           </div>
-          <div v-if="hex.resources.stone > 0" class="resourceItem stone">
+          <div v-if="tile.resources.stone > 0" class="resourceItem stone">
             <StoneIcon v-if="size > 6" />
-            <span>{{ hex.resources.stone }}</span>
+            <span>{{ tile.resources.stone }}</span>
           </div>
-          <div v-if="hex.resources.wheat > 0" class="resourceItem wheat">
+          <div v-if="tile.resources.wheat > 0" class="resourceItem wheat">
             <WheatIcon v-if="size > 6" />
-            <span>{{ hex.resources.wheat }}</span>
+            <span>{{ tile.resources.wheat }}</span>
           </div>
         </div>
       </div>
@@ -40,22 +40,22 @@ export default {
   },
   computed: {
     ...mapState({
-      size: (state) => state.style.tileSize,
-      borderWidth: (state) => state.style.borderWidth,
+      size: (state) => state.tileSize,
+      borderWidth: (state) => state.borderWidth,
     }),
     tileContentStyle() {
       return {
         display: "flex",
-        gap: `${this.size / 40}vw`,
-        backgroundColor: `${this.hex.color}9a`,
-        fontSize: `${0.06 * this.size}vw`,
+        gap: `${this.size / 50}vw`,
+        backgroundColor: `${this.tile.color}9a`,
+        fontSize: `clamp(8px, ${this.size / 10}vw, 20px`,
         height: `${100 - this.borderWidth}%`,
         width: `${100 - this.borderWidth}%`,
       };
     },
   },
   props: {
-    hex: {
+    tile: {
       color: String,
       number: Number,
       resources: {

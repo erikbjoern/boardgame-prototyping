@@ -4,41 +4,44 @@
       <label>Rader</label>
       <div class="input-buttons">
         <div
-          @click="rows < 23 && (rows += 1)"
-          :class="{ disabled: rows == 23 }"
+          @click="rowCount < 23 && (rowCount += 1)"
+          :class="{ disabled: rowCount == 23 }"
         >
           <span>+</span>
         </div>
-        <div @click="rows > 3 && (rows -= 1)" :class="{ disabled: rows == 3 }">
+        <div
+          @click="rowCount > 3 && (rowCount -= 1)"
+          :class="{ disabled: rowCount == 3 }"
+        >
           <span>−</span>
         </div>
       </div>
-      <input readonly type="number" min="3" max="23" v-model="rows" />
+      <input readonly type="number" min="3" max="23" v-model="rowCount" />
     </div>
     <div>
       <label>Kolumner</label>
       <div class="input-buttons">
         <div
-          @click="columns < 23 && (columns += 1)"
-          :class="{ disabled: columns == 23 }"
+          @click="columnCount < 23 && (columnCount += 1)"
+          :class="{ disabled: columnCount == 23 }"
         >
           <span>+</span>
         </div>
         <div
-          @click="columns > 3 && (columns -= 1)"
-          :class="{ disabled: columns == 3 }"
+          @click="columnCount > 3 && (columnCount -= 1)"
+          :class="{ disabled: columnCount == 3 }"
         >
           <span>−</span>
         </div>
       </div>
-      <input readonly type="number" min="3" max="30" v-model="columns" />
+      <input readonly type="number" min="3" max="30" v-model="columnCount" />
     </div>
     <div>
       <label htmlFor="tile-size">Storlek</label>
       <input
         id="tile-size"
         type="range"
-        min="5"
+        min="7"
         max="40"
         v-model.number="tileSize"
       />
@@ -67,7 +70,7 @@ export default {
   computed: {
     tileSize: {
       get() {
-        return this.$store.state.style.tileSize * 2
+        return this.$store.state.tileSize * 2;
       },
       set(value) {
         this.$store.commit("setTileSize", value / 2);
@@ -75,7 +78,7 @@ export default {
     },
     gap: {
       get() {
-        return this.$store.state.style.gap * 10
+        return this.$store.state.gap * 10;
       },
       set(value) {
         this.$store.commit("setGap", value / 10);
@@ -83,32 +86,32 @@ export default {
     },
     borderWidth: {
       get() {
-        return this.$store.state.style.borderWidth;
+        return this.$store.state.borderWidth;
       },
       set(value) {
         this.$store.commit("setBorderWidth", value);
       },
     },
-    columns: {
+    columnCount: {
       get() {
-        return this.$store.state.columns;
+        return this.$store.state.columnCount;
       },
       set(value) {
-        this.$store.commit("setColumns", value);
+        this.$store.commit("setColumnCount", value);
       },
     },
-    rows: {
+    rowCount: {
       get() {
-        return this.$store.state.rows;
+        return this.$store.state.rowCount;
       },
       set(value) {
-        this.$store.commit("setRows", value);
+        this.$store.commit("setRowCount", value);
       },
     },
   },
   methods: {
     reset() {
-      this.$store.dispatch('reset')
+      this.$store.dispatch("reset");
     },
   },
 };

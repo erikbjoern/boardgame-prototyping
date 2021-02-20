@@ -19,14 +19,9 @@ export default {
     };
   },
   computed: {
-    ...mapState(["rows", "columns"]),
-    hexRows: {
-      get() {
-        return this.$store.state.hexRows;
-      },
-      set(value) {
-        this.$store.commit("setHexRows", value);
-      },
+    ...mapState(["rowCount", "columnCount", "hexRows"]),
+    hexTotal() {
+      return Math.floor((this.rowCount * this.columnCount) / 2);
     },
   },
   methods: {
@@ -40,11 +35,11 @@ export default {
     getRandomColor() {
       return this.colors[Math.floor(Math.random() * this.colors.length)];
     },
-    buildHexRow(tileRow, iterator) {
-      const columns = this.columns;
-      const rowLength = tileRow.length;
+    buildHexRow(row, iteration) {
+      const columnCount = this.columnCount;
+      const rowLength = row.length;
       const tileCount =
-        Math.floor(columns / 2) + (((columns % 2) * iterator) % 2);
+        Math.floor(columnCount / 2) + (columnCount % 2) * (iteration % 2);
 
       for (let t = rowLength; t < tileCount; t++) {
         const tile = {
@@ -56,109 +51,75 @@ export default {
             wheat: this.getResource(),
           },
         };
-        tileRow.push(tile);
+        row.push(tile);
       }
 
-      return tileRow;
+      return row;
     },
     addHexColumns() {
-      const { rowsOdd, rowsEven } = this.hexRows;
+      const { rowCount, hexRows } = this;
 
-      for (let i = 0; i < this.rows; i++) {
-        const index = Math.floor(i / 2);
-        let targetRow = i % 2 == 0 ? rowsOdd[index] : rowsEven[index];
-        targetRow = this.buildHexRow(targetRow, i);
+      for (let i = 0; i < rowCount; i++) {
+        const targetRow = hexRows[i];
+        const extendedRow = this.buildHexRow([...targetRow], i);
+
+        this.$store.commit("replaceHexRow", { row: extendedRow, index: i });
       }
+
+      this.updateTileNumbers({ updateAll: true });
     },
     addHexRows(difference, oldRowTotal) {
-      const { rowsOdd, rowsEven, rowsOddStash, rowsEvenStash } = this.hexRows;
-      const newRowTotal = oldRowTotal + difference;
+      const p = oldRowTotal % 2;
 
-      for (let i = oldRowTotal; i < newRowTotal; i++) {
-        let tileRow = [];
+      for (let i = p; i < difference + p; i++) {
+        const newRow = this.buildHexRow([], i % 2);
 
-        if (i % 2 == 0 && rowsOddStash.length) {
-          tileRow = rowsOddStash.pop();
-        } else if (i % 2 == 1 && rowsEvenStash.length) {
-          tileRow = rowsEvenStash.pop();
-        }
-
-        const rowLength = tileRow.length;
-        const tileCount =
-          Math.floor(this.columns / 2) + (((this.columns % 2) * i) % 2);
-        const needsUpdate = rowLength != 0 && rowLength != tileCount;
-
-        if (rowLength < tileCount) {
-          tileRow = this.buildHexRow(tileRow, i);
-        } else if (rowLength > tileCount) {
-          for (let t = rowLength; t > tileCount; t--) {
-            tileRow.pop();
-          }
-        }
-
-        const index = Math.floor(i / 2);
-
-        i % 2 == 0 ? (rowsOdd[index] = tileRow) : (rowsEven[index] = tileRow);
-        this.hexRows = { ...this.hexRows };
-        needsUpdate && this.updateTileNumbers({ updateAll: false });
+        this.$store.commit("addHexRow", newRow);
       }
     },
-    removeHexColumns(difference, oldColumnTotal) {
-      const { rowsOdd, rowsEven } = this.hexRows;
-
-      for (let i = 0; i < Math.ceil(difference / 2); i++) {
-        (i + oldColumnTotal) % 2 == 0
-          ? rowsOdd.forEach((a) => a.pop())
-          : rowsEven.forEach((a) => a.pop());
+    removeHexColumns(difference, previousTotal) {
+      const p = previousTotal % 2;
+      for (let i = p; i < difference + p; i++) {
+        this.$store.commit("removeHexColumn", { indexParity: i % 2 });
       }
     },
-    removeHexRows(difference, oldRowTotal) {
-      const m = oldRowTotal % 2;
-      const { rowsOdd, rowsEven, rowsOddStash, rowsEvenStash } = this.hexRows;
-
-      for (let i = m; i < difference + m; i++) {
-        i % 2 == 1
-          ? rowsOddStash.push(rowsOdd.pop())
-          : rowsEvenStash.push(rowsEven.pop());
+    removeHexRows(difference) {
+      for (let i = 0; i < difference; i++) {
+        this.$store.commit("removeHexRow");
       }
     },
     updateTileNumbers({ updateAll }) {
-      const { rows, columns } = this;
-      const { rowsOdd, rowsEven } = this.hexRows;
-
-      const hexTotal = Math.floor((rows * columns) / 2);
+      const { rowCount, hexTotal, hexRows } = this;
       let hexNumber = hexTotal;
-      let targetRow = rows;
+      let index = rowCount;
 
       do {
-        const index = Math.floor((targetRow - 1) / 2);
-        const hexRows = targetRow % 2 == 1 ? rowsOdd : rowsEven;
-
-        hexRows[index].reverse().map((tile) => {
-          tile.number = hexNumber--;
-        });
-        hexRows[index].reverse();
-
-        targetRow--;
-      } while (targetRow > 0 && updateAll);
+        const targetRow = hexRows[--index];
+        const updatedRow = [...targetRow]
+          .reverse()
+          .map((tile) => (tile = { ...tile, number: hexNumber-- }))
+          .reverse();
+        this.$store.commit("replaceHexRow", { row: updatedRow, index });
+      } while (index > 0 && updateAll);
 
       this.hexNumber = hexTotal;
+      this.$store.dispatch("updateLocalStorage");
     },
   },
   watch: {
-    rows(newValue, oldValue) {
-      if (oldValue == 0 || oldValue == null) return;
+    rowCount(newValue, oldValue) {
+      if (oldValue == null) return;
 
       const difference = Math.abs(newValue - oldValue);
 
       if (newValue > oldValue) {
         this.addHexRows(difference, oldValue);
       } else {
-        this.removeHexRows(difference, oldValue);
+        this.removeHexRows(difference);
       }
     },
-    columns(newValue, oldValue) {
-      if (oldValue == 0 || oldValue == null) return;
+    columnCount(newValue, oldValue) {
+      if (oldValue == null) return;
 
       const difference = Math.abs(newValue - oldValue);
 
@@ -172,9 +133,11 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch("setStateFromLocalStorage");
+    this.$store.dispatch("setInitialState");
 
-    !this.hexRows.rowsOdd.length && this.addHexRows(this.rows, 0);
+    !this.hexRows.length && this.addHexRows(this.rowCount, 0);
+
+    this.hexNumber = this.hexTotal;
   },
 };
 </script>
