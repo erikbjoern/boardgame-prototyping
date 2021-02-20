@@ -2,21 +2,21 @@
   <div>
     <InputsBar />
     <div class="mainContainer" ref="mainContainer">
-      <HexGrid />
+      <HexGridContainer />
     </div>
   </div>
 </template>
 
 <script>
 import InputsBar from "@/components/InputsBar.vue";
-import HexGrid from "@/components/HexGrid.vue";
+import HexGridContainer from "@/containers/HexGridContainer.vue";
 import { scrollToCenter } from "@/helpers/scroll.js";
 import { dragToScrollStart, dragToScroll } from "@/helpers/scroll.js";
 
 export default {
   name: "App",
   components: {
-    HexGrid,
+    HexGridContainer,
     InputsBar,
   },
   data() {
