@@ -82,11 +82,14 @@ export default {
       for (let i = p; i < difference + p; i++) {
         this.$store.commit("removeHexColumn", { indexParity: i % 2 });
       }
+      
+      this.updateTileNumbers({ updateAll: true });
     },
     removeHexRows(difference) {
       for (let i = 0; i < difference; i++) {
         this.$store.commit("removeHexRow");
       }
+      this.hexNumber = this.hexTotal
     },
     updateTileNumbers({ updateAll }) {
       const { rowCount, hexTotal, hexRows } = this;
