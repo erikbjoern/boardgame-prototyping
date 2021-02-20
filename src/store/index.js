@@ -3,7 +3,7 @@ import Vuex from "vuex";
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
   state: {
     tileSize: 20,
     gap: 0,
@@ -84,3 +84,9 @@ export default new Vuex.Store({
   },
   modules: {},
 });
+
+store.watch((state) => ({ ...state }), () => {
+  store.dispatch('updateLocalStorage')
+})
+
+export default store

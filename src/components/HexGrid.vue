@@ -168,9 +168,6 @@ export default {
           : rowsEvenStash.push(rowsEven.pop());
       }
     },
-    updateLocalStorage() {
-      this.$store.dispatch('updateLocalStorage')
-    },
     updateTileNumbers({ updateAll }) {
       const { rows, columns } = this;
       const { rowsOdd, rowsEven } = this.hexRows;
@@ -205,8 +202,6 @@ export default {
       } else {
         this.removeHexRows(difference, oldValue);
       }
-
-      this.updateLocalStorage();
     },
     columns(newValue, oldValue) {
       if (oldValue == 0 || oldValue == null) return;
@@ -220,14 +215,12 @@ export default {
       }
 
       this.updateTileNumbers({ updateAll: true });
-      this.updateLocalStorage();
     },
   },
   created() {
     this.$store.dispatch('setStateFromLocalStorage')
 
     !this.hexRows.rowsOdd.length && (this.addHexRows(this.rows, 0))
-    this.updateLocalStorage();
   },
 };
 </script>

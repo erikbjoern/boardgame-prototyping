@@ -110,15 +110,7 @@ export default {
     reset() {
       this.$store.dispatch('reset')
     },
-    updateLocalStorage() {
-      this.$store.dispatch('updateLocalStorage')
-    },
   },
-  watch: {
-    tileSize: "updateLocalStorage",
-    gap: "updateLocalStorage",
-    borderWidth: "updateLocalStorage",
-  }
 };
 </script>
 
