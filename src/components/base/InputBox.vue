@@ -10,7 +10,7 @@
       >
         <span>−</span>
       </div>
-      <input 
+      <input
         v-if="property.showValue"
         id="show-value"
         type="number"
@@ -19,7 +19,7 @@
         v-model.number="inputFieldValue"
         @blur="setPropertyValue"
         @keydown="keydownHandler"
-      >
+      />
       <input
         v-if="!property.showValue"
         :id="property.name"
@@ -54,11 +54,11 @@ export default {
   computed: {
     inputFieldValue: {
       get() {
-        return this.propertyValue
+        return this.propertyValue;
       },
       set() {
-        null
-      }
+        null;
+      },
     },
     propertyValue: {
       get() {
@@ -77,53 +77,53 @@ export default {
   },
   methods: {
     clearTimeouts() {
-      clearTimeout(this.willDecrease)
-      clearInterval(this.isDecreasing)
-      clearTimeout(this.willIncrease)
-      clearInterval(this.isIncreasing)
-      window.removeEventListener("mouseup", this.clearTimeouts)
+      clearTimeout(this.willDecrease);
+      clearInterval(this.isDecreasing);
+      clearTimeout(this.willIncrease);
+      clearInterval(this.isIncreasing);
+      window.removeEventListener("mouseup", this.clearTimeouts);
     },
     decreaseValueStart() {
-      this.propertyValue > this.property.min && (this.propertyValue -= 1)
+      this.propertyValue > this.property.min && (this.propertyValue -= 1);
 
       this.willDecrease = setTimeout(() => {
         this.isDecreasing = setInterval(() => {
-          this.propertyValue > this.property.min 
+          this.propertyValue > this.property.min
             ? (this.propertyValue -= 1)
-            : clearInterval(this.isDecreasing)
-        }, 70)
-      }, 300)
-      
-      window.addEventListener("mouseup", this.clearTimeouts)
+            : clearInterval(this.isDecreasing);
+        }, 70);
+      }, 300);
+
+      window.addEventListener("mouseup", this.clearTimeouts);
     },
     increaseValueStart() {
-      this.propertyValue < this.property.max && (this.propertyValue += 1)
+      this.propertyValue < this.property.max && (this.propertyValue += 1);
 
       this.willIncrease = setTimeout(() => {
         this.isIncreasing = setInterval(() => {
-          this.propertyValue < this.property.max 
+          this.propertyValue < this.property.max
             ? (this.propertyValue += 1)
-            : clearInterval(this.isIncreasing)
-        }, 70)
-      }, 300)
+            : clearInterval(this.isIncreasing);
+        }, 70);
+      }, 300);
 
-      window.addEventListener("mouseup", this.clearTimeouts)
+      window.addEventListener("mouseup", this.clearTimeouts);
     },
     keydownHandler(e) {
       if (e.which == 27 || e.code == "Escape") {
-        const propertyValue = this.propertyValue
-        e.target.blur()
-        this.propertyValue = propertyValue
+        const propertyValue = this.propertyValue;
+        e.target.blur();
+        this.propertyValue = propertyValue;
       }
 
       if (e.which == 13 || e.code == "Enter") {
-        e.target.blur()    //triggers this.setPropertyValue()
+        e.target.blur(); //triggers this.setPropertyValue()
       }
     },
     setPropertyValue(e) {
-      this.propertyValue = parseInt(e.target.value)
-    }
-  }
+      this.propertyValue = parseInt(e.target.value) || this.propertyValue;
+    },
+  },
 };
 </script>
 
