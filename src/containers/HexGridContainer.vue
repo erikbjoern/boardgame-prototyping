@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 import { colors } from "@/helpers/colors";
 import HexGrid from "@/components/HexGrid.vue";
 
@@ -15,16 +15,22 @@ export default {
   data() {
     return {
       colors,
-      hexNumber: 0,
     };
   },
   computed: {
-    ...mapState(["rowCount", "columnCount", "hexRows"]),
-    hexTotal() {
-      return Math.floor((this.rowCount * this.columnCount) / 2);
-    },
+    ...mapState(["rowCount", "columnCount", "hexRows", "hexRowsStash"]),
   },
   methods: {
+    ...mapActions([
+      "getRowFromStash",
+      "setInitialState",
+      "storeHexRow",
+      "storeModifiedHexRow",
+      "updateLocalStorage",
+    ]),
+    getCurrentHexTotal() {
+      return [...this.hexRows].flat().length;
+    },
     getResource() {
       const chance = 25;
       const range = 9;
@@ -35,15 +41,19 @@ export default {
     getRandomColor() {
       return this.colors[Math.floor(Math.random() * this.colors.length)];
     },
-    buildHexRow(row, iteration) {
-      const columnCount = this.columnCount;
-      const rowLength = row.length;
-      const tileCount =
-        Math.floor(columnCount / 2) + (columnCount % 2) * (iteration % 2);
+    getTileCount(rowIndex) {
+      const { columnCount } = this;
+      return Math.floor(columnCount / 2) + (columnCount % 2) * (rowIndex % 2);
+    },
+    buildHexRow(row, rowIndex) {
+      const tileCount = this.getTileCount(rowIndex);
+      let hexNumber = this.getCurrentHexTotal();
 
-      for (let t = rowLength; t < tileCount; t++) {
-        const tile = {
-          number: ++this.hexNumber,
+      for (let t = row.length; t < tileCount; t++) {
+        const stashedRow = this.hexRowsStash[rowIndex];
+        const stashedTile = stashedRow ? stashedRow[row.length] : null;
+        const tile = stashedTile || {
+          number: ++hexNumber,
           color: this.getRandomColor(),
           resources: {
             stone: this.getResource(),
@@ -51,6 +61,7 @@ export default {
             wheat: this.getResource(),
           },
         };
+
         row.push(tile);
       }
 
@@ -59,22 +70,36 @@ export default {
     addHexColumns() {
       const { rowCount, hexRows } = this;
 
-      for (let i = 0; i < rowCount; i++) {
-        const targetRow = hexRows[i];
-        const extendedRow = this.buildHexRow([...targetRow], i);
+      for (let index = 0; index < rowCount; index++) {
+        const targetRow = hexRows[index];
+        const extendedRow = this.buildHexRow([...targetRow], index);
 
-        this.$store.commit("replaceHexRow", { row: extendedRow, index: i });
+        this.storeModifiedHexRow({ row: extendedRow, index });
       }
-
-      this.updateTileNumbers({ updateAll: true });
     },
-    addHexRows(difference, oldRowTotal) {
-      const p = oldRowTotal % 2;
+    async addHexRows(difference, oldRowTotal) {
+      const newTotal = oldRowTotal + difference;
 
-      for (let i = p; i < difference + p; i++) {
-        const newRow = this.buildHexRow([], i % 2);
+      for (let index = oldRowTotal; index < newTotal; index++) {
+        const stashedRow = await this.getRowFromStash(index);
+        const tileCount = this.getTileCount(index);
 
-        this.$store.commit("addHexRow", newRow);
+        let row, needsUpdate;
+
+        if (!stashedRow) {
+          row = this.buildHexRow([], index);
+        } else if (stashedRow.length < tileCount) {
+          row = this.buildHexRow([...stashedRow], index);
+          needsUpdate = true;
+        } else if (stashedRow.length > tileCount) {
+          row = [...stashedRow].slice(0, tileCount);
+          needsUpdate = true;
+        } else {
+          row = stashedRow;
+        }
+
+        this.storeHexRow({ row, index });
+        needsUpdate && this.updateTileNumbers({ updateAll: false });
       }
     },
     removeHexColumns(difference, previousTotal) {
@@ -82,18 +107,15 @@ export default {
       for (let i = p; i < difference + p; i++) {
         this.$store.commit("removeHexColumn", { indexParity: i % 2 });
       }
-      
-      this.updateTileNumbers({ updateAll: true });
     },
     removeHexRows(difference) {
       for (let i = 0; i < difference; i++) {
         this.$store.commit("removeHexRow");
       }
-      this.hexNumber = this.hexTotal
     },
     updateTileNumbers({ updateAll }) {
-      const { rowCount, hexTotal, hexRows } = this;
-      let hexNumber = hexTotal;
+      const { rowCount, getCurrentHexTotal, hexRows } = this;
+      let hexNumber = getCurrentHexTotal();
       let index = rowCount;
 
       do {
@@ -102,11 +124,10 @@ export default {
           .reverse()
           .map((tile) => (tile = { ...tile, number: hexNumber-- }))
           .reverse();
-        this.$store.commit("replaceHexRow", { row: updatedRow, index });
+        this.storeModifiedHexRow({ row: updatedRow, index });
       } while (index > 0 && updateAll);
 
-      this.hexNumber = hexTotal;
-      this.$store.dispatch("updateLocalStorage");
+      this.updateLocalStorage();
     },
   },
   watch: {
@@ -136,11 +157,9 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch("setInitialState");
+    this.setInitialState();
 
     !this.hexRows.length && this.addHexRows(this.rowCount, 0);
-
-    this.hexNumber = this.hexTotal;
   },
 };
 </script>

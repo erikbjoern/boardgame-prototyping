@@ -11,6 +11,7 @@ const store = new Vuex.Store({
     columnCount: null,
     rowCount: null,
     hexRows: [],
+    hexRowsStash: [],
   },
   mutations: {
     setTileSize(state, payload) {
@@ -28,8 +29,11 @@ const store = new Vuex.Store({
     setRowCount(state, payload) {
       state.rowCount = payload;
     },
-    addHexRow(state, payload) {
-      state.hexRows.push(payload);
+    addHexRow(state, { row, index }) {
+      state.hexRows.push(row);
+    },
+    addHexRowToStash(state, { row, index }) {
+      state.hexRowsStash.push(row);
     },
     removeHexRow(state) {
       state.hexRows.pop();
@@ -37,25 +41,51 @@ const store = new Vuex.Store({
     replaceHexRow(state, { row, index }) {
       state.hexRows[index] = row;
     },
+    replaceHexRowInStash(state, { row, index }) {
+      state.hexRowsStash[index] = row;
+    },
     removeHexColumn(state, { indexParity }) {
-      state.hexRows
-        .filter((row, i) => i % 2 == indexParity)
-        .map((row) => row.pop());
+      state.hexRows.map((row, i) => i % 2 == indexParity && row.pop());
     },
     setInitialHexRows(state, payload) {
-      state.hexRows = [...payload];
+      state.hexRows = payload;
+    },
+    setInitialHexRowsStash(state, payload) {
+      state.hexRowsStash = payload;
     },
   },
   actions: {
+    getRowFromStash(context, index) {
+      return context.state.hexRowsStash[index] || null;
+    },
+    storeHexRow(context, { row, index }) {
+      context.commit("addHexRow", { row, index });
+
+      if (index == context.state.hexRowsStash.length) {
+        context.commit("addHexRowToStash", { row: [...row], index });
+      }
+    },
+    storeModifiedHexRow(context, { row, index }) {
+      const stashedCopyOfRow = context.state.hexRowsStash[index];
+
+      if (row.length > stashedCopyOfRow.length) {
+        context.commit("replaceHexRow", { row, index });
+        context.commit("replaceHexRowInStash", { row: [...row], index });
+      } else {
+        context.commit("replaceHexRow", { row, index });
+      }
+    },
     setInitialState(context) {
       const savedRowCount = parseInt(localStorage.getItem("rowCount"));
       const savedColumnCount = parseInt(localStorage.getItem("columnCount"));
       const savedHexRows = JSON.parse(localStorage.getItem("hexRows"));
+      const savedHexStash = JSON.parse(localStorage.getItem("hexStash"));
       const savedStyle = JSON.parse(localStorage.getItem("style"));
 
       const rowCount = savedRowCount || 13;
       const columnCount = savedColumnCount || 13;
       const hexRows = savedHexRows || [];
+      const hexStash = savedHexStash || [];
       const style = savedStyle || {
         tileSize: 6,
         gap: 0,
@@ -65,6 +95,7 @@ const store = new Vuex.Store({
       context.commit("setRowCount", rowCount);
       context.commit("setColumnCount", columnCount);
       context.commit("setInitialHexRows", hexRows);
+      context.commit("setInitialHexRowsStash", hexStash);
       context.commit("setTileSize", style.tileSize);
       context.commit("setGap", style.gap);
       context.commit("setBorderWidth", style.borderWidth);
@@ -77,6 +108,7 @@ const store = new Vuex.Store({
         rowCount,
         columnCount,
         hexRows,
+        hexRowsStash,
       } = context.state;
       const style = { tileSize, gap, borderWidth };
 
@@ -84,12 +116,14 @@ const store = new Vuex.Store({
       localStorage.setItem("rowCount", rowCount);
       localStorage.setItem("columnCount", columnCount);
       localStorage.setItem("hexRows", JSON.stringify(hexRows));
+      localStorage.setItem("hexStash", JSON.stringify(hexRowsStash));
     },
     reset() {
       localStorage.removeItem("style");
       localStorage.removeItem("rowCount");
       localStorage.removeItem("columnCount");
       localStorage.removeItem("hexRows");
+      localStorage.removeItem("hexStash");
       window.location.reload();
     },
   },
@@ -99,7 +133,8 @@ const store = new Vuex.Store({
 store.watch(
   (state) => ({ ...state }),
   () => {
-    store.dispatch("updateLocalStorage");
+    //TODO - check that parameters match (rowCount, columnCount with total amount of hexes)
+    store.dispatch("updateLocalStorage")
   }
 );
 
