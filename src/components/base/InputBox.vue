@@ -1,19 +1,23 @@
 <template>
   <div>
     <label :htmlFor="property.name">
-      <span v-if="property.showValue">
-        {{ propertyValue + " " }}
-      </span>
       {{ property.text }}
     </label>
     <div class="inputs">
       <div
-        @click="propertyValue > property.min && (propertyValue -= 1)"
+        @mousedown="decreaseValueStart()"
         :class="{ disabled: propertyValue == property.min }"
       >
         <span>−</span>
       </div>
+      <span 
+        v-if="property.valueInText"
+        id="show-value"
+      >
+        {{ propertyValue }}
+      </span>
       <input
+        v-show="!property.valueInText"
         :id="property.name"
         type="range"
         :min="property.min"
@@ -21,7 +25,7 @@
         v-model.number="propertyValue"
       />
       <div
-        @click="propertyValue < property.max && (propertyValue += 1)"
+        @mousedown="increaseValueStart()"
         :class="{ disabled: propertyValue == property.max }"
       >
         <span>+</span>
@@ -40,7 +44,7 @@ export default {
       max: Number,
       text: String,
       double: Boolean,
-      showValue: Boolean,
+      valueInText: Boolean,
     },
   },
   computed: {
@@ -59,6 +63,41 @@ export default {
       return p[0].toUpperCase() + p.slice(1, p.length);
     },
   },
+  methods: {
+    clearTimeouts() {
+      clearTimeout(this.willDecrease)
+      clearInterval(this.isDecreasing)
+      clearTimeout(this.willIncrease)
+      clearInterval(this.isIncreasing)
+      window.removeEventListener("mouseup", this.clearTimeouts)
+    },
+    decreaseValueStart() {
+      this.propertyValue > this.property.min && (this.propertyValue -= 1)
+
+      this.willDecrease = setTimeout(() => {
+        this.isDecreasing = setInterval(() => {
+          this.propertyValue > this.property.min 
+            ? (this.propertyValue -= 1)
+            : clearInterval(this.isDecreasing)
+        }, 70)
+      }, 300)
+      
+      window.addEventListener("mouseup", this.clearTimeouts)
+    },
+    increaseValueStart() {
+      this.propertyValue < this.property.max && (this.propertyValue += 1)
+
+      this.willIncrease = setTimeout(() => {
+        this.isIncreasing = setInterval(() => {
+          this.propertyValue < this.property.max 
+            ? (this.propertyValue += 1)
+            : clearInterval(this.isIncreasing)
+        }, 70)
+      }, 300)
+
+      window.addEventListener("mouseup", this.clearTimeouts)
+    },
+  }
 };
 </script>
 
@@ -104,5 +143,11 @@ input[type="range"]#borderWidth {
 
 label {
   font-size: 85%;
+}
+
+#show-value {
+  margin: 5px;
+  text-align: center;
+  width: 1rem;
 }
 </style>
