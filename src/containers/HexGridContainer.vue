@@ -15,6 +15,23 @@ export default {
   data() {
     return {
       colors,
+      resourceParameters: [
+        {
+          type: "stone",
+          max: 9,
+          chance: 25,
+        },
+        {
+          type: "wood",
+          max: 9,
+          chance: 25,
+        },
+        {
+          type: "wheat",
+          max: 9,
+          chance: 25,
+        },
+      ],
     };
   },
   computed: {
@@ -37,6 +54,18 @@ export default {
       return Math.floor((Math.random() * 100) / chance) == 0
         ? Math.ceil(Math.random() * range)
         : 0;
+    },
+    getResources() {
+      const resources = {};
+
+      for (const resource of this.resourceParameters) {
+        resources[resource.type] =
+          Math.floor((Math.random() * 100) / resource.chance) == 0
+            ? Math.ceil(Math.random() * resource.max)
+            : 0;
+      }
+
+      return resources;
     },
     getRandomColor() {
       return this.colors[Math.floor(Math.random() * this.colors.length)];
@@ -155,6 +184,24 @@ export default {
       }
 
       this.updateTileNumbers({ updateAll: true });
+    },
+    resources: {
+      handler(newValue) {
+        let detectedChange;
+        newValue.forEach((resource) =>
+          Object.entries(resource).forEach(([k, v], index, resource) => {
+            if (typeof v === "string" && k !== "type") {
+              detectedChange = { resource, index };
+              return;
+            }
+          })
+        );
+
+        debugger;
+
+        localStorage.setItem("resourceParameters", JSON.stringify(newValue));
+      },
+      deep: true,
     },
   },
   created() {

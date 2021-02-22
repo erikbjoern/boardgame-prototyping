@@ -5,6 +5,26 @@
       :key="property.name"
       :property="property"
     />
+    <div
+        v-for="resource in resourceParameters"
+        :key="resource.type"
+        class="resource-input"
+        :style="
+          `background-color: ${(resource.type === 'stone' && '#252627') ||
+            (resource.type === 'wood' && '#553a2d') ||
+            (resource.type === 'wheat' && '#928d5c')}`
+        "
+      >
+        <div>
+          <label> max</label>
+          <input type="number" v-model="resource.max" />
+        </div>
+        <div>
+          <label> chans</label>
+          <input type="number" v-model="resource.chance" />
+          <span>%</span>
+        </div>
+      </div>
     <button @click="resetAdjustments">Återställ ändringar</button>
     <button @click="resetTiles">Förnya brickor</button>
   </div>
@@ -111,5 +131,27 @@ button {
 button:hover {
   cursor: pointer;
   opacity: 0.6;
+}
+
+.resource-input {
+  border-radius: 2px;
+  color: white;
+  display: flex;
+  padding: 0 2px;
+  margin: 0 4px;
+
+  & span {
+    margin-left: -4px;
+  }
+
+  & input {
+    width: 15px;
+  }
+
+  & input::-webkit-inner-spin-button,
+  & input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 }
 </style>
