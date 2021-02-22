@@ -118,10 +118,14 @@ const store = new Vuex.Store({
       localStorage.setItem("hexRows", JSON.stringify(hexRows));
       localStorage.setItem("hexStash", JSON.stringify(hexRowsStash));
     },
-    reset() {
+    resetAdjustments() {
       localStorage.removeItem("style");
       localStorage.removeItem("rowCount");
       localStorage.removeItem("columnCount");
+      localStorage.removeItem("hexRows");
+      window.location.reload();
+    },
+    resetTiles() {
       localStorage.removeItem("hexRows");
       localStorage.removeItem("hexStash");
       window.location.reload();

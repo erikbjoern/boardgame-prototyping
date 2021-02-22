@@ -99,7 +99,8 @@ export default {
         }
 
         this.storeHexRow({ row, index });
-        needsUpdate && this.updateTileNumbers({ updateAll: false });
+        needsUpdate &&
+          this.updateTileNumbers({ updateAll: false, row: index + 1 });
       }
     },
     removeHexColumns(difference, previousTotal) {
@@ -113,10 +114,10 @@ export default {
         this.$store.commit("removeHexRow");
       }
     },
-    updateTileNumbers({ updateAll }) {
+    updateTileNumbers({ updateAll, row }) {
       const { rowCount, getCurrentHexTotal, hexRows } = this;
       let hexNumber = getCurrentHexTotal();
-      let index = rowCount;
+      let index = row || rowCount;
 
       do {
         const targetRow = hexRows[--index];
@@ -159,7 +160,9 @@ export default {
   created() {
     this.setInitialState();
 
-    !this.hexRows.length && this.addHexRows(this.rowCount, 0);
+    const currentRowCount = this.hexRows.length
+    const difference = this.rowCount - currentRowCount
+    this.addHexRows(difference, currentRowCount);
   },
 };
 </script>

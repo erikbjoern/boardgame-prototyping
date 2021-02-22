@@ -5,12 +5,14 @@
       :key="property.name"
       :property="property"
     />
-    <button @click="reset">Reset</button>
+    <button @click="resetAdjustments">Återställ ändringar</button>
+    <button @click="resetTiles">Förnya brickor</button>
   </div>
 </template>
 
 <script>
 import InputBox from "@/components/base/InputBox.vue";
+import { mapActions } from 'vuex';
 
 export default {
   components: { InputBox },
@@ -55,11 +57,7 @@ export default {
       ],
     };
   },
-  methods: {
-    reset() {
-      this.$store.dispatch("reset");
-    },
-  },
+  methods: mapActions(["resetTiles", "resetAdjustments"]),
 };
 </script>
 
