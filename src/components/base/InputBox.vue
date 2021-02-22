@@ -47,7 +47,7 @@ export default {
       min: Number,
       max: Number,
       text: String,
-      double: Boolean,
+      multiple: Number,
       showValue: Boolean,
     },
   },
@@ -63,11 +63,13 @@ export default {
     propertyValue: {
       get() {
         const value = this.$store.state[this.property.name];
-        return this.property.double ? value * 2 : value;
+        return value * this.property.multiple;
       },
-      set(val) {
-        const value = this.property.double ? val / 2 : val;
-        this.$store.commit(`set${this.pascalCasedPropertyName}`, value);
+      set(value) {
+        this.$store.commit(
+          `set${this.pascalCasedPropertyName}`,
+          (value / this.property.multiple)
+        );
       },
     },
     pascalCasedPropertyName() {
