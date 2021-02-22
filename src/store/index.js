@@ -24,10 +24,12 @@ const store = new Vuex.Store({
       state.borderWidth = payload;
     },
     setColumnCount(state, payload) {
-      state.columnCount = payload;
+      const columnCount = payload > 23 ? 23 : payload < 3 ? 3 : payload;
+      state.columnCount = columnCount;
     },
     setRowCount(state, payload) {
-      state.rowCount = payload;
+      const rowCount = payload > 23 ? 23 : payload < 3 ? 3 : payload;
+      state.rowCount = rowCount;
     },
     addHexRow(state, { row, index }) {
       state.hexRows.push(row);
@@ -138,7 +140,7 @@ store.watch(
   (state) => ({ ...state }),
   () => {
     //TODO - check that parameters match (rowCount, columnCount with total amount of hexes)
-    store.dispatch("updateLocalStorage")
+    store.dispatch("updateLocalStorage");
   }
 );
 

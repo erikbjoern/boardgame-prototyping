@@ -25,14 +25,14 @@ export default {
           min: 3,
           max: 23,
           text: "Rader",
-          valueInText: true,
+          showValue: true,
         },
         {
           name: "columnCount",
           min: 3,
           max: 23,
           text: "Kolumner",
-          valueInText: true,
+          showValue: true,
         },
         {
           name: "tileSize",

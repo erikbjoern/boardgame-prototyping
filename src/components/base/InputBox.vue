@@ -10,14 +10,18 @@
       >
         <span>−</span>
       </div>
-      <span 
-        v-if="property.valueInText"
+      <input 
+        v-if="property.showValue"
         id="show-value"
+        type="number"
+        :min="property.min"
+        :max="property.max"
+        v-model.number="inputFieldValue"
+        @blur="setPropertyValue"
+        @keydown="keydownHandler"
       >
-        {{ propertyValue }}
-      </span>
       <input
-        v-show="!property.valueInText"
+        v-if="!property.showValue"
         :id="property.name"
         type="range"
         :min="property.min"
@@ -44,10 +48,18 @@ export default {
       max: Number,
       text: String,
       double: Boolean,
-      valueInText: Boolean,
+      showValue: Boolean,
     },
   },
   computed: {
+    inputFieldValue: {
+      get() {
+        return this.propertyValue
+      },
+      set() {
+        null
+      }
+    },
     propertyValue: {
       get() {
         const value = this.$store.state[this.property.name];
@@ -97,6 +109,20 @@ export default {
 
       window.addEventListener("mouseup", this.clearTimeouts)
     },
+    keydownHandler(e) {
+      if (e.which == 27 || e.code == "Escape") {
+        const propertyValue = this.propertyValue
+        e.target.blur()
+        this.propertyValue = propertyValue
+      }
+
+      if (e.which == 13 || e.code == "Enter") {
+        e.target.blur()    //triggers this.setPropertyValue()
+      }
+    },
+    setPropertyValue(e) {
+      this.propertyValue = parseInt(e.target.value)
+    }
   }
 };
 </script>
@@ -106,6 +132,7 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: 2px;
+  user-select: none;
 
   & > div {
     background-color: #eeeeee;
@@ -114,7 +141,6 @@ export default {
     cursor: pointer;
     height: 0.8em;
     padding: 0 2px;
-    user-select: none;
 
     & > span {
       bottom: 0.2em;
@@ -145,9 +171,20 @@ label {
   font-size: 85%;
 }
 
-#show-value {
+input#show-value {
+  background-color: transparent;
+  border: 1px solid slategray;
+  border-radius: 3px;
   margin: 5px;
   text-align: center;
   width: 1rem;
+  &::-webkit-inner-spin-button {
+    display: none;
+  }
+
+  &:hover,
+  &:focus {
+    background-color: #22222222;
+  }
 }
 </style>
