@@ -132,6 +132,7 @@ export default {
 <style lang="scss" scoped>
 .container {
   align-items: center;
+  justify-content: center;
   background-color: #09244623;
   border-radius: 3px;
   box-shadow: 1px 1px 3px #09244622;
