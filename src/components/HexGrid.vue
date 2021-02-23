@@ -28,7 +28,7 @@ export default {
     gridRowsStyle() {
       return {
         display: "grid",
-        gridAutoRows: `${this.tileSize}vw`,
+        gridAutoRows: `${this.tileSize * 0.866}vw`,
         gap: `${this.gapValue}vw`,
         gridColumnStart: 1,
         gridRowStart: 1,
@@ -43,7 +43,7 @@ export default {
     gridRowsEvenStyle() {
       return {
         gridTemplateColumns: `repeat(${this.rowsEvenLength}, ${this.tileSpaceX}vw)`,
-        marginTop: `${this.tileSize / 2 + this.gapValue / 2}vw`,
+        marginTop: `${this.tileSize * 0.866 / 2 + this.gapValue / 2}vw`,
       };
     },
     rowsOddLength() {

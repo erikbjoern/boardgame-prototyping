@@ -99,7 +99,7 @@ svg {
   flex-wrap: wrap;
   justify-content: center;
   align-content: flex-start;
-  height: 85%;
+  height: 80%;
   width: 66%;
 }
 
