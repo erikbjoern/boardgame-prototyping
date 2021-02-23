@@ -1,41 +1,36 @@
 <template>
   <div>
-    <InputsBar />
-    <div
-      class="mainContainer"
-      ref="mainContainer"
-      :style="{ paddingLeft: `${tileSize - 7}vw` }"
-    >
+    <AdjustmentsBar />
+    <div class="mainContainer" ref="mainContainer">
       <HexGridContainer />
     </div>
   </div>
 </template>
 
 <script>
-import InputsBar from "@/components/InputsBar.vue";
+import AdjustmentsBar from "@/components/AdjustmentsBar.vue";
 import HexGridContainer from "@/containers/HexGridContainer.vue";
 import { scrollToCenter } from "@/helpers/scroll.js";
 import { dragToScrollStart, dragToScroll } from "@/helpers/scroll.js";
-import { mapState } from "vuex";
 
 export default {
   name: "App",
   components: {
     HexGridContainer,
-    InputsBar,
+    AdjustmentsBar,
   },
   data() {
     return {
       mousePosition: { x: 0, y: 0 },
     };
   },
-  computed: {
-    ...mapState(["tileSize"]),
-  },
   methods: {
-    scrollToCenter,
     dragToScrollStart,
     dragToScroll,
+    scrollToCenter,
+    refreshTileSize() {
+      this.$store.commit("refreshTileSize");
+    },
     mouseMoveHandler(e) {
       this.dragToScroll.bind(this)(e);
     },
@@ -53,18 +48,22 @@ export default {
       document.addEventListener("mouseup", this.mouseUpHandler);
     },
   },
-  created() {
-    this.scrollToCenter();
-  },
   mounted() {
     const mainContainer = this.$refs.mainContainer;
+
     mainContainer.addEventListener("mousedown", this.mouseDownHandler);
     window.addEventListener("resize", this.scrollToCenter);
+    window.addEventListener("resize", this.refreshTileSize);
+  
+    window.scrollTo({ left: visualViewport.width / 2 })
+    this.scrollToCenter();
   },
-  destroyed() {
+  beforeDestroy() {
     document.removeEventListener("mousedown", this.mouseDownHandler);
     document.removeEventListener("mousemove", this.mouseMoveHandler);
     document.removeEventListener("mouseup", this.mouseUpHandler);
+    window.removeEventListener("resize", this.scrollToCenter);
+    window.removeEventListener("resize", this.refreshTileSize);
   },
 };
 </script>
@@ -79,9 +78,11 @@ body {
 
 .mainContainer {
   cursor: grab;
-  height: 200vh;
+  display: grid;
+  height: 300vh;
+  place-items: center;
+  padding-top: calc(3vw + 35px);
   width: 200vw;
-  padding-top: calc(3vw + 50px);
 }
 
 ::-webkit-scrollbar {

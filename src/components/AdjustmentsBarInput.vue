@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <label :htmlFor="property.name">
       {{ property.text }}
     </label>
@@ -40,7 +40,7 @@
 
 <script>
 export default {
-  name: "InputBox",
+  name: "AdjustmentsBarInput",
   props: {
     property: {
       name: String,
@@ -68,7 +68,7 @@ export default {
       set(value) {
         this.$store.commit(
           `set${this.pascalCasedPropertyName}`,
-          (value / this.property.multiple)
+          value / this.property.multiple
         );
       },
     },
@@ -130,6 +130,31 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.container {
+  align-items: center;
+  background-color: #09244623;
+  border-radius: 3px;
+  box-shadow: 1px 1px 3px #09244622;
+  color: #1d232a;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  gap: 5px;
+  padding: 3px;
+  opacity: 0.85;
+  transition: all .3s;
+
+  &:hover {
+    background-color: #092446d3;
+    color: #fefefeee;
+    opacity: 1;
+
+    & input#show-value {
+      color: #fefefeee;
+    }
+  }
+}
+
 .inputs {
   display: inline-flex;
   align-items: center;
@@ -137,9 +162,9 @@ export default {
   user-select: none;
 
   & > div {
-    background-color: #eeeeee;
-    border-radius: 4px;
-    border: outset;
+    background-color: #09244623;
+    border-radius: 5px;
+    border: outset #4284cf;
     cursor: pointer;
     height: 0.8em;
     padding: 0 2px;
@@ -150,11 +175,12 @@ export default {
     }
 
     &:hover {
-      background-color: #ffffffff;
+      background-color: #274e7b;
+      color: #4e8dd4;
     }
 
     &:active {
-      border: inset;
+      border: inset #4284cf;
     }
 
     &.disabled {
@@ -171,15 +197,17 @@ input[type="range"]#borderWidth {
 
 label {
   font-size: 85%;
+  letter-spacing: .5px;
 }
 
 input#show-value {
   background-color: transparent;
-  border: 1px solid slategray;
   border-radius: 3px;
+  border: 1px solid #09244682;
   margin: 5px;
   text-align: center;
   width: 1rem;
+  
   &::-webkit-inner-spin-button {
     display: none;
   }

@@ -14,7 +14,7 @@ export function dragToScrollStart(e) {
 }
 
 export function scrollToCenter() {
-  const top = visualViewport.height / 2;
+  const top = visualViewport.height;
   const left = visualViewport.width / 2;
   setTimeout(() => {
     window.scrollTo({ top, left, behavior: "smooth" });

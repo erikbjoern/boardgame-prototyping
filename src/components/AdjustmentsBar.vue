@@ -1,42 +1,26 @@
 <template>
   <div class="inputs-bar">
-    <InputBox
+    <AdjustmentsBarInput
       v-for="property in properties"
       :key="property.name"
       :property="property"
     />
-    <div
-        v-for="resource in resourceParameters"
-        :key="resource.type"
-        class="resource-input"
-        :style="
-          `background-color: ${(resource.type === 'stone' && '#252627') ||
-            (resource.type === 'wood' && '#553a2d') ||
-            (resource.type === 'wheat' && '#928d5c')}`
-        "
-      >
-        <div>
-          <label> max</label>
-          <input type="number" v-model="resource.max" />
-        </div>
-        <div>
-          <label> chans</label>
-          <input type="number" v-model="resource.chance" />
-          <span>%</span>
-        </div>
-      </div>
-    <button @click="resetAdjustments">Återställ ändringar</button>
-    <button @click="resetTiles">Förnya brickor</button>
+    <div class="buttons-box">
+      <button @click="resetAdjustments">Återställ ändringar</button>
+      <button @click="resetTiles">Förnya brickor</button>
+      <button @click="center">Centrera bräde</button>
+    </div>
   </div>
 </template>
 
 <script>
-import InputBox from "@/components/base/InputBox.vue";
-import { mapActions } from 'vuex';
+import AdjustmentsBarInput from "@/components/AdjustmentsBarInput.vue";
+import { mapActions } from "vuex";
+import { scrollToCenter } from "@/helpers/scroll";
 
 export default {
-  components: { InputBox },
-  name: "InputsBar",
+  components: { AdjustmentsBarInput },
+  name: "AdjustmentsBar",
   data() {
     return {
       properties: [
@@ -46,7 +30,7 @@ export default {
           max: 23,
           text: "Rader",
           showValue: true,
-          multiple: 1
+          multiple: 1,
         },
         {
           name: "columnCount",
@@ -54,12 +38,12 @@ export default {
           max: 23,
           text: "Kolumner",
           showValue: true,
-          multiple: 1
+          multiple: 1,
         },
         {
           name: "tileSize",
           min: 12,
-          max: 50,
+          max: 45,
           text: "Storlek",
           multiple: 3,
         },
@@ -75,12 +59,19 @@ export default {
           min: 0,
           max: 20,
           text: "Bård",
-          multiple: 1
+          multiple: 1,
         },
       ],
     };
   },
-  methods: mapActions(["resetTiles", "resetAdjustments"]),
+  methods: {
+    scrollToCenter,
+    ...mapActions(["resetTiles", "resetAdjustments"]),
+    center(e) {
+      this.scrollToCenter();
+      e.target.blur();
+    },
+  },
 };
 </script>
 
@@ -102,22 +93,24 @@ export default {
   width: 90vw;
   z-index: 1000;
 
-  & > div {
-    align-items: center;
-    background-color: #aaaaaa55;
-    border-radius: 3px;
+  .buttons-box {
     display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    gap: 5px;
-    padding: 3px;
-  }
+    background-color: transparent;
+    flex-direction: row;
+    flex-basis: 100px;
+    align-items: stretch;
+    gap: 10px;
 
-  
-  @media screen and (max-width: 900px) {
-    & {
-      top: unset;
-      bottom: 4vh;
+    & button {
+      flex: 1 1 auto;
+      color: #071b35;
+      transition: all .3s;
+
+      &:hover {
+        background-color: #092446c3;
+        color: #fefefeee;
+        opacity: 1;
+      }
     }
   }
 }
@@ -126,9 +119,10 @@ input,
 button {
   background-color: #eef1ef;
   border-radius: 3px;
-  border: 1px solid #999;
+  border: 1px solid #09244643;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  box-shadow: 1px 1px 3px #09244622;
 }
 
 button:hover {

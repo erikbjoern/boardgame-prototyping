@@ -12,6 +12,7 @@ const store = new Vuex.Store({
     rowCount: null,
     hexRows: [],
     hexRowsStash: [],
+    viewportWidth: visualViewport.width,
   },
   mutations: {
     setTileSize(state, payload) {
@@ -54,6 +55,9 @@ const store = new Vuex.Store({
     },
     setInitialHexRowsStash(state, payload) {
       state.hexRowsStash = payload;
+    },
+    refreshTileSize(state) {
+      state.viewportWidth = visualViewport.width;
     },
   },
   actions: {
@@ -131,6 +135,16 @@ const store = new Vuex.Store({
       localStorage.removeItem("hexRows");
       localStorage.removeItem("hexStash");
       window.location.reload();
+    },
+  },
+  getters: {
+    tileSize(state) {
+      const thresholdInPx = 45;
+      if (state.tileSize * (state.viewportWidth / 100) > thresholdInPx) {
+        return state.tileSize;
+      } else {
+        return (thresholdInPx / state.viewportWidth) * 100;
+      }
     },
   },
   modules: {},
