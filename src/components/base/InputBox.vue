@@ -10,14 +10,18 @@
       >
         <span>−</span>
       </div>
-      <span 
-        v-if="property.valueInText"
-        id="show-value"
-      >
-        {{ propertyValue }}
-      </span>
       <input
-        v-show="!property.valueInText"
+        v-if="property.showValue"
+        id="show-value"
+        type="number"
+        :min="property.min"
+        :max="property.max"
+        v-model.number="inputFieldValue"
+        @blur="setPropertyValue"
+        @keydown="keydownHandler"
+      />
+      <input
+        v-if="!property.showValue"
         :id="property.name"
         type="range"
         :min="property.min"
@@ -43,19 +47,29 @@ export default {
       min: Number,
       max: Number,
       text: String,
-      double: Boolean,
-      valueInText: Boolean,
+      multiple: Number,
+      showValue: Boolean,
     },
   },
   computed: {
+    inputFieldValue: {
+      get() {
+        return this.propertyValue;
+      },
+      set() {
+        null;
+      },
+    },
     propertyValue: {
       get() {
         const value = this.$store.state[this.property.name];
-        return this.property.double ? value * 2 : value;
+        return value * this.property.multiple;
       },
-      set(val) {
-        const value = this.property.double ? val / 2 : val;
-        this.$store.commit(`set${this.pascalCasedPropertyName}`, value);
+      set(value) {
+        this.$store.commit(
+          `set${this.pascalCasedPropertyName}`,
+          (value / this.property.multiple)
+        );
       },
     },
     pascalCasedPropertyName() {
@@ -65,39 +79,53 @@ export default {
   },
   methods: {
     clearTimeouts() {
-      clearTimeout(this.willDecrease)
-      clearInterval(this.isDecreasing)
-      clearTimeout(this.willIncrease)
-      clearInterval(this.isIncreasing)
-      window.removeEventListener("mouseup", this.clearTimeouts)
+      clearTimeout(this.willDecrease);
+      clearInterval(this.isDecreasing);
+      clearTimeout(this.willIncrease);
+      clearInterval(this.isIncreasing);
+      window.removeEventListener("mouseup", this.clearTimeouts);
     },
     decreaseValueStart() {
-      this.propertyValue > this.property.min && (this.propertyValue -= 1)
+      this.propertyValue > this.property.min && (this.propertyValue -= 1);
 
       this.willDecrease = setTimeout(() => {
         this.isDecreasing = setInterval(() => {
-          this.propertyValue > this.property.min 
+          this.propertyValue > this.property.min
             ? (this.propertyValue -= 1)
-            : clearInterval(this.isDecreasing)
-        }, 70)
-      }, 300)
-      
-      window.addEventListener("mouseup", this.clearTimeouts)
+            : clearInterval(this.isDecreasing);
+        }, 70);
+      }, 300);
+
+      window.addEventListener("mouseup", this.clearTimeouts);
     },
     increaseValueStart() {
-      this.propertyValue < this.property.max && (this.propertyValue += 1)
+      this.propertyValue < this.property.max && (this.propertyValue += 1);
 
       this.willIncrease = setTimeout(() => {
         this.isIncreasing = setInterval(() => {
-          this.propertyValue < this.property.max 
+          this.propertyValue < this.property.max
             ? (this.propertyValue += 1)
-            : clearInterval(this.isIncreasing)
-        }, 70)
-      }, 300)
+            : clearInterval(this.isIncreasing);
+        }, 70);
+      }, 300);
 
-      window.addEventListener("mouseup", this.clearTimeouts)
+      window.addEventListener("mouseup", this.clearTimeouts);
     },
-  }
+    keydownHandler(e) {
+      if (e.which == 27 || e.code == "Escape") {
+        const propertyValue = this.propertyValue;
+        e.target.blur();
+        this.propertyValue = propertyValue;
+      }
+
+      if (e.which == 13 || e.code == "Enter") {
+        e.target.blur(); //triggers this.setPropertyValue()
+      }
+    },
+    setPropertyValue(e) {
+      this.propertyValue = parseInt(e.target.value) || this.propertyValue;
+    },
+  },
 };
 </script>
 
@@ -106,6 +134,7 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: 2px;
+  user-select: none;
 
   & > div {
     background-color: #eeeeee;
@@ -114,7 +143,6 @@ export default {
     cursor: pointer;
     height: 0.8em;
     padding: 0 2px;
-    user-select: none;
 
     & > span {
       bottom: 0.2em;
@@ -145,9 +173,20 @@ label {
   font-size: 85%;
 }
 
-#show-value {
+input#show-value {
+  background-color: transparent;
+  border: 1px solid slategray;
+  border-radius: 3px;
   margin: 5px;
   text-align: center;
   width: 1rem;
+  &::-webkit-inner-spin-button {
+    display: none;
+  }
+
+  &:hover,
+  &:focus {
+    background-color: #22222222;
+  }
 }
 </style>

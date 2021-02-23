@@ -45,34 +45,37 @@ export default {
           min: 3,
           max: 23,
           text: "Rader",
-          valueInText: true,
+          showValue: true,
+          multiple: 1
         },
         {
           name: "columnCount",
           min: 3,
           max: 23,
           text: "Kolumner",
-          valueInText: true,
+          showValue: true,
+          multiple: 1
         },
         {
           name: "tileSize",
-          min: 8,
-          max: 35,
+          min: 12,
+          max: 50,
           text: "Storlek",
-          double: true,
+          multiple: 3,
         },
         {
           name: "gap",
           min: 0,
-          max: 6,
+          max: 20,
           text: "Mellanrum",
-          double: true,
+          multiple: 70,
         },
         {
           name: "borderWidth",
           min: 0,
           max: 20,
           text: "Bård",
+          multiple: 1
         },
       ],
     };

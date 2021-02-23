@@ -33,7 +33,7 @@ export default {
       return {
         display: "grid",
         gridAutoRows: `${this.tileHeight()}vw`,
-        gap: `${this.gap}vw`,
+        gap: `${this.gapValue}vw`,
       };
     },
     gridRowsOddStyle() {
@@ -45,8 +45,8 @@ export default {
       return {
         gridTemplateColumns: `repeat(${this.rowsEvenLength}, ${this.tileSpaceX}vw)`,
         position: "absolute",
-        top: `${this.tileHeight() / 2 + this.gap / 2}vw`,
-        left: `${-this.tileSpaceX / 2 - this.gap / 2}vw`,
+        top: `${this.tileHeight() / 2 + this.gapValue / 2}vw`,
+        left: `${-this.tileSpaceX / 2 - this.gapValue / 2}vw`,
       };
     },
     rowsOddLength() {
@@ -58,6 +58,9 @@ export default {
     tileSpaceX() {
       return this.tileHeight() * 1.5;
     },
+    gapValue() {
+      return this.gap * this.tileHeight()
+    }
   },
   methods: {
     rowsOdd() {
