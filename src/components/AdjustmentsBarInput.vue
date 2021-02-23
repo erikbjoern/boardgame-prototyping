@@ -138,7 +138,7 @@ export default {
   color: #1d232a;
   display: flex;
   flex-direction: column;
-  flex: 1 1 auto;
+  flex: 10 1 auto;
   gap: 5px;
   padding: 3px;
   opacity: 0.85;

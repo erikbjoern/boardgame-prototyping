@@ -1,29 +1,47 @@
 <template>
-  <div class="inputs-bar">
-    <AdjustmentsBarInput
-      v-for="property in properties"
-      :key="property.name"
-      :property="property"
-    />
-    <div class="buttons-box">
-      <button @click="resetAdjustments">Återställ ändringar</button>
-      <button @click="resetTiles">Förnya brickor</button>
-      <button @click="center">Centrera bräde</button>
+  <div class="input-bar-container">
+    <div class="board-inputs">
+      <AdjustmentsBarInput
+        v-for="property in gridProperties"
+        :key="property.name"
+        :property="property"
+      />
+      <div class="buttons-box">
+        <button @click="resetAdjustments">Återställ ändringar</button>
+        <button @click="center">Centrera bräde</button>
+        <button @click="resetTiles">Förnya brickor</button>
+        <button v-if="!resourceInputsIsVisible" @click="showResourceInputs">
+          Hantera resurser
+        </button>
+        <button v-else id="close" @click="hideResourceInputs">Stäng</button>
+      </div>
+    </div>
+    <div v-if="resourceInputsIsVisible" class="resource-inputs">
+      <AdjustmentsBarResourceInput 
+        v-for="resource in resourceParameters"
+        :key="resource.type" 
+        :resource="resource"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import AdjustmentsBarInput from "@/components/AdjustmentsBarInput.vue";
-import { mapActions } from "vuex";
+import AdjustmentsBarResourceInput from "@/components/AdjustmentsBarResourceInput.vue";
+import { mapActions, mapState } from "vuex";
 import { scrollToCenter } from "@/helpers/scroll";
 
 export default {
-  components: { AdjustmentsBarInput },
+  components: { 
+    AdjustmentsBarInput,
+    AdjustmentsBarResourceInput,
+  },
   name: "AdjustmentsBar",
   data() {
     return {
-      properties: [
+      resourceInputsIsVisible: false,
+      gridProperties: [
         {
           name: "rowCount",
           min: 3,
@@ -64,6 +82,7 @@ export default {
       ],
     };
   },
+  computed: mapState(["resourceParameters"]),
   methods: {
     scrollToCenter,
     ...mapActions(["resetTiles", "resetAdjustments"]),
@@ -71,19 +90,22 @@ export default {
       this.scrollToCenter();
       e.target.blur();
     },
+    showResourceInputs() {
+      this.resourceInputsIsVisible = true;
+    },
+    hideResourceInputs(e) {
+      this.resourceInputsIsVisible = false;
+      e.target.blur()
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.inputs-bar {
-  background-color: #efefef55;
-  border-radius: 5px;
-  display: inline-flex;
+
+.input-bar-container {
+  display: flex;
   flex-wrap: wrap;
-  font-family: -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu,
-    Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  gap: 10px;
   justify-content: flex-end;
   left: 50%;
   padding: 0.5vw;
@@ -92,26 +114,87 @@ export default {
   transform: translateX(-50%);
   width: 90vw;
   z-index: 1000;
+}
+
+.board-inputs {
+  background-color: #efefef55;
+  border-radius: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  font-family: -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu,
+    Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 0.5vw;
+  width: 90vw;
 
   .buttons-box {
     display: flex;
+    flex-wrap: wrap;
     background-color: transparent;
-    flex-direction: row;
-    flex-basis: 100px;
+    grid-template-columns: 1fr 1fr;
+    justify-content: flex-end;
     align-items: stretch;
-    gap: 10px;
+    gap: 4px;
+    z-index: 1001;
+    flex: 1 0 280px;
 
     & button {
-      flex: 1 1 auto;
       color: #071b35;
-      transition: all .3s;
+      transition: all 0.3s;
+      width: 140px;
+      height: 30px;
 
       &:hover {
-        background-color: #092446c3;
+        background-color: #092446d3;
         color: #fefefeee;
         opacity: 1;
       }
     }
+  }
+}
+
+@keyframes expand {
+  from {
+    max-height: 20px;
+  }
+}
+
+.resource-inputs {
+  animation: expand .15s forwards;
+  background-color: #092446e3;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 8px;
+  position: relative;
+  right: 0.5vw;
+  top: -0.25vw;
+  border-radius: 4px 0 4px 4px;
+  min-width: 170px;
+  max-height: 120px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: calc(-30px - 0.25vw);
+    right: 0;
+    height: calc(30px + 0.25vw);
+    width: 140px;
+    background-color: #092446e3;
+    border-radius: 3px 3px 0 0;
+  }
+
+  &::after {
+    content: "";
+    border-left: 3px solid transparent;
+    border-top: 3px solid transparent;
+    border-bottom: 3px solid #092446e3;
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    top: -6px;
+    right: 140px;
   }
 }
 
@@ -130,25 +213,13 @@ button:hover {
   opacity: 0.6;
 }
 
-.resource-input {
-  border-radius: 2px;
+button#close {
+  background-color: transparent;
   color: white;
-  display: flex;
-  padding: 0 2px;
-  margin: 0 4px;
-
-  & span {
-    margin-left: -4px;
-  }
-
-  & input {
-    width: 15px;
-  }
-
-  & input::-webkit-inner-spin-button,
-  & input::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+  border: none;
+  
+  &:focus {
+    outline: none;
   }
 }
 </style>

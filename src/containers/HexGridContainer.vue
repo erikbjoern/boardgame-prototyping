@@ -15,27 +15,16 @@ export default {
   data() {
     return {
       colors,
-      resourceParameters: [
-        {
-          type: "stone",
-          max: 9,
-          chance: 25,
-        },
-        {
-          type: "wood",
-          max: 9,
-          chance: 25,
-        },
-        {
-          type: "wheat",
-          max: 9,
-          chance: 25,
-        },
-      ],
     };
   },
   computed: {
-    ...mapState(["rowCount", "columnCount", "hexRows", "hexRowsStash"]),
+    ...mapState([
+      "rowCount",
+      "columnCount",
+      "hexRows",
+      "hexRowsStash",
+      "resourceParameters",
+    ]),
   },
   methods: {
     ...mapActions([
@@ -47,13 +36,6 @@ export default {
     ]),
     getCurrentHexTotal() {
       return [...this.hexRows].flat().length;
-    },
-    getResource() {
-      const chance = 25;
-      const range = 9;
-      return Math.floor((Math.random() * 100) / chance) == 0
-        ? Math.ceil(Math.random() * range)
-        : 0;
     },
     getResources() {
       const resources = {};
@@ -84,11 +66,7 @@ export default {
         const tile = stashedTile || {
           number: ++hexNumber,
           color: this.getRandomColor(),
-          resources: {
-            stone: this.getResource(),
-            wood: this.getResource(),
-            wheat: this.getResource(),
-          },
+          resources: this.getResources(),
         };
 
         row.push(tile);
@@ -205,8 +183,8 @@ export default {
   created() {
     this.setInitialState();
 
-    const currentRowCount = this.hexRows.length
-    const difference = this.rowCount - currentRowCount
+    const currentRowCount = this.hexRows.length;
+    const difference = this.rowCount - currentRowCount;
     this.addHexRows(difference, currentRowCount);
   },
 };

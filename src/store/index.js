@@ -13,8 +13,15 @@ const store = new Vuex.Store({
     hexRows: [],
     hexRowsStash: [],
     viewportWidth: visualViewport.width,
+    resourceParameters: [],
   },
   mutations: {
+    setResourceParameter(state, { value, resource, property }) {
+      const object = state.resourceParameters.filter(
+        (r) => r.type == resource.type
+      )[0];
+      Vue.set(object, property, value);
+    },
     setTileSize(state, payload) {
       state.tileSize = payload;
     },
@@ -56,6 +63,9 @@ const store = new Vuex.Store({
     setInitialHexRowsStash(state, payload) {
       state.hexRowsStash = payload;
     },
+    setInitialResourceParameters(state, payload) {
+      state.resourceParameters = payload;
+    },
     refreshTileSize(state) {
       state.viewportWidth = visualViewport.width;
     },
@@ -87,6 +97,9 @@ const store = new Vuex.Store({
       const savedHexRows = JSON.parse(localStorage.getItem("hexRows"));
       const savedHexStash = JSON.parse(localStorage.getItem("hexStash"));
       const savedStyle = JSON.parse(localStorage.getItem("style"));
+      const savedResourceData = JSON.parse(
+        localStorage.getItem("resourceData")
+      );
 
       const rowCount = savedRowCount || 13;
       const columnCount = savedColumnCount || 13;
@@ -97,6 +110,23 @@ const store = new Vuex.Store({
         gap: 0,
         borderWidth: 6,
       };
+      const resourceParameters = savedResourceData || [
+        {
+          type: "stone",
+          max: 9,
+          chance: 25,
+        },
+        {
+          type: "wood",
+          max: 9,
+          chance: 25,
+        },
+        {
+          type: "wheat",
+          max: 9,
+          chance: 25,
+        },
+      ];
 
       context.commit("setRowCount", rowCount);
       context.commit("setColumnCount", columnCount);
@@ -105,6 +135,7 @@ const store = new Vuex.Store({
       context.commit("setTileSize", style.tileSize);
       context.commit("setGap", style.gap);
       context.commit("setBorderWidth", style.borderWidth);
+      context.commit("setInitialResourceParameters", resourceParameters);
     },
     updateLocalStorage(context) {
       const {
@@ -115,6 +146,7 @@ const store = new Vuex.Store({
         columnCount,
         hexRows,
         hexRowsStash,
+        resourceParameters,
       } = context.state;
       const style = { tileSize, gap, borderWidth };
 
@@ -123,6 +155,7 @@ const store = new Vuex.Store({
       localStorage.setItem("columnCount", columnCount);
       localStorage.setItem("hexRows", JSON.stringify(hexRows));
       localStorage.setItem("hexStash", JSON.stringify(hexRowsStash));
+      localStorage.setItem("resourceData", JSON.stringify(resourceParameters));
     },
     resetAdjustments() {
       localStorage.removeItem("style");
@@ -151,7 +184,12 @@ const store = new Vuex.Store({
 });
 
 store.watch(
-  (state) => ({ ...state }),
+  (state) => ({
+    ...state,
+    ...state.resourceParameters[0],
+    ...state.resourceParameters[1],
+    ...state.resourceParameters[2],
+  }),
   () => {
     //TODO - check that parameters match (rowCount, columnCount with total amount of hexes)
     store.dispatch("updateLocalStorage");

@@ -77,22 +77,20 @@ svg path:last-child {
 
 .stone {
   background-color: #252627;
-  fill: #252627;
 }
 
 .wood {
   background-color: #47352c;
-  fill: #47352c;
 }
 
 .wheat {
   background-color: #928d5c;
-  fill: #928d5c;
 }
 
 svg {
   width: inherit !important;
   height: inherit !important;
+  fill: transparent;
 }
 
 .resourceContainer {
