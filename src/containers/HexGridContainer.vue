@@ -197,8 +197,6 @@ export default {
           })
         );
 
-        debugger;
-
         localStorage.setItem("resourceParameters", JSON.stringify(newValue));
       },
       deep: true,
