@@ -1,6 +1,6 @@
 <template>
   <div>
-    <InputsBar />
+    <AdjustmentsBar />
     <div class="mainContainer" ref="mainContainer">
       <HexGridContainer />
     </div>
@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import InputsBar from "@/components/InputsBar.vue";
+import AdjustmentsBar from "@/components/AdjustmentsBar.vue";
 import HexGridContainer from "@/containers/HexGridContainer.vue";
 import { scrollToCenter } from "@/helpers/scroll.js";
 import { dragToScrollStart, dragToScroll } from "@/helpers/scroll.js";
@@ -17,7 +17,7 @@ export default {
   name: "App",
   components: {
     HexGridContainer,
-    InputsBar,
+    AdjustmentsBar,
   },
   data() {
     return {
@@ -54,7 +54,8 @@ export default {
     mainContainer.addEventListener("mousedown", this.mouseDownHandler);
     window.addEventListener("resize", this.scrollToCenter);
     window.addEventListener("resize", this.refreshTileSize);
-
+  
+    window.scrollTo({ left: visualViewport.width / 2 })
     this.scrollToCenter();
   },
   beforeDestroy() {
