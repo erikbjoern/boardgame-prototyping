@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import HexGridTile from "@/components/HexGridTile.vue";
 
 export default {
@@ -23,30 +23,27 @@ export default {
     HexGridTile,
   },
   computed: {
-    ...mapState({
-      tileSize: (state) => state.tileSize,
-      gap: (state) => state.gap,
-      columnCount: (state) => state.columnCount,
-      hexRows: (state) => state.hexRows,
-    }),
+    ...mapState(["gap", "columnCount", "hexRows"]),
+    ...mapGetters(["tileSize"]),
     gridRowsStyle() {
       return {
         display: "grid",
-        gridAutoRows: `${this.tileHeight()}vw`,
+        gridAutoRows: `${this.tileSize}vw`,
         gap: `${this.gapValue}vw`,
+        gridColumnStart: 1,
+        gridRowStart: 1,
       };
     },
     gridRowsOddStyle() {
       return {
         gridTemplateColumns: `repeat(${this.rowsOddLength}, ${this.tileSpaceX}vw)`,
+        marginLeft: `${this.tileSpaceX / 2 + this.gapValue / 2}vw`,
       };
     },
     gridRowsEvenStyle() {
       return {
         gridTemplateColumns: `repeat(${this.rowsEvenLength}, ${this.tileSpaceX}vw)`,
-        position: "absolute",
-        top: `${this.tileHeight() / 2 + this.gapValue / 2}vw`,
-        left: `${-this.tileSpaceX / 2 - this.gapValue / 2}vw`,
+        marginTop: `${this.tileSize / 2 + this.gapValue / 2}vw`,
       };
     },
     rowsOddLength() {
@@ -56,10 +53,10 @@ export default {
       return Math.ceil(this.columnCount / 2);
     },
     tileSpaceX() {
-      return this.tileHeight() * 1.5;
+      return this.tileSize * 1.5;
     },
     gapValue() {
-      return this.gap * this.tileHeight()
+      return this.gap * this.tileSize
     }
   },
   methods: {
@@ -69,20 +66,13 @@ export default {
     rowsEven() {
       return this.hexRows.filter((a, index) => index % 2 == 1);
     },
-    tileHeight() {
-      return (this.tileSize * visualViewport.width) / 100 > 40
-        ? this.tileSize
-        : (40 / visualViewport.width) * 100;
-    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
 .grid-container {
-  position: relative;
-  width: min-content;
-  margin: 50vh auto;
+  display: grid;
   padding-bottom: 10vh;
 }
 </style>

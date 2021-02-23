@@ -8,15 +8,15 @@
           :style="{ fontSize: `clamp(10px, ${size / 10}vw, 40px`, gap: `${size / 40}vw` }"
         >
           <div v-if="tile.resources.wood > 0" class="resourceItem wood">
-            <WoodIcon v-if="size > 6" />
+            <WoodIcon v-if="tileIsLargeEnough" />
             <span>{{ tile.resources.wood }}</span>
           </div>
           <div v-if="tile.resources.stone > 0" class="resourceItem stone">
-            <StoneIcon v-if="size > 6" />
+            <StoneIcon v-if="tileIsLargeEnough" />
             <span>{{ tile.resources.stone }}</span>
           </div>
           <div v-if="tile.resources.wheat > 0" class="resourceItem wheat">
-            <WheatIcon v-if="size > 6" />
+            <WheatIcon v-if="tileIsLargeEnough" />
             <span>{{ tile.resources.wheat }}</span>
           </div>
         </div>
@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import WoodIcon from "@/assets/icons/log.svg";
 import StoneIcon from "@/assets/icons/stone-block.svg";
 import WheatIcon from "@/assets/icons/wheat.svg";
@@ -39,10 +39,8 @@ export default {
     WheatIcon,
   },
   computed: {
-    ...mapState({
-      size: (state) => state.tileSize,
-      borderWidth: (state) => state.borderWidth,
-    }),
+    ...mapState(["borderWidth", "viewportWidth"]),
+    ...mapGetters({ size: 'tileSize' }),
     tileContentStyle() {
       return {
         display: "flex",
@@ -53,6 +51,9 @@ export default {
         width: `${100 - this.borderWidth}%`,
       };
     },
+    tileIsLargeEnough() {
+      return this.size > 6 && this.viewportWidth > 800
+    }
   },
   props: {
     tile: {

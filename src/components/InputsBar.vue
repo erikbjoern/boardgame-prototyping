@@ -92,14 +92,6 @@ export default {
     gap: 5px;
     padding: 3px;
   }
-
-  
-  @media screen and (max-width: 900px) {
-    & {
-      top: unset;
-      bottom: 4vh;
-    }
-  }
 }
 
 input,
