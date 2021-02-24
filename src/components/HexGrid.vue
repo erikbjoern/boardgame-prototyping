@@ -23,7 +23,11 @@ export default {
     HexGridTile,
   },
   computed: {
-    ...mapState(["gap", "columnCount", "hexRows"]),
+    ...mapState({
+      gap: (state) => state.grid.gap,
+      columnCount: (state) => state.grid.columnCount,
+      hexRows: (state) => state.grid.hexRows,
+    }),
     ...mapGetters(["tileSize"]),
     gridRowsStyle() {
       return {
@@ -43,7 +47,7 @@ export default {
     gridRowsEvenStyle() {
       return {
         gridTemplateColumns: `repeat(${this.rowsEvenLength}, ${this.tileSpaceX}vw)`,
-        marginTop: `${this.tileSize * 0.866 / 2 + this.gapValue / 2}vw`,
+        marginTop: `${(this.tileSize * 0.866) / 2 + this.gapValue / 2}vw`,
       };
     },
     rowsOddLength() {
@@ -52,12 +56,12 @@ export default {
     rowsEvenLength() {
       return Math.ceil(this.columnCount / 2);
     },
+    gapValue() {
+      return this.gap * this.tileSize;
+    },
     tileSpaceX() {
       return this.tileSize * 1.5;
     },
-    gapValue() {
-      return this.gap * this.tileSize
-    }
   },
   methods: {
     rowsOdd() {

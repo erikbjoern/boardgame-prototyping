@@ -5,7 +5,10 @@
         {{ tile.number }}
         <div
           class="resourceContainer"
-          :style="{ fontSize: `clamp(10px, ${size / 10}vw, 40px`, gap: `${size / 40}vw` }"
+          :style="{
+            fontSize: `clamp(10px, ${size / 10}vw, 40px`,
+            gap: `${size / 40}vw`,
+          }"
         >
           <div v-if="tile.resources.wood > 0" class="resourceItem wood">
             <WoodIcon v-if="tileIsLargeEnough" />
@@ -39,8 +42,11 @@ export default {
     WheatIcon,
   },
   computed: {
-    ...mapState(["borderWidth", "viewportWidth"]),
-    ...mapGetters({ size: 'tileSize' }),
+    ...mapState({
+      borderWidth: (state) => state.grid.tileBorderWidth,
+      viewportWidth: (state) => state.viewportWidth,
+    }),
+    ...mapGetters({ size: "tileSize" }),
     tileContentStyle() {
       return {
         display: "flex",
@@ -52,8 +58,8 @@ export default {
       };
     },
     tileIsLargeEnough() {
-      return this.size > 6 && this.viewportWidth > 800
-    }
+      return this.size > 6 && this.viewportWidth > 800;
+    },
   },
   props: {
     tile: {

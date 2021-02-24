@@ -17,9 +17,9 @@
       </div>
     </div>
     <div v-if="resourceInputsIsVisible" class="resource-inputs">
-      <AdjustmentsBarResourceInput 
+      <AdjustmentsBarResourceInput
         v-for="resource in resourceParameters"
-        :key="resource.type" 
+        :key="resource.type"
         :resource="resource"
       />
     </div>
@@ -33,7 +33,7 @@ import { mapActions, mapState } from "vuex";
 import { scrollToCenter } from "@/helpers/scroll";
 
 export default {
-  components: { 
+  components: {
     AdjustmentsBarInput,
     AdjustmentsBarResourceInput,
   },
@@ -73,7 +73,7 @@ export default {
           multiple: 70,
         },
         {
-          name: "borderWidth",
+          name: "tileBorderWidth",
           min: 0,
           max: 20,
           text: "Bård",
@@ -82,7 +82,9 @@ export default {
       ],
     };
   },
-  computed: mapState(["resourceParameters"]),
+  computed: mapState({
+    resourceParameters: state => state.resources.parameters,
+  }),
   methods: {
     scrollToCenter,
     ...mapActions(["resetTiles", "resetAdjustments"]),
@@ -95,14 +97,13 @@ export default {
     },
     hideResourceInputs(e) {
       this.resourceInputsIsVisible = false;
-      e.target.blur()
+      e.target.blur();
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-
 .input-bar-container {
   display: flex;
   flex-wrap: wrap;
@@ -161,7 +162,7 @@ export default {
 }
 
 .resource-inputs {
-  animation: expand .15s forwards;
+  animation: expand 0.15s forwards;
   background-color: #092446e3;
   display: flex;
   flex-direction: column;
@@ -217,7 +218,7 @@ button#close {
   background-color: transparent;
   color: white;
   border: none;
-  
+
   &:focus {
     outline: none;
   }

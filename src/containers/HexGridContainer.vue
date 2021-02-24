@@ -18,13 +18,13 @@ export default {
     };
   },
   computed: {
-    ...mapState([
-      "rowCount",
-      "columnCount",
-      "hexRows",
-      "hexRowsStash",
-      "resourceParameters",
-    ]),
+    ...mapState({
+      rowCount: (state) => state.grid.rowCount,
+      columnCount: (state) => state.grid.columnCount,
+      hexRows: (state) => state.grid.hexRows,
+      hexRowsStash: (state) => state.grid.hexRowsStash,
+      resourceParameters: (state) => state.resources.parameters,
+    }),
   },
   methods: {
     ...mapActions([
@@ -162,22 +162,6 @@ export default {
       }
 
       this.updateTileNumbers({ updateAll: true });
-    },
-    resources: {
-      handler(newValue) {
-        let detectedChange;
-        newValue.forEach((resource) =>
-          Object.entries(resource).forEach(([k, v], index, resource) => {
-            if (typeof v === "string" && k !== "type") {
-              detectedChange = { resource, index };
-              return;
-            }
-          })
-        );
-
-        localStorage.setItem("resourceParameters", JSON.stringify(newValue));
-      },
-      deep: true,
     },
   },
   created() {

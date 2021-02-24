@@ -62,7 +62,7 @@ export default {
     },
     propertyValue: {
       get() {
-        const value = this.$store.state[this.property.name];
+        const value = this.$store.state.grid[this.property.name];
         return value * this.property.multiple;
       },
       set(value) {
@@ -192,7 +192,7 @@ export default {
 }
 
 input[type="range"]#gap,
-input[type="range"]#borderWidth {
+input[type="range"]#tileBorderWidth {
   width: 60px;
 }
 

@@ -28,8 +28,8 @@ export default {
     dragToScrollStart,
     dragToScroll,
     scrollToCenter,
-    refreshTileSize() {
-      this.$store.commit("refreshTileSize");
+    updateViewportWidth() {
+      this.$store.commit("updateViewportWidth");
     },
     mouseMoveHandler(e) {
       this.dragToScroll.bind(this)(e);
@@ -53,7 +53,7 @@ export default {
 
     mainContainer.addEventListener("mousedown", this.mouseDownHandler);
     window.addEventListener("resize", this.scrollToCenter);
-    window.addEventListener("resize", this.refreshTileSize);
+    window.addEventListener("resize", this.updateViewportWidth);
   
     window.scrollTo({ left: visualViewport.width / 2 })
     this.scrollToCenter();
@@ -63,7 +63,7 @@ export default {
     document.removeEventListener("mousemove", this.mouseMoveHandler);
     document.removeEventListener("mouseup", this.mouseUpHandler);
     window.removeEventListener("resize", this.scrollToCenter);
-    window.removeEventListener("resize", this.refreshTileSize);
+    window.removeEventListener("resize", this.updateViewportWidth);
   },
 };
 </script>
