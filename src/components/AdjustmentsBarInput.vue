@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" :style="{ flex: `${property.flexGrow} 1 auto`}">
     <label :htmlFor="property.name">
       {{ property.text }}
     </label>
@@ -139,7 +139,6 @@ export default {
   color: #1d232a;
   display: flex;
   flex-direction: column;
-  flex: 10 1 auto;
   gap: 5px;
   padding: 3px;
   opacity: 0.85;

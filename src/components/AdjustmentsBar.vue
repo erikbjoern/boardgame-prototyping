@@ -49,6 +49,7 @@ export default {
           text: "Rader",
           showValue: true,
           multiple: 1,
+          flexGrow: 10,
         },
         {
           name: "columnCount",
@@ -57,13 +58,15 @@ export default {
           text: "Kolumner",
           showValue: true,
           multiple: 1,
+          flexGrow: 10,
         },
         {
           name: "tileSize",
-          min: 12,
-          max: 45,
+          min: 60,
+          max: 225,
           text: "Storlek",
-          multiple: 3,
+          multiple: 15,
+          flexGrow: 7,
         },
         {
           name: "gap",
@@ -71,6 +74,7 @@ export default {
           max: 20,
           text: "Mellanrum",
           multiple: 70,
+          flexGrow: 1,
         },
         {
           name: "tileBorderWidth",
@@ -78,6 +82,7 @@ export default {
           max: 20,
           text: "Bård",
           multiple: 1,
+          flexGrow: 1,
         },
       ],
     };
@@ -130,15 +135,15 @@ export default {
   width: 90vw;
 
   .buttons-box {
+    align-items: stretch;
+    background-color: transparent;
     display: flex;
     flex-wrap: wrap;
-    background-color: transparent;
+    gap: 4px;
     grid-template-columns: 1fr 1fr;
     justify-content: flex-end;
-    align-items: stretch;
-    gap: 4px;
+    width: 284px;
     z-index: 1001;
-    flex: 1 0 280px;
 
     & button {
       color: #071b35;
@@ -164,38 +169,38 @@ export default {
 .resource-inputs {
   animation: expand 0.15s forwards;
   background-color: #092446e3;
+  border-radius: 4px 0 4px 4px;
   display: flex;
   flex-direction: column;
-  padding: 20px;
   gap: 8px;
+  max-height: 120px;
+  min-width: 170px;
+  padding: 20px;
   position: relative;
   right: 0.5vw;
   top: -0.25vw;
-  border-radius: 4px 0 4px 4px;
-  min-width: 170px;
-  max-height: 120px;
 
   &::before {
     content: "";
-    position: absolute;
-    top: calc(-30px - 0.25vw);
-    right: 0;
-    height: calc(30px + 0.25vw);
-    width: 140px;
     background-color: #092446e3;
     border-radius: 3px 3px 0 0;
+    height: calc(30px + 0.25vw);
+    position: absolute;
+    right: 0;
+    top: calc(-30px - 0.25vw);
+    width: 140px;
   }
 
   &::after {
     content: "";
+    border-bottom: 3px solid #092446e3;
     border-left: 3px solid transparent;
     border-top: 3px solid transparent;
-    border-bottom: 3px solid #092446e3;
-    width: 0px;
     height: 0px;
     position: absolute;
-    top: -6px;
     right: 140px;
+    top: -6px;
+    width: 0px;
   }
 }
 
@@ -204,9 +209,9 @@ button {
   background-color: #eef1ef;
   border-radius: 3px;
   border: 1px solid #09244643;
+  box-shadow: 1px 1px 3px #09244622;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  box-shadow: 1px 1px 3px #09244622;
 }
 
 button:hover {
