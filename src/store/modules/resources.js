@@ -12,6 +12,7 @@ export const resources = {
   }),
   mutations: {
     setResourceParameter(state, { value, resource, property }) {
+      value > 100 && (value = 100)
       const object = state.parameters.filter(
         (r) => r.type == resource.type
       )[0];
