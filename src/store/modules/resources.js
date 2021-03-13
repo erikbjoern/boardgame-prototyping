@@ -1,6 +1,6 @@
 import Vue from "vue";
 
-export const resources = {
+export default {
   state: () => ({
     parameters: [
       {

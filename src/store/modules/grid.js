@@ -1,4 +1,4 @@
-export const grid = {
+export default {
   state: () => ({
     rowCount: null,
     columnCount: null,
