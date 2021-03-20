@@ -32,9 +32,6 @@ export default {
     replaceHexRowInStash(state, { row, index }) {
       state.hexRowsStash[index] = row;
     },
-    removeHexColumn(state, { indexParity }) {
-      state.hexRows.map((row, i) => i % 2 == indexParity && row.pop());
-    },
     setInitialHexRows(state, payload) {
       state.hexRows = payload;
     },

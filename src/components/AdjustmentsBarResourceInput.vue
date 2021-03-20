@@ -1,11 +1,7 @@
 <template>
   <div
     class="resource-input"
-    :style="
-      `background-color: ${(resource.type === 'stone' && '#252627') ||
-        (resource.type === 'wood' && '#553a2d') ||
-        (resource.type === 'wheat' && '#928d5c')}`
-    "
+    :style="{ backgroundColor: colors[resource.type]}"
   >
     <WoodIcon v-if="resource.type == 'wood'" />
     <StoneIcon v-if="resource.type == 'stone'" />
@@ -38,6 +34,7 @@
 import WoodIcon from "@/assets/icons/log.svg";
 import StoneIcon from "@/assets/icons/stone-block.svg";
 import WheatIcon from "@/assets/icons/wheat.svg";
+import colors from "@/assets/colors";
 
 export default {
   name: "AdjustmentsBarResourceInput",
@@ -45,6 +42,11 @@ export default {
     WoodIcon,
     StoneIcon,
     WheatIcon,
+  },
+  data() {
+    return {
+      colors
+    }
   },
   props: ['resource'],
   methods: {

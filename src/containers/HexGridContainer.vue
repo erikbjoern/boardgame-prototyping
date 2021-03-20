@@ -4,7 +4,7 @@
 
 <script>
 import { mapActions, mapState } from "vuex";
-import { colors } from "@/helpers/colors";
+import colors from "@/assets/colors";
 import HexGrid from "@/components/HexGrid.vue";
 
 export default {
@@ -15,6 +15,7 @@ export default {
   data() {
     return {
       colors,
+      hexNumber: 0,
     };
   },
   computed: {
@@ -35,7 +36,7 @@ export default {
       "updateLocalStorage",
     ]),
     getCurrentHexTotal() {
-      return [...this.hexRows].flat().length;
+      return [...this.$store.state.grid.hexRows].flat().length;
     },
     getResources() {
       const resources = {};
@@ -50,7 +51,9 @@ export default {
       return resources;
     },
     getRandomColor() {
-      return this.colors[Math.floor(Math.random() * this.colors.length)];
+      return this.colors.random[
+        Math.floor(Math.random() * this.colors.random.length)
+      ];
     },
     getTileCount(rowIndex) {
       const { columnCount } = this;
@@ -58,24 +61,60 @@ export default {
     },
     buildHexRow(row, rowIndex) {
       const tileCount = this.getTileCount(rowIndex);
-      let hexNumber = this.getCurrentHexTotal();
+      let newRow = [];
 
-      for (let t = row.length; t < tileCount; t++) {
-        const stashedRow = this.hexRowsStash[rowIndex];
-        const stashedTile = stashedRow ? stashedRow[row.length] : null;
-        const tile = stashedTile || {
-          number: ++hexNumber,
-          color: this.getRandomColor(),
-          resources: this.getResources(),
-        };
+      for (let t = 0; t < tileCount; t++) {
+        let tile;
 
-        row.push(tile);
+        if (!!row[t]) {
+          tile = row[t];
+        } else {
+          const stashedRow = this.hexRowsStash[rowIndex];
+          const stashedTile = stashedRow ? stashedRow[newRow.length] : null;
+
+          let resources;
+          let color;
+
+          if (!stashedTile) {
+            resources = this.getResources();
+            const highestResourceValue = Math.max(...Object.values(resources));
+            const highestResourceType = Object.keys(resources).find(
+              (type) => resources[type] == highestResourceValue
+            );
+            color =
+              highestResourceValue == 0
+                ? `${this.getRandomColor()}9a`
+                : `${colors[highestResourceType]}ea`;
+          }
+
+          tile = stashedTile || {
+            color,
+            resources,
+          };
+        }
+
+        (tile.number = ++this.hexNumber), (tile.index = newRow.length);
+        tile.rowIndex = rowIndex;
+
+        newRow.push(tile);
       }
 
-      return row;
+      return newRow;
+    },
+    reduceHexRow(targetRow, rowIndex) {
+      const tileCount = this.getTileCount(rowIndex);
+      let reducedRow = [];
+
+      for (let i = 0; i < tileCount; i++) {
+        const tile = { ...targetRow[i], number: ++this.hexNumber };
+        reducedRow.push(tile);
+      }
+
+      return reducedRow
     },
     addHexColumns() {
       const { rowCount, hexRows } = this;
+      this.hexNumber = 0;
 
       for (let index = 0; index < rowCount; index++) {
         const targetRow = hexRows[index];
@@ -86,56 +125,31 @@ export default {
     },
     async addHexRows(difference, oldRowTotal) {
       const newTotal = oldRowTotal + difference;
+      this.hexNumber = this.getCurrentHexTotal()
 
       for (let index = oldRowTotal; index < newTotal; index++) {
         const stashedRow = await this.getRowFromStash(index);
-        const tileCount = this.getTileCount(index);
-
-        let row, needsUpdate;
-
-        if (!stashedRow) {
-          row = this.buildHexRow([], index);
-        } else if (stashedRow.length < tileCount) {
-          row = this.buildHexRow([...stashedRow], index);
-          needsUpdate = true;
-        } else if (stashedRow.length > tileCount) {
-          row = [...stashedRow].slice(0, tileCount);
-          needsUpdate = true;
-        } else {
-          row = stashedRow;
-        }
+        const row = stashedRow
+          ? this.buildHexRow([...stashedRow], index)
+          : this.buildHexRow([], index);
 
         this.storeHexRow({ row, index });
-        needsUpdate &&
-          this.updateTileNumbers({ updateAll: false, row: index + 1 });
       }
     },
-    removeHexColumns(difference, previousTotal) {
-      const p = previousTotal % 2;
-      for (let i = p; i < difference + p; i++) {
-        this.$store.commit("removeHexColumn", { indexParity: i % 2 });
+    removeHexColumns() {
+      this.hexNumber = 0;
+
+      for (let index = 0; index < this.rowCount; index++) { 
+        const targetRow = this.hexRows[index];
+        const reducedRow = this.reduceHexRow(targetRow, index);
+        
+        this.storeModifiedHexRow({ row: reducedRow, index });
       }
     },
     removeHexRows(difference) {
-      for (let i = 0; i < difference; i++) {
+      while(difference--) {
         this.$store.commit("removeHexRow");
       }
-    },
-    updateTileNumbers({ updateAll, row }) {
-      const { rowCount, getCurrentHexTotal, hexRows } = this;
-      let hexNumber = getCurrentHexTotal();
-      let index = row || rowCount;
-
-      do {
-        const targetRow = hexRows[--index];
-        const updatedRow = [...targetRow]
-          .reverse()
-          .map((tile) => (tile = { ...tile, number: hexNumber-- }))
-          .reverse();
-        this.storeModifiedHexRow({ row: updatedRow, index });
-      } while (index > 0 && updateAll);
-
-      this.updateLocalStorage();
     },
   },
   watch: {
@@ -153,23 +167,19 @@ export default {
     columnCount(newValue, oldValue) {
       if (oldValue == null) return;
 
-      const difference = Math.abs(newValue - oldValue);
-
       if (newValue > oldValue) {
         this.addHexColumns();
       } else {
-        this.removeHexColumns(difference, oldValue);
+        this.removeHexColumns();
       }
-
-      this.updateTileNumbers({ updateAll: true });
     },
   },
   created() {
     this.setInitialState();
 
-    const currentRowCount = this.hexRows.length;
-    const difference = this.rowCount - currentRowCount;
-    this.addHexRows(difference, currentRowCount);
+    const stashedRowsCount = this.hexRows.length;
+    const difference = this.rowCount - stashedRowsCount;
+    this.addHexRows(difference, stashedRowsCount);
   },
 };
 </script>

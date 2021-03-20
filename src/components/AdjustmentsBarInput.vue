@@ -86,12 +86,12 @@ export default {
       window.removeEventListener("mouseup", this.clearTimeouts);
     },
     decreaseValueStart() {
-      this.propertyValue > this.property.min && (this.propertyValue -= 1);
+      this.propertyValue > this.property.min && (this.propertyValue -= 2);
 
       this.willDecrease = setTimeout(() => {
         this.isDecreasing = setInterval(() => {
           this.propertyValue > this.property.min
-            ? (this.propertyValue -= 1)
+            ? (this.propertyValue -= 2)
             : clearInterval(this.isDecreasing);
         }, 70);
       }, 300);
@@ -99,12 +99,12 @@ export default {
       window.addEventListener("mouseup", this.clearTimeouts);
     },
     increaseValueStart() {
-      this.propertyValue < this.property.max && (this.propertyValue += 1);
+      this.propertyValue < this.property.max && (this.propertyValue += 2);
 
       this.willIncrease = setTimeout(() => {
         this.isIncreasing = setInterval(() => {
           this.propertyValue < this.property.max
-            ? (this.propertyValue += 1)
+            ? (this.propertyValue += 2)
             : clearInterval(this.isIncreasing);
         }, 70);
       }, 300);

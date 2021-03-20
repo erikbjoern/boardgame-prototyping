@@ -13,7 +13,8 @@
           <div
             v-for="resource in resources"
             :key="resource.type"
-            :class="['resourceItem', resource.type]"
+            class="resourceItem"
+            :style="{ backgroundColor: colors[resource.type] }"
           >
             <WoodIcon v-if="resource.type == 'wood' && tileIsLargeEnough" />
             <StoneIcon v-if="resource.type == 'stone' && tileIsLargeEnough" />
@@ -31,6 +32,7 @@ import { mapGetters, mapState } from "vuex";
 import WoodIcon from "@/assets/icons/log.svg";
 import StoneIcon from "@/assets/icons/stone-block.svg";
 import WheatIcon from "@/assets/icons/wheat.svg";
+import colors from "@/assets/colors";
 
 export default {
   name: "ResourceTile",
@@ -38,6 +40,11 @@ export default {
     WoodIcon,
     StoneIcon,
     WheatIcon,
+  },
+  data() {
+    return {
+      colors,
+    };
   },
   props: {
     tile: {
