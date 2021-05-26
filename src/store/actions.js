@@ -2,6 +2,18 @@ import { storeConfig } from "@/store";
 
 export default {
   setInitialState(context) {
+    const timeStamp = localStorage.getItem("timeStamp");
+
+    if (new Date(timeStamp) < new Date("2021-05-26T19:38:15.287Z")) {
+      localStorage.removeItem("hexRows");
+      localStorage.removeItem("hexStash");
+      localStorage.removeItem("tileStyle");
+      localStorage.removeItem("resourceData");
+      localStorage.setItem("timeStamp", new Date());
+
+      return;
+    }
+
     const initialGrid = storeConfig.initialState.grid;
     const initialResourceData = storeConfig.initialState.resources;
 
@@ -20,8 +32,7 @@ export default {
     const tileSize = savedTileStyle?.tileSize || initialGrid.tileSize;
     const tileBorderWidth =
       savedTileStyle?.tileBorderWidth || initialGrid.tileBorderWidth;
-    const resourceData =
-      savedResourceData || initialResourceData;
+    const resourceData = savedResourceData || initialResourceData;
 
     context.commit("setRowCount", rowCount);
     context.commit("setColumnCount", columnCount);
@@ -43,7 +54,7 @@ export default {
       tileBorderWidth,
     } = context.state.grid;
     const tileStyle = { gap, tileSize, tileBorderWidth };
-    const resourceData = context.state.resources
+    const resourceData = context.state.resources;
 
     localStorage.setItem("rowCount", rowCount);
     localStorage.setItem("columnCount", columnCount);
@@ -51,6 +62,7 @@ export default {
     localStorage.setItem("hexStash", JSON.stringify(hexRowsStash));
     localStorage.setItem("tileStyle", JSON.stringify(tileStyle));
     localStorage.setItem("resourceData", JSON.stringify(resourceData));
+    localStorage.setItem("timeStamp", new Date());
   },
   resetAdjustments() {
     localStorage.removeItem("rowCount");
