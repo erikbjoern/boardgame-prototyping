@@ -88,4 +88,15 @@ body {
 ::-webkit-scrollbar {
   display: none;
 }
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .2s;
+  opacity: 1;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>

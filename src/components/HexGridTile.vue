@@ -2,26 +2,32 @@
   <div class="hex-grid__item" :style="{ zIndex: tile.number }">
     <div class="hex-grid-item__background">
       <div class="hex-grid-item__content" :style="{ ...tileContentStyle }">
-        {{ tile.number }}
-        <div
-          class="resourceContainer"
-          :style="{
-            fontSize: `clamp(10px, ${size / 10}vw, 40px`,
-            gap: `${size / 40}vw`,
-          }"
-        >
+        <span :style="`margin-top: ${size / 5}px;`">{{ tile.number }}</span>
+        <transition name="fade" mode="out-in">
           <div
-            v-for="resource in resources"
-            :key="resource.type"
-            class="resourceItem"
-            :style="{ backgroundColor: colors[resource.type] }"
+            v-show="
+              $store.state.resources.distributionMode == 'INDIVIDUAL' &&
+                $store.state.resources.visibleValues
+            "
+            class="resourceContainer"
+            :style="{
+              fontSize: `clamp(10px, ${size / 10}vw, 40px`,
+              gap: `${size / 40}vw`,
+            }"
           >
-            <WoodIcon v-if="resource.type == 'wood' && tileIsLargeEnough" />
-            <StoneIcon v-if="resource.type == 'stone' && tileIsLargeEnough" />
-            <WheatIcon v-if="resource.type == 'wheat' && tileIsLargeEnough" />
-            <span>{{ resource.amount }}</span>
+            <div
+              v-for="resource in resources"
+              :key="resource.type"
+              class="resourceItem"
+              :style="{ backgroundColor: colors.resources[resource.type] }"
+            >
+              <WoodIcon v-if="resource.type == 'wood' && tileIsLargeEnough" />
+              <StoneIcon v-if="resource.type == 'stone' && tileIsLargeEnough" />
+              <WheatIcon v-if="resource.type == 'wheat' && tileIsLargeEnough" />
+              <span>{{ resource.amount }}</span>
+            </div>
           </div>
-        </div>
+        </transition>
       </div>
     </div>
   </div>
@@ -73,7 +79,7 @@ export default {
       return {
         display: "flex",
         gap: `${this.size / 50}vw`,
-        backgroundColor: `${this.tile.color}9a`,
+        backgroundColor: this.tile.color,
         fontSize: `clamp(8px, ${this.size / 10}vw, 20px`,
         height: `${100 - this.borderWidth}%`,
         width: `${100 - this.borderWidth}%`,
@@ -89,18 +95,6 @@ export default {
 <style lang="scss" scoped>
 svg path:last-child {
   fill: #eee !important;
-}
-
-.stone {
-  background-color: #252627;
-}
-
-.wood {
-  background-color: #47352c;
-}
-
-.wheat {
-  background-color: #928d5c;
 }
 
 svg {
@@ -153,6 +147,6 @@ svg {
   display: flex;
   flex-direction: column;
   font-size: 0.7vw;
-  justify-content: center;
+  justify-content: start;
 }
 </style>

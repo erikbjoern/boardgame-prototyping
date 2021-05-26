@@ -17,10 +17,40 @@
       </div>
     </div>
     <div v-if="resourceInputsIsVisible" class="resource-inputs">
+      <div
+        style="display: flex; justify-content: space-between; padding-right: 5px;"
+      >
+        <label
+          ><input
+            type="radio"
+            name="mode"
+            :checked="$store.state.resources.distributionMode == 'INDIVIDUAL'"
+            @click="toggleResourceDistributionMode"
+          />Individuella värden</label
+        >
+        <label
+          ><input
+            type="radio"
+            name="mode"
+            :checked="$store.state.resources.distributionMode == 'FRACTION'"
+            @click="toggleResourceDistributionMode"
+          />Fördelning</label
+        >
+      </div>
+      <div style="height: 20px;">
+        <label v-if="$store.state.resources.distributionMode == 'INDIVIDUAL'"
+          ><input
+            type="checkbox"
+            :checked="$store.state.resources.visibleValues"
+            @click="toggleResourceValuesVisibility"
+          />Visa värden</label
+        >
+      </div>
       <AdjustmentsBarResourceInput
         v-for="resource in resourceParameters"
         :key="resource.type"
         :resource="resource"
+        :mode="$store.state.resources.distributionMode"
       />
     </div>
   </div>
@@ -88,7 +118,7 @@ export default {
     };
   },
   computed: mapState({
-    resourceParameters: state => state.resources.parameters,
+    resourceParameters: (state) => state.resources.parameters,
   }),
   methods: {
     scrollToCenter,
@@ -103,6 +133,12 @@ export default {
     hideResourceInputs(e) {
       this.resourceInputsIsVisible = false;
       e.target.blur();
+    },
+    toggleResourceValuesVisibility() {
+      this.$store.commit("toggleResourceValuesVisibility");
+    },
+    toggleResourceDistributionMode() {
+      this.$store.commit("toggleResourceDistributionMode");
     },
   },
 };
@@ -168,12 +204,12 @@ export default {
 
 .resource-inputs {
   animation: expand 0.15s forwards;
-  background-color: #092446e3;
+  background-color: #092446ef;
   border-radius: 4px 0 4px 4px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 120px;
+  max-height: 170px;
   min-width: 170px;
   padding: 20px;
   position: relative;
@@ -182,7 +218,7 @@ export default {
 
   &::before {
     content: "";
-    background-color: #092446e3;
+    background-color: #092446ef;
     border-radius: 3px 3px 0 0;
     height: calc(30px + 0.25vw);
     position: absolute;
@@ -193,12 +229,12 @@ export default {
 
   &::after {
     content: "";
-    border-bottom: 3px solid #092446e3;
+    border-bottom: 3px solid #092446ef;
     border-left: 3px solid transparent;
     border-top: 3px solid transparent;
     height: 0px;
     position: absolute;
-    right: 140px;
+    right: 139px;
     top: -6px;
     width: 0px;
   }
@@ -212,6 +248,15 @@ button {
   box-shadow: 1px 1px 3px #09244622;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+label {
+  user-select: none;
+  color: whitesmoke;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  font-weight: 300;
+  font-size: 0.85rem;
 }
 
 button:hover {

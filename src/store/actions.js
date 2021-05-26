@@ -20,8 +20,8 @@ export default {
     const tileSize = savedTileStyle?.tileSize || initialGrid.tileSize;
     const tileBorderWidth =
       savedTileStyle?.tileBorderWidth || initialGrid.tileBorderWidth;
-    const resourceParameters =
-      savedResourceData || initialResourceData.parameters;
+    const resourceData =
+      savedResourceData || initialResourceData;
 
     context.commit("setRowCount", rowCount);
     context.commit("setColumnCount", columnCount);
@@ -30,7 +30,7 @@ export default {
     context.commit("setGap", gap);
     context.commit("setTileSize", tileSize);
     context.commit("setTileBorderWidth", tileBorderWidth);
-    context.commit("setInitialResourceParameters", resourceParameters);
+    context.commit("setInitialResourceParameters", resourceData);
   },
   updateLocalStorage(context) {
     const {
@@ -42,15 +42,15 @@ export default {
       tileSize,
       tileBorderWidth,
     } = context.state.grid;
-    const resourceParameters = context.state.resources.parameters;
     const tileStyle = { gap, tileSize, tileBorderWidth };
+    const resourceData = context.state.resources
 
     localStorage.setItem("rowCount", rowCount);
     localStorage.setItem("columnCount", columnCount);
     localStorage.setItem("hexRows", JSON.stringify(hexRows));
     localStorage.setItem("hexStash", JSON.stringify(hexRowsStash));
     localStorage.setItem("tileStyle", JSON.stringify(tileStyle));
-    localStorage.setItem("resourceData", JSON.stringify(resourceParameters));
+    localStorage.setItem("resourceData", JSON.stringify(resourceData));
   },
   resetAdjustments() {
     localStorage.removeItem("rowCount");

@@ -26,18 +26,23 @@ export default class StoreConfig {
             type: "stone",
             max: 9,
             chance: 25,
+            fraction: 1,
           },
           {
             type: "wood",
             max: 9,
             chance: 25,
+            fraction: 2,
           },
           {
             type: "wheat",
             max: 9,
             chance: 25,
+            fraction: 3,
           },
         ],
+        visibleValues: false,
+        distributionMode: "FRACTION",
       },
     };
   }

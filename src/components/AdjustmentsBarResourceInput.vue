@@ -1,31 +1,49 @@
 <template>
   <div
     class="resource-input"
-    :style="{ backgroundColor: colors[resource.type]}"
+    :style="{
+      backgroundColor:
+        distributionMode == 'FRACTION'
+          ? colors.backgrounds[resource.type]
+          : colors.resources[resource.type],
+    }"
   >
     <WoodIcon v-if="resource.type == 'wood'" />
     <StoneIcon v-if="resource.type == 'stone'" />
     <WheatIcon v-if="resource.type == 'wheat'" />
-    <div>
+    <div v-if="mode == 'INDIVIDUAL'">
       <label> max</label>
       <input
         type="number"
-        id="max"
+        name="max"
         :value="resource.max"
         @change="handleChange"
         @keydown="keydownHandler"
       />
     </div>
-    <div>
+    <div v-if="mode == 'INDIVIDUAL'">
       <label> chans</label>
       <input
         type="number"
-        id="chance"
+        name="chance"
         :value="resource.chance"
         @change="handleChange"
         @keydown="keydownHandler"
       />
       <span>%</span>
+    </div>
+    <div v-if="mode == 'FRACTION'">
+      <label> fördelning</label>
+      <input
+        type="text"
+        name="fraction"
+        :value="resource.fraction"
+        @change="handleChange"
+        @keydown="keydownHandler"
+      />
+      <span style="margin-left: 2px;">
+        / {{ $store.getters.resourceDistributionSum }}</span
+      >
     </div>
   </div>
 </template>
@@ -45,36 +63,46 @@ export default {
   },
   data() {
     return {
-      colors
-    }
+      colors,
+    };
   },
-  props: ['resource'],
+  props: ["resource", "mode"],
+  computed: {
+    distributionMode() {
+      return this.$store.state.resources.distributionMode;
+    },
+  },
   methods: {
     handleChange(e) {
-      const value = parseInt(e.target.value)
-      const resource = this.resource
-      const property = e.target.id;
+      const value = parseInt(e.target.value);
+      const resource = this.resource;
+      const property = e.target.name;
 
       if (!value) {
-        e.target.value = resource[property]
-        return
+        e.target.value = resource[property];
+        return;
       }
 
       this.$store.commit("setResourceParameter", { value, resource, property });
     },
     keydownHandler(e) {
-      const value = parseInt(e.target.value)
-      const resource = this.resource
-      const property = e.target.id;
+      const value =
+        property !== "fraction" ? parseInt(e.target.value) : e.target.value;
+      const resource = this.resource;
+      const property = e.target.name;
 
       if (e.which == 27 || e.code == "Escape") {
-        e.target.value = resource[property]
+        e.target.value = resource[property];
         e.target.blur();
       }
 
       if (e.which == 13 || e.code == "Enter") {
-        this.$store.commit("setResourceParameter", { value, resource, property });
-        e.target.blur()
+        this.$store.commit("setResourceParameter", {
+          value,
+          resource,
+          property,
+        });
+        e.target.blur();
       }
     },
   },
@@ -95,7 +123,7 @@ svg {
 }
 
 .resource-input {
-  animation: fadeIn .2s forwards;
+  animation: fadeIn 0.2s forwards;
   border-radius: 2px;
   color: white;
   display: flex;

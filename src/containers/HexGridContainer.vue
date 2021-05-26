@@ -25,6 +25,7 @@ export default {
       hexRows: (state) => state.grid.hexRows,
       hexRowsStash: (state) => state.grid.hexRowsStash,
       resourceParameters: (state) => state.resources.parameters,
+      resourceDistributionMode: (state) => state.resources.distributionMode,
     }),
   },
   methods: {
@@ -55,6 +56,31 @@ export default {
         Math.floor(Math.random() * this.colors.random.length)
       ];
     },
+    getColor(resources) {
+      if (this.resourceDistributionMode == "INDIVIDUAL") {
+        const highestResourceValue = Math.max(...Object.values(resources));
+        const highestResourceType = Object.keys(resources).find(
+          (type) => resources[type] == highestResourceValue
+        );
+        return highestResourceValue == 0
+          ? `${this.getRandomColor()}9a`
+          : this.colors.backgrounds[highestResourceType];
+      } else {
+        const colorsByDistribution = [];
+
+        this.$store.state.resources.parameters.map((r) => {
+          let count = r.fraction;
+          while (count > 0) {
+            colorsByDistribution.push(colors.backgrounds[r.type]);
+            count--;
+          }
+        });
+
+        return colorsByDistribution[
+          Math.floor(Math.random() * colorsByDistribution.length)
+        ];
+      }
+    },
     getTileCount(rowIndex) {
       const { columnCount } = this;
       return Math.floor(columnCount / 2) + (columnCount % 2) * (rowIndex % 2);
@@ -77,14 +103,7 @@ export default {
 
           if (!stashedTile) {
             resources = this.getResources();
-            const highestResourceValue = Math.max(...Object.values(resources));
-            const highestResourceType = Object.keys(resources).find(
-              (type) => resources[type] == highestResourceValue
-            );
-            color =
-              highestResourceValue == 0
-                ? `${this.getRandomColor()}9a`
-                : `${colors[highestResourceType]}ea`;
+            color = this.getColor(resources);
           }
 
           tile = stashedTile || {
@@ -110,7 +129,7 @@ export default {
         reducedRow.push(tile);
       }
 
-      return reducedRow
+      return reducedRow;
     },
     addHexColumns() {
       const { rowCount, hexRows } = this;
@@ -125,7 +144,7 @@ export default {
     },
     async addHexRows(difference, oldRowTotal) {
       const newTotal = oldRowTotal + difference;
-      this.hexNumber = this.getCurrentHexTotal()
+      this.hexNumber = this.getCurrentHexTotal();
 
       for (let index = oldRowTotal; index < newTotal; index++) {
         const stashedRow = await this.getRowFromStash(index);
@@ -139,15 +158,15 @@ export default {
     removeHexColumns() {
       this.hexNumber = 0;
 
-      for (let index = 0; index < this.rowCount; index++) { 
+      for (let index = 0; index < this.rowCount; index++) {
         const targetRow = this.hexRows[index];
         const reducedRow = this.reduceHexRow(targetRow, index);
-        
+
         this.storeModifiedHexRow({ row: reducedRow, index });
       }
     },
     removeHexRows(difference) {
-      while(difference--) {
+      while (difference--) {
         this.$store.commit("removeHexRow");
       }
     },

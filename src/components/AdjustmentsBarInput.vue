@@ -1,5 +1,5 @@
 <template>
-  <div class="container" :style="{ flex: `${property.flexGrow} 1 auto`}">
+  <div class="container" :style="{ flex: `${property.flexGrow} 1 auto` }">
     <label :htmlFor="property.name">
       {{ property.text }}
     </label>
@@ -142,7 +142,7 @@ export default {
   gap: 5px;
   padding: 3px;
   opacity: 0.85;
-  transition: all .3s;
+  transition: all 0.3s;
 
   &:hover {
     background-color: #092446d3;
@@ -197,7 +197,7 @@ input[type="range"]#tileBorderWidth {
 
 label {
   font-size: 85%;
-  letter-spacing: .5px;
+  letter-spacing: 0.5px;
 }
 
 input#show-value {
@@ -207,7 +207,7 @@ input#show-value {
   margin: 5px;
   text-align: center;
   width: 1rem;
-  
+
   &::-webkit-inner-spin-button {
     display: none;
   }
