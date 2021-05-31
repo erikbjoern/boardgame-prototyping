@@ -92,7 +92,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 svg path:last-child {
   fill: #eee !important;
 }
@@ -128,7 +128,7 @@ svg {
   height: 100%;
   margin: 0 auto;
   position: relative;
-  width: percentage(2/3);
+  width: 66.6666%;
 }
 
 .hex-grid-item__background {

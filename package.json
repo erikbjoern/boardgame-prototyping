@@ -8,7 +8,11 @@
     "jest": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "@tailwindcss/postcss7-compat": "^2.1.2",
+    "autoprefixer": "^9",
     "core-js": "^3.6.5",
+    "postcss": "^7",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.2",
     "vue": "^2.6.11",
     "vuex": "^3.4.0"
   },
@@ -21,6 +25,7 @@
     "node-sass": "^4.12.0",
     "sass-loader": "^8.0.2",
     "vue-svg-loader": "^0.16.0",
+    "vue-cli-plugin-tailwind": "~2.0.6",
     "vue-template-compiler": "^2.6.12"
   }
 }

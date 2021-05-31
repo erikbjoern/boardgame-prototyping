@@ -1,5 +1,5 @@
 <template>
-  <div class="container" :style="{ flex: `${property.flexGrow} 1 auto` }">
+  <div class="input-container" :style="{ flex: `${property.flexGrow} 1 auto` }">
     <label :htmlFor="property.name">
       {{ property.text }}
     </label>
@@ -129,8 +129,8 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.container {
+<style scoped>
+.input-container {
   align-items: center;
   justify-content: center;
   background-color: #09244623;
@@ -142,17 +142,15 @@ export default {
   gap: 5px;
   padding: 3px;
   opacity: 0.85;
-  transition: all 0.3s;
-
-  &:hover {
-    background-color: #092446d3;
-    color: #fefefeee;
-    opacity: 1;
-
-    & input#show-value {
-      color: #fefefeee;
-    }
-  }
+  transition: all 0.2s;
+}
+.input-container:hover {
+  background-color: #092446d3;
+  color: #fefefeee;
+  opacity: 1;
+}
+.input-container:hover input#show-value {
+  color: #fefefeee;
 }
 
 .inputs {
@@ -160,61 +158,52 @@ export default {
   align-items: center;
   gap: 2px;
   user-select: none;
-
-  & > div {
-    background-color: #09244623;
-    border-radius: 5px;
-    border: outset #4284cf;
-    cursor: pointer;
-    height: 0.8em;
-    padding: 0 2px;
-
-    & > span {
-      bottom: 0.2em;
-      position: relative;
-    }
-
-    &:hover {
-      background-color: #274e7b;
-      color: #4e8dd4;
-    }
-
-    &:active {
-      border: inset #4284cf;
-    }
-
-    &.disabled {
-      opacity: 0.6;
-      pointer-events: none;
-    }
-  }
+}
+.inputs > div {
+  background-color: #09244623;
+  border-radius: 5px;
+  border: outset #4284cf;
+  cursor: pointer;
+  height: 1.2rem;
+  padding: 0 2px;
+}
+.inputs > div > span {
+  bottom: 0.3rem;
+  position: relative;
+}
+.inputs > div:hover {
+  background-color: #274e7b;
+  color: #4e8dd4;
+}
+.inputs > div:active {
+  border: inset #4284cf;
+}
+.inputs > div.disabled {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 input[type="range"]#gap,
 input[type="range"]#tileBorderWidth {
   width: 60px;
 }
-
 label {
   font-size: 85%;
   letter-spacing: 0.5px;
 }
-
 input#show-value {
   background-color: transparent;
   border-radius: 3px;
   border: 1px solid #09244682;
   margin: 5px;
   text-align: center;
-  width: 1rem;
-
-  &::-webkit-inner-spin-button {
-    display: none;
-  }
-
-  &:hover,
-  &:focus {
-    background-color: #22222222;
-  }
+  width: 2rem;
+}
+input#show-value::-webkit-inner-spin-button {
+  display: none;
+}
+input#show-value:hover,
+input#show-value:focus {
+  background-color: #22222222;
 }
 </style>

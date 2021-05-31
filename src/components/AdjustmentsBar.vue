@@ -144,7 +144,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .input-bar-container {
   display: flex;
   flex-wrap: wrap;
@@ -169,31 +169,31 @@ export default {
   justify-content: flex-end;
   padding: 0.5vw;
   width: 90vw;
+}
 
-  .buttons-box {
-    align-items: stretch;
-    background-color: transparent;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    grid-template-columns: 1fr 1fr;
-    justify-content: flex-end;
-    width: 284px;
-    z-index: 1001;
+.board-inputs .buttons-box {
+  align-items: stretch;
+  background-color: transparent;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  grid-template-columns: 1fr 1fr;
+  justify-content: flex-end;
+  width: 284px;
+  z-index: 1001;
+}
 
-    & button {
-      color: #071b35;
-      transition: all 0.3s;
-      width: 140px;
-      height: 30px;
+.board-inputs .buttons-box button {
+  color: #071b35;
+  transition: all 0.2s;
+  width: 140px;
+  height: 30px;
+}
 
-      &:hover {
-        background-color: #092446d3;
-        color: #fefefeee;
-        opacity: 1;
-      }
-    }
-  }
+.board-inputs .buttons-box button:hover {
+  background-color: #092446d3;
+  color: #fefefeee;
+  opacity: 1;
 }
 
 @keyframes expand {
@@ -215,29 +215,36 @@ export default {
   position: relative;
   right: 0.5vw;
   top: -0.25vw;
+}
 
-  &::before {
-    content: "";
-    background-color: #092446ef;
-    border-radius: 3px 3px 0 0;
-    height: calc(30px + 0.25vw);
-    position: absolute;
-    right: 0;
-    top: calc(-30px - 0.25vw);
-    width: 140px;
-  }
+.resource-inputs::before {
+  content: "";
+  background-color: #092446ef;
+  border-radius: 3px 3px 0 0;
+  height: calc(30px + 0.25vw);
+  position: absolute;
+  right: 0;
+  top: calc(-30px - 0.25vw);
+  width: 140px;
+}
 
-  &::after {
-    content: "";
-    border-bottom: 3px solid #092446ef;
-    border-left: 3px solid transparent;
-    border-top: 3px solid transparent;
-    height: 0px;
-    position: absolute;
-    right: 139px;
-    top: -6px;
-    width: 0px;
-  }
+.resource-inputs::after {
+  content: "";
+  border-bottom: 3px solid #092446ef;
+  border-left: 3px solid transparent;
+  border-top: 3px solid transparent;
+  height: 0px;
+  position: absolute;
+  right: 139px;
+  top: -6px;
+  width: 0px;
+}
+
+.resource-input div#field-list {
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 input,
@@ -268,9 +275,9 @@ button#close {
   background-color: transparent;
   color: white;
   border: none;
+}
 
-  &:focus {
-    outline: none;
-  }
+button#close:focus {
+  outline: none;
 }
 </style>

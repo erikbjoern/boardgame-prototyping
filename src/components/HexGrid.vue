@@ -74,7 +74,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .grid-container {
   display: grid;
   padding-bottom: 10vh;

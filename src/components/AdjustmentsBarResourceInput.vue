@@ -109,7 +109,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 svg {
   width: 20px !important;
   height: 20px !important;
@@ -125,21 +125,19 @@ svg {
 .resource-input {
   animation: fadeIn 0.2s forwards;
   border-radius: 2px;
-  color: white;
+  color: #ffffff;
   display: flex;
   padding: 4px;
   gap: 10px;
   margin: 0 4px;
   opacity: 1;
-
-  & input {
-    width: 25px;
-    margin-left: 3px;
-  }
-
-  & input::-webkit-inner-spin-button,
-  & input::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-  }
+}
+.resource-input input {
+  width: 25px;
+  margin-left: 3px;
+}
+.resource-input input::-webkit-inner-spin-button,
+.resource-input input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
 }
 </style>
