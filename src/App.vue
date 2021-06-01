@@ -8,8 +8,8 @@
 </template>
 
 <script>
-import AdjustmentsBar from '@/components/AdjustmentsBar.vue';
-import HexGridContainer from '@/containers/HexGridContainer.vue';
+import AdjustmentsBar from '@/components/SettingsBar/Index';
+import HexGridContainer from '@/containers/HexGridContainer';
 import { scrollToCenter } from '@/helpers/scroll.js';
 import { dragToScrollStart, dragToScroll } from '@/helpers/scroll.js';
 

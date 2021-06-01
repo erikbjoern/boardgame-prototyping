@@ -40,7 +40,7 @@
 
 <script>
 export default {
-  name: "AdjustmentsBarInput",
+  name: "SettingsInputGrid",
   props: {
     property: {
       name: String,

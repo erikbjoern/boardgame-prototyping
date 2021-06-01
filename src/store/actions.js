@@ -4,7 +4,7 @@ export default {
   setInitialState(context) {
     const timeStamp = localStorage.getItem("timeStamp");
 
-    if (new Date(timeStamp) < new Date("2021-05-26T19:38:15.287Z")) {
+    if (new Date(timeStamp) < new Date("2021-06-01T18:18:56.926Z")) {
       localStorage.removeItem("hexRows");
       localStorage.removeItem("hexStash");
       localStorage.removeItem("tileStyle");
@@ -16,13 +16,14 @@ export default {
 
     const initialGrid = storeConfig.initialState.grid;
     const initialResourceData = storeConfig.initialState.resources;
+    const initialLandscapeData = storeConfig.initialState.landscapes;
 
     const savedRowCount = parseInt(localStorage.getItem("rowCount"));
     const savedColumnCount = parseInt(localStorage.getItem("columnCount"));
     const savedHexRows = JSON.parse(localStorage.getItem("hexRows"));
     const savedHexStash = JSON.parse(localStorage.getItem("hexStash"));
     const savedTileStyle = JSON.parse(localStorage.getItem("tileStyle"));
-    const savedResourceData = JSON.parse(localStorage.getItem("resourceData"));
+    const savedResourceData = null //JSON.parse(localStorage.getItem("resourceData"));
 
     const rowCount = savedRowCount || initialGrid.rowCount;
     const columnCount = savedColumnCount || initialGrid.columnCount;
@@ -33,6 +34,7 @@ export default {
     const tileBorderWidth =
       savedTileStyle?.tileBorderWidth || initialGrid.tileBorderWidth;
     const resourceData = savedResourceData || initialResourceData;
+    const landscapeData = initialLandscapeData
 
     context.commit("setRowCount", rowCount);
     context.commit("setColumnCount", columnCount);
@@ -41,7 +43,8 @@ export default {
     context.commit("setGap", gap);
     context.commit("setTileSize", tileSize);
     context.commit("setTileBorderWidth", tileBorderWidth);
-    context.commit("setInitialResourceParameters", resourceData);
+    context.commit("setInitialResourceData", resourceData);
+    context.commit("setInitialLandscapeParameters", landscapeData);
   },
   updateLocalStorage(context) {
     const {

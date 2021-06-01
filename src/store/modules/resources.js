@@ -1,43 +1,37 @@
-import Vue from "vue";
+import Vue from 'vue'
+import colors from '@/assets/colors'
 
 export default {
   state: () => ({
-    parameters: [
+    data: [
       {
-        type: null,
-        max: null,
-        chance: null,
-        fraction: null,
+        name: '',
+        color: '#eee',
+        icon: '',
       },
     ],
-    visibleValues: false,
-    distributionMode: 'FRACTION'
   }),
   mutations: {
     setResourceParameter(state, { value, resource, property }) {
-      value > 100 && (value = 100);
-      const object = state.parameters.filter((r) => r.type == resource.type)[0];
-      Vue.set(object, property, value);
+      const object = state.resources.find(r => r.id == resource.id)
+      Vue.set(object, property, value)
     },
-    setInitialResourceParameters(state, payload) {
-      state.parameters = payload.parameters;
-      state.visibleValues = payload.visibleValues;
-      state.distributionMode = payload.distributionMode;
+    setInitialResourceData(state, payload) {
+      state.data = payload
     },
-    toggleResourceValuesVisibility(state) {
-      state.visibleValues = !state.visibleValues;
-    },
-    toggleResourceDistributionMode(state) {
-      state.distributionMode =
-        state.distributionMode == "FRACTION"
-          ? "INDIVIDUAL"
-          : "FRACTION";
+    addResource(state) {
+      const payload = {
+        name: 'nytt',
+        color: '#ddd',
+        icon: '',
+      }
+
+      state.resources.push(payload)
     },
   },
   getters: {
-    resourceDistributionSum(state) {
-      const fractions = state.parameters.map((p) => p.fraction);
-      return fractions.reduce((a, b) => a + b, 0);
+    resourceColors(state) {
+      return Object.assign(...state.data.map(r => ({ [r.name]: r.color })))
     },
   },
-};
+}
