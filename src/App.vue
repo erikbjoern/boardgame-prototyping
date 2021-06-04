@@ -8,10 +8,10 @@
 </template>
 
 <script>
-import AdjustmentsBar from '@/components/SettingsBar/Index';
-import HexGridContainer from '@/containers/HexGridContainer';
-import { scrollToCenter } from '@/helpers/scroll.js';
-import { dragToScrollStart, dragToScroll } from '@/helpers/scroll.js';
+import AdjustmentsBar from '@/components/SettingsBar/Index'
+import HexGridContainer from '@/containers/HexGridContainer'
+import { scrollToCenter } from '@/helpers/scroll.js'
+import { dragToScrollStart, dragToScroll } from '@/helpers/scroll.js'
 
 export default {
   name: 'App',
@@ -22,50 +22,50 @@ export default {
   data() {
     return {
       mousePosition: { x: 0, y: 0 },
-    };
+    }
   },
   methods: {
     dragToScrollStart,
     dragToScroll,
     scrollToCenter,
     updateViewportWidth() {
-      this.$store.commit('updateViewportWidth');
+      this.$store.commit('updateViewportWidth')
     },
     mouseMoveHandler(e) {
-      this.dragToScroll.bind(this)(e);
+      this.dragToScroll.bind(this)(e)
     },
     mouseUpHandler() {
-      this.$refs.mainContainer.style.cursor = 'grab';
+      this.$refs.mainContainer.style.cursor = 'grab'
 
-      document.removeEventListener('mousemove', this.mouseMoveHandler);
-      document.removeEventListener('mouseup', this.mouseUpHandler);
+      document.removeEventListener('mousemove', this.mouseMoveHandler)
+      document.removeEventListener('mouseup', this.mouseUpHandler)
     },
     mouseDownHandler(e) {
-      if (e.button !== 0 || e.which !== 1) return;
-      this.dragToScrollStart.bind(this)(e);
+      if (e.button !== 0 || e.which !== 1) return
+      this.dragToScrollStart.bind(this)(e)
 
-      document.addEventListener('mousemove', this.mouseMoveHandler);
-      document.addEventListener('mouseup', this.mouseUpHandler);
+      document.addEventListener('mousemove', this.mouseMoveHandler)
+      document.addEventListener('mouseup', this.mouseUpHandler)
     },
   },
   mounted() {
-    const mainContainer = this.$refs.mainContainer;
+    const mainContainer = this.$refs.mainContainer
 
-    mainContainer.addEventListener('mousedown', this.mouseDownHandler);
-    window.addEventListener('resize', this.scrollToCenter);
-    window.addEventListener('resize', this.updateViewportWidth);
+    mainContainer.addEventListener('mousedown', this.mouseDownHandler)
+    window.addEventListener('resize', this.scrollToCenter)
+    window.addEventListener('resize', this.updateViewportWidth)
 
-    window.scrollTo({ left: visualViewport.width / 2 });
-    this.scrollToCenter();
+    window.scrollTo({ left: visualViewport.width / 2 })
+    this.scrollToCenter()
   },
   beforeDestroy() {
-    document.removeEventListener('mousedown', this.mouseDownHandler);
-    document.removeEventListener('mousemove', this.mouseMoveHandler);
-    document.removeEventListener('mouseup', this.mouseUpHandler);
-    window.removeEventListener('resize', this.scrollToCenter);
-    window.removeEventListener('resize', this.updateViewportWidth);
+    document.removeEventListener('mousedown', this.mouseDownHandler)
+    document.removeEventListener('mousemove', this.mouseMoveHandler)
+    document.removeEventListener('mouseup', this.mouseUpHandler)
+    window.removeEventListener('resize', this.scrollToCenter)
+    window.removeEventListener('resize', this.updateViewportWidth)
   },
-};
+}
 </script>
 
 <style>

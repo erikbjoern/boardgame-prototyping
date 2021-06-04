@@ -1,6 +1,6 @@
 <template>
   <div
-    class="resource-input flex flex-col w-64 p-2"
+    class="resource-input flex flex-col w-full p-2"
     :style="{ backgroundColor: resource.color }"
   >
     <div class="flex flex-col items-stretch space-y-2">

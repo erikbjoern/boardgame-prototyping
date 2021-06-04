@@ -15,39 +15,62 @@
         </button>
         <button
           v-else
-          class="!bg-[#092446ef] !text-white font-light"
+          class="!bg-[#000000ef] !text-white font-light"
           @click="hideResourceInputs"
         >
           Stäng
         </button>
       </div>
     </div>
-    <div v-if="resourceSettingsIsOpen" class="rounded bg-[#092446ef] flex">
-      <div>
-        <SettingsInputLandscapes
-            v-for="(landscape, index) in landscapeParameters"
-            :key="landscape.name + '' + index"
-            :landscape="landscape"
-          />
+    <div
+      v-if="resourceSettingsIsOpen"
+      class="rounded bg-[#000000e0] p-6 space-y-6 flex flex-col items-center"
+    >
+      <div class="flex w-72 rounded overflow-hidden">
+        <button
+          class="block h-full flex-1 !rounded-none"
+          :class="
+            mode == 'LANDSCAPES'
+              ? '!bg-[#707070] text-[#eeeeee]'
+              : '!bg-[#333333] text-[#9f9f9f]'
+          "
+          @click="toggleMode"
+        >
+          Landskap
+        </button>
+        <button
+          class="block h-full flex-1 !rounded-none"
+          :class="
+            mode == 'RESOURCES'
+              ? '!bg-[#777777] text-[#eeeeee]'
+              : '!bg-[#333333] text-[#9f9f9f]'
+          "
+          @click="toggleMode"
+        >
+          Resurser
+        </button>
       </div>
-      <div>
-        <div style="height: 20px;">
-          <label>
-            <input
-              type="checkbox"
-              :checked="$store.state.grid.visibleResourceValues"
-              @click="toggleResourceValuesVisibility"
-            />
-            Visa värden
-          </label>
-        </div>
-        <div id="field-list" class="p-2">
-          <SettingsInputResources
-            v-for="(resource, index) in resourceParameters"
-            :key="resource.name + '' + index"
-            :resource="resource"
+      <div v-if="mode == 'LANDSCAPES'" class="flex flex-col space-y-4 w-72">
+        <SettingsInputLandscapes
+          v-for="(landscape, index) in landscapeParameters"
+          :key="landscape.name + '' + index"
+          :landscape="landscape"
+        />
+      </div>
+      <div v-if="mode == 'RESOURCES'" class="flex flex-col space-y-4 w-72">
+        <label>
+          <input
+            type="checkbox"
+            :checked="$store.state.grid.visibleResourceValues"
+            @click="toggleResourceValuesVisibility"
           />
-        </div>
+          Visa värden
+        </label>
+        <SettingsInputResources
+          v-for="(resource, index) in resourceParameters"
+          :key="resource.name + '' + index"
+          :resource="resource"
+        />
         <button @click="$store.commit('addResource')">Lägg till resurs</button>
       </div>
     </div>
@@ -70,7 +93,8 @@ export default {
   name: 'SettingsBar',
   data() {
     return {
-      resourceSettingsIsOpen: false,
+      resourceSettingsIsOpen: true,
+      mode: 'LANDSCAPES',
       gridProperties: [
         {
           name: 'rowCount',
@@ -138,6 +162,10 @@ export default {
     toggleResourceValuesVisibility() {
       this.$store.commit('toggleResourceValuesVisibility')
     },
+    toggleMode(e) {
+      this.mode = this.mode == 'LANDSCAPES' ? 'RESOURCES' : 'LANDSCAPES'
+      e.target.blur()
+    },
   },
 }
 </script>
@@ -189,7 +217,7 @@ export default {
 }
 
 .board-inputs .buttons-box button:hover {
-  background-color: #092446d3;
+  background-color: #000000d3;
   color: #fefefeee;
   opacity: 1;
 }
@@ -202,7 +230,7 @@ export default {
 
 .resource-inputs {
   animation: expand 0.15s forwards;
-  background-color: #092446ef;
+  background-color: #000000ef;
   border-radius: 4px 0 4px 4px;
   display: flex;
   flex-direction: column;
@@ -226,8 +254,8 @@ input,
 button {
   background-color: #eef1ef;
   border-radius: 3px;
-  border: 1px solid #09244643;
-  box-shadow: 1px 1px 3px #09244622;
+  border: 1px solid #00000043;
+  box-shadow: 1px 1px 3px #00000022;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
     Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }

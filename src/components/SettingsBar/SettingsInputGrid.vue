@@ -133,9 +133,9 @@ export default {
 .input-container {
   align-items: center;
   justify-content: center;
-  background-color: #09244623;
+  background-color: #00000023;
   border-radius: 3px;
-  box-shadow: 1px 1px 3px #09244622;
+  box-shadow: 1px 1px 3px #00000022;
   color: #1d232a;
   display: flex;
   flex-direction: column;
@@ -145,7 +145,7 @@ export default {
   transition: all 0.2s;
 }
 .input-container:hover {
-  background-color: #092446d3;
+  background-color: #000000d3;
   color: #fefefeee;
   opacity: 1;
 }
@@ -160,7 +160,7 @@ export default {
   user-select: none;
 }
 .inputs > div {
-  background-color: #09244623;
+  background-color: #00000023;
   border-radius: 5px;
   border: outset #4284cf;
   cursor: pointer;
@@ -194,7 +194,7 @@ label {
 input#show-value {
   background-color: transparent;
   border-radius: 3px;
-  border: 1px solid #09244682;
+  border: 1px solid #00000082;
   margin: 5px;
   text-align: center;
   width: 2rem;
