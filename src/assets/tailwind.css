@@ -7,6 +7,9 @@
 button:active {
   @apply outline-none;
 }
+button:hover {
+  @apply bg-opacity-80 !important;
+}
 button {
   @apply grid place-items-center whitespace-nowrap select-none;
   padding-top: 0.125rem;

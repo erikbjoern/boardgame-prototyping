@@ -19,18 +19,18 @@ export default {
     ],
   }),
   mutations: {
-    setLandscapeParameter(state, { value, landscapeName, property }) {
+    setLandscapeParameter(state, { value, name, property }) {
       value > 100 && (value = 100)
-      const object = state.data.find(l => l.name == landscapeName)
+      const object = state.data.find(l => l.name == name)
       Vue.set(object, property, value)
     },
     setInitialLandscapeParameters(state, payload) {
       state.data = payload
     },
     addLandscape(state) {
-      const color = getRandomHexColor(0,50)
+      const color = getRandomHexColor(0, 50)
       const payload = {
-        name: '',
+        name: `landskap #${state.data.length + 1}`,
         fraction: 1,
         color,
         invertedColor: getInvertedHexColor(color),
@@ -43,7 +43,20 @@ export default {
         ],
       }
 
-      state.parameters.push(payload)
+      state.data.push(payload)
+    },
+    addResourceToLandscape(state, { landscape, resource }) {
+      const targetLandscape = state.data.find(l => l.name == landscape)
+
+      targetLandscape?.resources.push(resource)
+    },
+    setResourceValueOnLandscape(state, { name, resource, property, value }) {
+      const targetLandscape = state.data.find(l => l.name == name)
+      const targetResourceIndex = targetLandscape.resources.findIndex(
+        r => r.name == resource
+      )
+
+      targetLandscape.resources[targetResourceIndex][property] = value
     },
   },
   getters: {
