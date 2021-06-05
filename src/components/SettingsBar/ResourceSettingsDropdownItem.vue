@@ -16,7 +16,7 @@
           :ref="item.name"
         />
       </div>
-      <div v-if="tab == 'LANDSCAPES'" class="grid place-items-center h-full">
+      <div v-if="tab == 'LANDSCAPES'" class="grid place-items-center h-full w-8">
         <svg
           class="transition-all duration-300 select-none cursor-pointer hover:opacity-50 transform"
           :class="expanded ? 'rotate-180 translate-y-px' : '-translate-y-0'"
@@ -36,10 +36,10 @@
           ></path>
         </svg>
       </div>
-      <div class="w-1/2 flex-shrink pl-10">
+      <div class="w-1/2 flex-shrink">
         <div
           :style="{ backgroundColor: item.invertedColor }"
-          class="rounded-md flex items-center h-full"
+          class="rounded-md flex items-center h-full w-20 ml-auto"
         >
           <input
             class="font-semibold bg-transparent text-sm w-full text-center"
