@@ -1,25 +1,26 @@
 <template>
   <div class="flex flex-col w-full rounded overflow-hidden">
-    <div
-      class="flex w-full p-2"
-      :style="{ backgroundColor: getInvertedHexColor(landscape.color) }"
-    >
+    <div class="flex w-full p-2" :style="{ backgroundColor: landscape.invertedColor }">
       <input
         class="font-semibold flex-1 bg-transparent mr-2"
-        v-model="landscape.name"
+        name="name"
+        v-model.lazy="landscape.name"
         :style="{ color: landscape.color }"
+        @keydown.esc="handleEscapeKey"
       />
       <input
         class="font-semibold w-16 bg-transparent text-sm"
+        name="color"
         v-model.lazy="landscapeColor"
         :style="{ color: landscape.color }"
+        @keydown.esc="handleEscapeKey"
       />
     </div>
     <div
       class="flex flex-col items-stretch space-y-2 p-2"
       :style="{
         backgroundColor: landscape.color,
-        color: getInvertedHexColor(landscape.color),
+        color: landscape.invertedColor,
       }"
     >
       <label class="inline-flex justify-between font-semibold">
@@ -32,8 +33,9 @@
               type="number"
               name="min"
               :value="landscape.min"
-              @change="handleChange"
-              @keydown="keydownHandler"
+              @change="submitChange"
+              @keydown.enter="submitChange"
+              @keydown.esc="handleEscapeKey"
             />
           </div>
         </div>
@@ -48,8 +50,9 @@
               type="number"
               name="max"
               :value="landscape.max"
-              @change="handleChange"
-              @keydown="keydownHandler"
+              @change="submitChange"
+              @keydown.enter="submitChange"
+              @keydown.esc="handleEscapeKey"
             />
           </div>
         </div>
@@ -64,8 +67,9 @@
               type="text"
               name="fraction"
               :value="landscape.fraction"
-              @change="handleChange"
-              @keydown="keydownHandler"
+              @change="submitChange"
+              @keydown.enter="submitChange"
+              @keydown.esc="handleEscapeKey"
             />
           </div>
           <span class="ml-2">/</span>
@@ -102,25 +106,27 @@ export default {
         return this.landscape.color
       },
       set(value) {
-        if (/^#dddddd/.test(value)) {
-          this.landscape.color = value.slice(0, 7)
-          return
+        let color = value.slice(0, 7)
+
+        if (!/^#dddddd/.test(color)) {
+          let split = value.replace('#', '').split('')
+
+          if (split.length == 3) {
+            split = split.map(v => (v = v + v))
+          }
+
+          color = ['#', ...split].join('')
         }
 
-        let split = value.replace('#', '').split('')
-
-        if (split.length == 3) {
-          split = split.map(v => (v = v + v))
-        }
-
-        this.landscape.color = ['#', ...split].join('')
+        this.landscape.color = color
+        this.landscape.invertedColor = getInvertedHexColor(color)
       },
     },
   },
   methods: {
     getInvertedHexColor,
-    handleChange(e) {
-      const value = parseInt(e.target.value)
+    submitChange(e) {
+      const value = property !== 'fraction' ? parseInt(e.target.value) : e.target.value
       const landscape = this.landscape
       const property = e.target.name
 
@@ -129,26 +135,20 @@ export default {
         return
       }
 
-      this.$store.commit('setLandscapeParameter', { value, landscape, property })
+      this.$store.commit('setLandscapeParameter', {
+        value,
+        landscapeName: landscape.name,
+        property,
+      })
+
+      if (e.type == 'keydown') {
+        e.target.blur()
+      }
     },
-    keydownHandler(e) {
-      const value = property !== 'fraction' ? parseInt(e.target.value) : e.target.value
-      const landscape = this.landscape
+    handleEscapeKey(e) {
       const property = e.target.name
-
-      if (e.which == 27 || e.code == 'Escape') {
-        e.target.value = landscape[property]
-        e.target.blur()
-      }
-
-      if (e.which == 13 || e.code == 'Enter') {
-        this.$store.commit('setLandscapeParameter', {
-          value,
-          landscape,
-          property,
-        })
-        e.target.blur()
-      }
+      e.target.value = this.landscape[property]
+      e.target.blur()
     },
   },
 }

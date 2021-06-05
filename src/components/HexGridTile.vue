@@ -16,7 +16,10 @@
               v-for="resource in tile.resources"
               :key="resource.name"
               class="resourceItem"
-              :style="{ backgroundColor: $store.getters.resourceColors[resource.name] }"
+              :style="{
+                backgroundColor: $store.getters.resourceColors[resource.name],
+                color: $store.getters.invertedResourceColors[resource.name],
+              }"
             >
               <WoodIcon v-if="resource.name == 'wood' && tileIsLargeEnough" />
               <StoneIcon v-if="resource.name == 'stone' && tileIsLargeEnough" />

@@ -24,13 +24,13 @@
     </div>
     <div
       v-if="resourceSettingsIsOpen"
-      class="rounded bg-[#000000e0] p-6 space-y-6 flex flex-col items-center"
+      class="rounded bg-[#000000ef] p-6 space-y-6 flex flex-col items-center"
     >
       <div class="flex w-72 rounded overflow-hidden">
         <button
           class="block h-full flex-1 !rounded-none"
           :class="
-            mode == 'LANDSCAPES'
+            tab == 'LANDSCAPES'
               ? '!bg-[#707070] text-[#eeeeee]'
               : '!bg-[#333333] text-[#9f9f9f]'
           "
@@ -41,7 +41,7 @@
         <button
           class="block h-full flex-1 !rounded-none"
           :class="
-            mode == 'RESOURCES'
+            tab == 'RESOURCES'
               ? '!bg-[#777777] text-[#eeeeee]'
               : '!bg-[#333333] text-[#9f9f9f]'
           "
@@ -50,14 +50,14 @@
           Resurser
         </button>
       </div>
-      <div v-if="mode == 'LANDSCAPES'" class="flex flex-col space-y-4 w-72">
+      <div v-if="tab == 'LANDSCAPES'" class="flex flex-col space-y-4 w-72">
         <SettingsInputLandscapes
           v-for="(landscape, index) in landscapeParameters"
           :key="landscape.name + '' + index"
           :landscape="landscape"
         />
       </div>
-      <div v-if="mode == 'RESOURCES'" class="flex flex-col space-y-4 w-72">
+      <div v-if="tab == 'RESOURCES'" class="flex flex-col space-y-4 w-72">
         <label>
           <input
             type="checkbox"
@@ -94,7 +94,7 @@ export default {
   data() {
     return {
       resourceSettingsIsOpen: true,
-      mode: 'LANDSCAPES',
+      tab: 'LANDSCAPES',
       gridProperties: [
         {
           name: 'rowCount',
@@ -163,7 +163,7 @@ export default {
       this.$store.commit('toggleResourceValuesVisibility')
     },
     toggleMode(e) {
-      this.mode = this.mode == 'LANDSCAPES' ? 'RESOURCES' : 'LANDSCAPES'
+      this.tab = this.tab == 'LANDSCAPES' ? 'RESOURCES' : 'LANDSCAPES'
       e.target.blur()
     },
   },

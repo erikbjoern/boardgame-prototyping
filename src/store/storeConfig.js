@@ -5,6 +5,7 @@ import mutations from './mutations'
 import grid from './modules/grid'
 import resources from './modules/resources'
 import landscapes from './modules/landscapes'
+import { getInvertedHexColor } from '@/helpers/getDynamicColor.js'
 
 export default class StoreConfig {
   constructor() {
@@ -26,20 +27,24 @@ export default class StoreConfig {
         {
           name: 'sten',
           color: '#252627',
+          invertedColor: getInvertedHexColor('#252627'),
         },
         {
           name: 'trä',
           color: '#47352c',
+          invertedColor: getInvertedHexColor('#47352c'),
         },
         {
           name: 'mat',
           color: '#681717',
+          invertedColor: getInvertedHexColor('#681717'),
         },
       ],
       landscapes: [
         {
           name: 'skog',
           color: '#455B37',
+          invertedColor: getInvertedHexColor('#455B37'),
           fraction: 2,
           resources: [
             {
@@ -62,6 +67,7 @@ export default class StoreConfig {
         {
           name: 'fält',
           color: '#81996D',
+          invertedColor: getInvertedHexColor('#81996D'),
           fraction: 3,
           resources: [
             {
@@ -84,6 +90,7 @@ export default class StoreConfig {
         {
           name: 'berg',
           color: '#919191',
+          invertedColor: getInvertedHexColor('#919191'),
           fraction: 1,
           resources: [
             {

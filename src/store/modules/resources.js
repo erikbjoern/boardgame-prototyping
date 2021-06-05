@@ -33,5 +33,8 @@ export default {
     resourceColors(state) {
       return Object.assign(...state.data.map(r => ({ [r.name]: r.color })))
     },
+    invertedResourceColors(state) {
+      return Object.assign(...state.data.map(r => ({ [r.name]: r.invertedColor })))
+    },
   },
 }

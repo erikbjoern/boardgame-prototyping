@@ -20,7 +20,7 @@ export default {
   mutations: {
     setLandscapeParameter(state, { value, landscapeName, property }) {
       value > 100 && (value = 100)
-      const object = state.parameters.find(l => l.name == landscapeName)
+      const object = state.data.find(l => l.name == landscapeName)
       Vue.set(object, property, value)
     },
     setInitialLandscapeParameters(state, payload) {
