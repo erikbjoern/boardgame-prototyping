@@ -64,3 +64,34 @@ export function getInvertedHexColor(backgroundColor) {
       .join('')
   )
 }
+
+export function getRandomHexColor(brightnessMin = 0, brightnessMax = 100) {
+  if (brightnessMin < 0) {
+    brightnessMin = 0
+  } else {
+    brightnessMin = brightnessMin / 100
+  }
+
+  if (brightnessMax > 100) {
+    brightnessMax = 1
+  } else {
+    brightnessMax = brightnessMax / 100
+  }
+
+  function getRandomValue() {
+    return Math.floor(
+      255 * brightnessMin + Math.random() * (255 * brightnessMax - 255 * brightnessMin)
+    )
+  }
+
+  return (
+    '#' +
+    ['r', 'g', 'b']
+      .map(hue =>
+        getRandomValue()
+          .toString(16)
+          .padStart(2, '0')
+      )
+      .join('')
+  )
+}

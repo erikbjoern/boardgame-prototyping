@@ -1,7 +1,7 @@
 <template>
   <div class="input-bar-container h-24">
-    <div class="board-inputs">
-      <SettingsInputGrid
+    <div class="board-inputs h-20">
+      <GridSettingsItem
         v-for="property in gridProperties"
         :key="property.name"
         :property="property"
@@ -21,80 +21,26 @@
           Stäng
         </button>
       </div>
-    </div>
-    <div
-      v-if="resourceSettingsIsOpen"
-      class="rounded bg-[#000000ef] p-6 space-y-6 flex flex-col items-center"
-    >
-      <div class="flex w-72 rounded overflow-hidden">
-        <button
-          class="block h-full flex-1 !rounded-none"
-          :class="
-            tab == 'LANDSCAPES'
-              ? '!bg-[#707070] text-[#eeeeee]'
-              : '!bg-[#333333] text-[#9f9f9f]'
-          "
-          @click="toggleMode"
-        >
-          Landskap
-        </button>
-        <button
-          class="block h-full flex-1 !rounded-none"
-          :class="
-            tab == 'RESOURCES'
-              ? '!bg-[#777777] text-[#eeeeee]'
-              : '!bg-[#333333] text-[#9f9f9f]'
-          "
-          @click="toggleMode"
-        >
-          Resurser
-        </button>
-      </div>
-      <div v-if="tab == 'LANDSCAPES'" class="flex flex-col space-y-4 w-72">
-        <SettingsInputLandscapes
-          v-for="(landscape, index) in landscapeParameters"
-          :key="landscape.name + '' + index"
-          :landscape="landscape"
-        />
-      </div>
-      <div v-if="tab == 'RESOURCES'" class="flex flex-col space-y-4 w-72">
-        <label>
-          <input
-            type="checkbox"
-            :checked="$store.state.grid.visibleResourceValues"
-            @click="toggleResourceValuesVisibility"
-          />
-          Visa värden
-        </label>
-        <SettingsInputResources
-          v-for="(resource, index) in resourceParameters"
-          :key="resource.name + '' + index"
-          :resource="resource"
-        />
-        <button @click="$store.commit('addResource')">Lägg till resurs</button>
-      </div>
+      <ResourceSettings v-if="resourceSettingsIsOpen" />
     </div>
   </div>
 </template>
 
 <script>
-import SettingsInputGrid from './SettingsInputGrid'
-import SettingsInputResources from './SettingsInputResources'
-import SettingsInputLandscapes from './SettingsInputLandscapes'
-import { mapActions, mapState } from 'vuex'
+import GridSettingsItem from './GridSettingsItem'
+import ResourceSettings from './ResourceSettings'
+import { mapActions } from 'vuex'
 import { scrollToCenter } from '@/helpers/scroll'
 
 export default {
   components: {
-    SettingsInputGrid,
-    SettingsInputResources,
-    SettingsInputLandscapes,
+    GridSettingsItem,
+    ResourceSettings,
   },
   name: 'SettingsBar',
   data() {
     return {
-      resourceSettingsIsOpen: true,
-      tab: 'LANDSCAPES',
+      resourceSettingsIsOpen: false,
       gridProperties: [
         {
           name: 'rowCount',
@@ -141,10 +87,6 @@ export default {
       ],
     }
   },
-  computed: mapState({
-    landscapeParameters: state => state.landscapes.data,
-    resourceParameters: state => state.resources.data,
-  }),
   methods: {
     scrollToCenter,
     ...mapActions(['resetTiles', 'resetAdjustments']),
@@ -157,13 +99,6 @@ export default {
     },
     hideResourceInputs(e) {
       this.resourceSettingsIsOpen = false
-      e.target.blur()
-    },
-    toggleResourceValuesVisibility() {
-      this.$store.commit('toggleResourceValuesVisibility')
-    },
-    toggleMode(e) {
-      this.tab = this.tab == 'LANDSCAPES' ? 'RESOURCES' : 'LANDSCAPES'
       e.target.blur()
     },
   },
@@ -258,15 +193,6 @@ button {
   box-shadow: 1px 1px 3px #00000022;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
     Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-}
-
-label {
-  user-select: none;
-  color: whitesmoke;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-    Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  font-weight: 300;
-  font-size: 0.85rem;
 }
 
 button:hover {

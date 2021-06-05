@@ -1,9 +1,9 @@
 <template>
-  <div class="input-container" :style="{ flex: `${property.flexGrow} 1 auto` }">
+  <div class="input-container flex flex-col justify-between items-center" :style="{ flex: `${property.flexGrow} 1 auto` }">
     <label :htmlFor="property.name">
       {{ property.text }}
     </label>
-    <div class="inputs">
+    <div class="inputs flex-1">
       <div
         @mousedown="decreaseValueStart()"
         :class="{ disabled: propertyValue == property.min }"
@@ -131,14 +131,10 @@ export default {
 
 <style scoped>
 .input-container {
-  align-items: center;
-  justify-content: center;
   background-color: #00000023;
   border-radius: 3px;
   box-shadow: 1px 1px 3px #00000022;
   color: #1d232a;
-  display: flex;
-  flex-direction: column;
   gap: 5px;
   padding: 3px;
   opacity: 0.85;

@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import colors from '@/assets/colors'
+import { getRandomHexColor, getInvertedHexColor } from '@/helpers/getDynamicColor.js'
 
 export default {
   state: () => ({
@@ -20,13 +20,15 @@ export default {
       state.data = payload
     },
     addResource(state) {
+      const color = getRandomHexColor(0, 50)
+
       const payload = {
-        name: 'nytt',
-        color: '#ddd',
-        icon: '',
+        name: `resurs #${state.data.length + 1}`,
+        color,
+        invertedColor: getInvertedHexColor(color),
       }
 
-      state.resources.push(payload)
+      state.data.push(payload)
     },
   },
   getters: {

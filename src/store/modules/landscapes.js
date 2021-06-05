@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import { getRandomHexColor, getInvertedHexColor } from '@/helpers/getDynamicColor.js'
 
 export default {
   state: () => ({
@@ -27,10 +28,12 @@ export default {
       state.data = payload
     },
     addLandscape(state) {
+      const color = getRandomHexColor(0,50)
       const payload = {
         name: '',
-        fraction: 0,
-        color: '#eee',
+        fraction: 1,
+        color,
+        invertedColor: getInvertedHexColor(color),
         resources: [
           {
             name: '',
