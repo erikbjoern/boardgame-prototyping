@@ -44,7 +44,7 @@ export default {
 
       for (const { name, min, max } of parameters.resources) {
         const amount = min + Math.floor(Math.random() * (max - min + 1))
-        resources.push({ name, amount })
+        resources.push({ name, amount, backgroundColor: this.$store.getters.resourceColors[name] })
       }
 
       return resources
@@ -108,15 +108,18 @@ export default {
           const stashedTile = stashedRow ? stashedRow[newRow.length] : null
           let landscapeType
           let resources
+          let color
 
           if (!stashedTile) {
             landscapeType = this.getLandscapeType()
             resources = this.getResources(landscapeType)
+            color = this.$store.getters.landscapeColors[landscapeType]
           }
 
           tile = stashedTile || {
             landscapeType,
             resources,
+            color,
           }
         }
 

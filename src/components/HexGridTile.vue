@@ -17,8 +17,8 @@
               :key="resource.name"
               class="resourceItem"
               :style="{
-                backgroundColor: $store.getters.resourceColors[resource.name],
-                color: $store.getters.invertedResourceColors[resource.name],
+                backgroundColor: resource.backgroundColor,
+                color: getInvertedHexcolorGrayscale(resource.backgroundColor),
               }"
             >
               <WoodIcon v-if="resource.name == 'wood' && tileIsLargeEnough" />
@@ -35,6 +35,7 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
+import { getInvertedHexcolorGrayscale } from '@/helpers/getDynamicColor.js'
 import WoodIcon from '@/assets/icons/log.svg'
 import StoneIcon from '@/assets/icons/stone-block.svg'
 import WheatIcon from '@/assets/icons/wheat.svg'
@@ -81,7 +82,7 @@ export default {
       return {
         display: 'flex',
         gap: `${this.size / 50}vw`,
-        backgroundColor: this.$store.getters.landscapeColors[this.tile.landscapeType],
+        backgroundColor: this.tile.color,
         fontSize: `clamp(8px, ${this.size / 10}vw, 20px`,
         height: `${100 - this.borderWidth}%`,
         width: `${100 - this.borderWidth}%`,
@@ -90,6 +91,9 @@ export default {
     tileIsLargeEnough() {
       return this.size > 6 && this.viewportWidth > 800
     },
+  },
+  methods: {
+    getInvertedHexcolorGrayscale,
   },
 }
 </script>

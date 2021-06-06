@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import { getRandomHexColor, getInvertedHexColor } from '@/helpers/getDynamicColor.js'
+import { getUniqueDefaultName } from '@/helpers/getUniqueName.js'
 
 export default {
   state: () => ({
@@ -29,8 +30,14 @@ export default {
     },
     addLandscape(state) {
       const color = getRandomHexColor(0, 50)
+
+      const defaultName = getUniqueDefaultName(
+        `landskap #${state.data.length + 1}`,
+        state.data
+      )
+
       const payload = {
-        name: `landskap #${state.data.length + 1}`,
+        name: defaultName,
         fraction: 1,
         color,
         invertedColor: getInvertedHexColor(color),
@@ -44,6 +51,11 @@ export default {
       }
 
       state.data.push(payload)
+    },
+    removeLandscape(state, name) {
+      const targetLandscapeIndex = state.data.findIndex(l => l.name == name)
+
+      state.data.splice(targetLandscapeIndex, 1)
     },
     addResourceToLandscape(state, { landscape, resource }) {
       const targetLandscape = state.data.find(l => l.name == landscape)

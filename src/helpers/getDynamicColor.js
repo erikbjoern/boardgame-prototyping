@@ -1,23 +1,26 @@
-export function getInvertedHexColor(backgroundColor) {
-  const bgColorValueR =
-    backgroundColor.length > 4
-      ? backgroundColor.slice(1, 3)
-      : backgroundColor.slice(1, 2) + backgroundColor.slice(1, 2)
-  const bgColorValueG =
-    backgroundColor.length > 4
-      ? backgroundColor.slice(3, 5)
-      : backgroundColor.slice(2, 3) + backgroundColor.slice(2, 3)
-  const bgColorValueB =
-    backgroundColor.length > 4
-      ? backgroundColor.slice(5, 7)
-      : backgroundColor.slice(3, 4) + backgroundColor.slice(3, 4)
+function getRGBValues(hexColor) {
+  const r =
+    hexColor.length > 4
+      ? hexColor.slice(1, 3)
+      : hexColor.slice(1, 2) + hexColor.slice(1, 2)
+  const g =
+    hexColor.length > 4
+      ? hexColor.slice(3, 5)
+      : hexColor.slice(2, 3) + hexColor.slice(2, 3)
+  const b =
+    hexColor.length > 4
+      ? hexColor.slice(5, 7)
+      : hexColor.slice(3, 4) + hexColor.slice(3, 4)
 
-  const rgbValues = [bgColorValueR, bgColorValueG, bgColorValueB].map((v, index) =>
-    parseInt(v, 16)
-  )
+  return [r, g, b].map((v, index) => parseInt(v, 16))
+}
+
+const rgbMax = 255
+
+export function getInvertedHexColor(hexColor) {
+  const rgbValues = getRGBValues(hexColor)
 
   const max = Math.max(...rgbValues)
-  const rgbMax = 255
   const average = rgbValues.reduce((a, b) => a + b, 0) / rgbValues.length
   const blueIsSingleMax = ![rgbValues[0], rgbValues[1]].includes(max)
 
@@ -43,7 +46,7 @@ export function getInvertedHexColor(backgroundColor) {
       multiplied -= multiplied * (2 / 3)
     }
 
-    // if result will be a dark shade, increase main color slightly
+    // if result will be a dark shade, increase main hexColor slightly
     if (multiplied < rgbMax / 2 && v == max) {
       multiplied += 5
     }
@@ -89,6 +92,31 @@ export function getRandomHexColor(brightnessMin = 0, brightnessMax = 100) {
     ['r', 'g', 'b']
       .map(hue =>
         getRandomValue()
+          .toString(16)
+          .padStart(2, '0')
+      )
+      .join('')
+  )
+}
+
+export function getInvertedHexcolorGrayscale(hexColor) {
+  const rgbValues = getRGBValues(hexColor)
+
+  const average = rgbValues.reduce((a, b) => a + b, 0) / rgbValues.length
+
+  const invertedGrayValues = rgbValues.map(v => {
+    if (average > rgbMax / 2) {
+      return rgbMax / 2 - Math.min(rgbMax / 2, rgbMax - average * 1.1)
+    } else {
+      return rgbMax / 2 + Math.min(rgbMax / 2, average * 1.1)
+    }
+  })
+
+  return (
+    '#' +
+    invertedGrayValues
+      .map(v =>
+        Math.floor(v)
           .toString(16)
           .padStart(2, '0')
       )
