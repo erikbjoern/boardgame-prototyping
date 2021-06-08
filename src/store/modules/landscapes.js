@@ -19,6 +19,7 @@ export default {
         ],
       },
     ],
+    landscapePool: [],
   }),
   mutations: {
     setLandscapeParameter(state, { value, name, property }) {
@@ -65,17 +66,30 @@ export default {
 
       targetLandscape.resources[targetResourceIndex][property] = value
     },
+    setLandscapePool(state, payload) {
+      state.landscapePool = payload
+    },
+  },
+  actions: {
+    arrangeLandscapePool({ state, getters, commit }, payload) {
+      const landscapes = state.data
+
+      for (var i = 0, landscapePool = []; i < landscapes.length; i++) {
+        for (let i2 = 0; i2 < landscapes[i].fraction; i2++) {
+          landscapePool.push(landscapes[i].name)
+        }
+      }
+
+      commit('setLandscapePool', landscapePool)
+    },
   },
   getters: {
+    landscapeDistributions(state, getters) {
+      return state.data.map(l => l.fraction)
+    },
     landscapeDistributionSum(state) {
       const fractions = state.data.map(l => l.fraction)
       return fractions.reduce((a, b) => a + b, 0)
-    },
-    landscapeNames(state) {
-      return state.data.map(l => l.name)
-    },
-    landscapeChances(state, getters) {
-      return state.data.map(l => l.fraction / getters.landscapeDistributionSum)
     },
     landscapeColors(state) {
       return Object.assign(...state.data.map(l => ({ [l.name]: l.color })))

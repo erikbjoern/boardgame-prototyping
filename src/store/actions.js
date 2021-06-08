@@ -46,6 +46,8 @@ export default {
     context.commit("setTileBorderWidth", tileBorderWidth);
     context.commit("setInitialResourceData", resourceData);
     context.commit("setInitialLandscapeData", landscapeData);
+
+    context.dispatch('arrangeLandscapePool')
   },
   updateLocalStorage(context) {
     const {
