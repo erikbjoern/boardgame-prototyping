@@ -224,23 +224,32 @@ export default {
   },
   methods: {
     getInvertedHexColor,
-    submitChange(e, resource = null) {
+    submitChange(e, resourceName = null) {
       const item = this.item
       const property = e.target.name
-      const value = parseInt(e.target.value)
+
+      let value = parseInt(e.target.value)
+      let resource
+
+      if (resourceName) {
+        resource = item.resources.find(r => r.name == resourceName)
+      }
 
       if ([undefined, null, '', NaN].includes(value)) {
-        if (resource) {
-          return (e.target.value = item.resources.find(r => r.name == resource)[property])
-        }
-
-        return (e.target.value = item[property])
+        return resource ? (e.target.value = resource[property]) : item[property]
       }
 
       let mutation
 
       if (resource) {
         mutation = 'setResourceValueOnLandscape'
+
+        if (property == 'max' && value < resource.min) {
+          value = resource.min
+        }
+        if (property == 'min' && value > resource.max) {
+          value = resource.max
+        }
       } else {
         mutation =
           this.tab == 'LANDSCAPES' ? 'setLandscapeParameter' : 'setResourceParameter'
@@ -250,8 +259,12 @@ export default {
         name: item.name,
         property,
         value,
-        ...(resource && { resource }),
+        ...(resourceName && { resourceName }),
       })
+
+      e.target.value = this.$store.state.landscapes.data
+        .find(l => l.name == item.name)
+        .resources.find(r => r.name == resourceName)[property]
 
       if (e.type == 'keydown') {
         e.target.blur()

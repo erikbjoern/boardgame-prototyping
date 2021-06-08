@@ -57,10 +57,10 @@ export default {
 
       targetLandscape?.resources.push(resource)
     },
-    setResourceValueOnLandscape(state, { name, resource, property, value }) {
+    setResourceValueOnLandscape(state, { name, resourceName, property, value }) {
       const targetLandscape = state.data.find(l => l.name == name)
       const targetResourceIndex = targetLandscape.resources.findIndex(
-        r => r.name == resource
+        r => r.name == resourceName
       )
 
       targetLandscape.resources[targetResourceIndex][property] = value
