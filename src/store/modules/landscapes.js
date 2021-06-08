@@ -48,7 +48,7 @@ export default {
 
       state.data.push(payload)
     },
-    removeLandscape(state, name) {
+    removeLandscape(state, { name }) {
       const targetLandscapeIndex = state.data.findIndex(l => l.name == name)
 
       state.data.splice(targetLandscapeIndex, 1)

@@ -38,7 +38,7 @@
       </div>
       <div class="w-1/2 flex-shrink flex items-center">
         <div
-          class="grid place-items-center ml-auto transition-all"
+          class="grid place-items-center ml-auto transition-all overflow-hidden"
           :class="
             removalMode
               ? 'cursor-pointer rounded-lg h-5 w-5 shadow'
@@ -49,14 +49,14 @@
           <transition name="fade" mode="out-in">
             <div
               v-if="!removalMode"
-              class=" font-semibold bg-transparent text-sm w-full text-center "
+              class="font-semibold bg-transparent text-sm w-full text-center"
             >
               <input class="absolute opacity-0" type="color" v-model="itemColor" />
               <span :style="{ color: item.color }">
                 {{ item.color }}
               </span>
             </div>
-            <button v-else @click="removeItem">
+            <button v-else @click="remove(item)">
               <svg
                 fill="none"
                 viewBox="0 0 24 24"
@@ -111,47 +111,84 @@
         <div
           v-for="(resource, index) in item.resources"
           :key="resource.name + index"
-          class="flex space-x-2 justify-between p-2 w-full rounded"
+          class="flex justify-between p-2 w-full rounded"
           :style="{
             backgroundColor: $store.getters.resourceColors[resource.name],
             color: $store.getters.invertedResourceColors[resource.name],
           }"
         >
           <span class="inline-block flex-1 font-semibold">{{ resource.name }}</span>
-          <label class="inline-flex justify-between font-semibold">
-            min
-            <div class="inline-block pl-1">
-              <div class="bg-white w-8 bg-opacity-10 rounded overflow-hidden">
-                <input
-                  class="text-gray-900 font-semibold text-center w-8 bg-transparent"
-                  :style="{ color: $store.getters.invertedResourceColors[resource.name] }"
-                  type="number"
-                  name="min"
-                  :value="resource.min"
-                  @change="e => submitChange(e, resource.name)"
-                  @keydown.enter="e => submitChange(e, resource.name)"
-                  @keydown.esc="handleEscapeKey"
-                />
+          <div
+            class="grid place-items-center ml-auto transition-all overflow-hidden"
+            :class="
+              removalMode
+                ? 'cursor-pointer rounded-lg h-5 w-5 shadow'
+                : 'rounded-md h-full w-[8.75rem]'
+            "
+          >
+            <transition name="fade" mode="out-in">
+              <div v-if="!removalMode" class="flex space-x-2">
+                <label class="inline-flex justify-between font-semibold">
+                  min
+                  <div class="inline-block pl-1">
+                    <div class="bg-white w-8 bg-opacity-10 rounded overflow-hidden">
+                      <input
+                        class="text-gray-900 font-semibold text-center w-8 bg-transparent"
+                        :style="{
+                          color: $store.getters.invertedResourceColors[resource.name],
+                        }"
+                        type="number"
+                        name="min"
+                        :value="resource.min"
+                        @change="e => submitChange(e, resource.name)"
+                        @keydown.enter="e => submitChange(e, resource.name)"
+                        @keydown.esc="handleEscapeKey"
+                      />
+                    </div>
+                  </div>
+                </label>
+                <label class="inline-flex justify-between font-semibold">
+                  max
+                  <div class="inline-block pl-1">
+                    <div class="bg-white w-8 bg-opacity-10 rounded overflow-hidden">
+                      <input
+                        class="text-gray-900 font-semibold text-center bg-transparent w-8"
+                        :style="{
+                          color: $store.getters.invertedResourceColors[resource.name],
+                        }"
+                        type="number"
+                        name="max"
+                        :value="resource.max"
+                        @change="e => submitChange(e, resource.name)"
+                        @keydown.enter="e => submitChange(e, resource.name)"
+                        @keydown.esc="handleEscapeKey"
+                      />
+                    </div>
+                  </div>
+                </label>
               </div>
-            </div>
-          </label>
-          <label class="inline-flex justify-between font-semibold">
-            max
-            <div class="inline-block pl-1">
-              <div class="bg-white w-8 bg-opacity-10 rounded overflow-hidden">
-                <input
-                  class="text-gray-900 font-semibold text-center bg-transparent w-8"
-                  :style="{ color: $store.getters.invertedResourceColors[resource.name] }"
-                  type="number"
-                  name="max"
-                  :value="resource.max"
-                  @change="e => submitChange(e, resource.name)"
-                  @keydown.enter="e => submitChange(e, resource.name)"
-                  @keydown.esc="handleEscapeKey"
-                />
+              <div
+                v-else
+                class="grid place-items-center ml-auto transition-colors duration-200 delay-200 cursor-pointer rounded-lg h-5 w-5 shadow bg-[#992222]"
+              >
+                <button @click="remove(resource)">
+                  <svg
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    height="15"
+                    width="15"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      xmlns="http://www.w3.org/2000/svg"
+                      d="M5.29289 5.29289C5.68342 4.90237 6.31658 4.90237 6.70711 5.29289L12 10.5858L17.2929 5.29289C17.6834 4.90237 18.3166 4.90237 18.7071 5.29289C19.0976 5.68342 19.0976 6.31658 18.7071 6.70711L13.4142 12L18.7071 17.2929C19.0976 17.6834 19.0976 18.3166 18.7071 18.7071C18.3166 19.0976 17.6834 19.0976 17.2929 18.7071L12 13.4142L6.70711 18.7071C6.31658 19.0976 5.68342 19.0976 5.29289 18.7071C4.90237 18.3166 4.90237 17.6834 5.29289 17.2929L10.5858 12L5.29289 6.70711C4.90237 6.31658 4.90237 5.68342 5.29289 5.29289Z"
+                      fill="#fff"
+                    ></path>
+                  </svg>
+                </button>
               </div>
-            </div>
-          </label>
+            </transition>
+          </div>
         </div>
       </div>
       <select
@@ -275,9 +312,19 @@ export default {
       e.target.value = this.item[property]
       e.target.blur()
     },
-    removeItem() {
-      const mutation = this.tab == 'LANDSCAPES' ? 'removeLandscape' : 'removeResource'
-      this.$store.commit(mutation, this.item.name)
+    remove(item) {
+      let mutation
+
+      if (this.tab == 'RESOURCES') mutation = 'removeResource'
+
+      if (this.tab == 'LANDSCAPES') {
+        mutation = item == this.item ? 'removeLandscape' : 'removeResourceFromLandscape'
+      }
+
+      this.$store.commit(mutation, {
+        name: item.name,
+        ...(mutation == 'removeResourceFromLandscape' && { landscape: this.item.name }),
+      })
     },
   },
   mounted() {

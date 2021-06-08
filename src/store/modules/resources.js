@@ -36,7 +36,7 @@ export default {
 
       state.data.push(payload)
     },
-    removeResource(state, name) {
+    removeResource(state, { name }) {
       const targetResourceIndex = state.data.findIndex(r => r.name == name)
 
       state.data.splice(targetResourceIndex, 1)
