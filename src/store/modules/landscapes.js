@@ -42,13 +42,7 @@ export default {
         fraction: 1,
         color,
         invertedColor: getInvertedHexColor(color),
-        resources: [
-          {
-            name: '',
-            min: 0,
-            max: 0,
-          },
-        ],
+        resources: [],
       }
 
       state.data.push(payload)
