@@ -6,9 +6,10 @@ export default {
   state: () => ({
     data: [
       {
-        name: '',
-        fraction: 0,
-        color: '#eee',
+        name: 'Sten',
+        fraction: 1,
+        color: '#eeefff',
+        invertedColor: '#111000',
         resources: [
           {
             name: '',
@@ -25,7 +26,7 @@ export default {
       const object = state.data.find(l => l.name == name)
       Vue.set(object, property, value)
     },
-    setInitialLandscapeParameters(state, payload) {
+    setInitialLandscapeData(state, payload) {
       state.data = payload
     },
     addLandscape(state) {

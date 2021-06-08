@@ -7,7 +7,7 @@ export default {
     data: [
       {
         name: '',
-        color: '#eee',
+        color: '#eeefff',
         icon: '',
       },
     ],
