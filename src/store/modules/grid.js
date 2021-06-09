@@ -7,76 +7,80 @@ export default {
     gap: null,
     tileSize: null,
     tileBorderWidth: null,
+    visibleResourceValues: false,
   }),
   mutations: {
     setRowCount(state, payload) {
-      const rowCount = payload > 23 ? 23 : payload < 3 ? 3 : payload;
-      state.rowCount = rowCount;
+      const rowCount = payload > 23 ? 23 : payload < 3 ? 3 : payload
+      state.rowCount = rowCount
     },
     setColumnCount(state, payload) {
-      const columnCount = payload > 23 ? 23 : payload < 3 ? 3 : payload;
-      state.columnCount = columnCount;
+      const columnCount = payload > 23 ? 23 : payload < 3 ? 3 : payload
+      state.columnCount = columnCount
     },
     addHexRow(state, { row, index }) {
-      state.hexRows.push(row);
+      state.hexRows.push(row)
     },
     addHexRowToStash(state, { row, index }) {
-      state.hexRowsStash.push(row);
+      state.hexRowsStash.push(row)
     },
     removeHexRow(state) {
-      state.hexRows.pop();
+      state.hexRows.pop()
     },
     replaceHexRow(state, { row, index }) {
-      state.hexRows[index] = row;
+      state.hexRows[index] = row
     },
     replaceHexRowInStash(state, { row, index }) {
-      state.hexRowsStash[index] = row;
+      state.hexRowsStash[index] = row
     },
     setInitialHexRows(state, payload) {
-      state.hexRows = payload;
+      state.hexRows = payload
     },
     setInitialHexRowsStash(state, payload) {
-      state.hexRowsStash = payload;
+      state.hexRowsStash = payload
     },
     setGap(state, payload) {
-      state.gap = payload;
+      state.gap = payload
     },
     setTileSize(state, payload) {
-      state.tileSize = payload;
+      state.tileSize = payload
     },
     setTileBorderWidth(state, payload) {
-      state.tileBorderWidth = payload;
+      state.tileBorderWidth = payload
+    },
+    toggleResourceValuesVisibility(state) {
+      state.visibleResourceValues = !state.visibleResourceValues
     },
   },
   actions: {
     getRowFromStash(context, index) {
-      return context.state.hexRowsStash[index] || null;
+      return context.state.hexRowsStash[index] || null
     },
     storeHexRow(context, { row, index }) {
-      context.commit("addHexRow", { row, index });
+      context.commit('addHexRow', { row, index })
 
       if (index == context.state.hexRowsStash.length) {
-        context.commit("addHexRowToStash", { row: [...row], index });
+        context.commit('addHexRowToStash', { row: [...row], index })
       }
     },
     storeModifiedHexRow(context, { row, index }) {
-      const stashedCopyOfRow = context.state.hexRowsStash[index];
+      const stashedCopyOfRow = context.state.hexRowsStash[index]
 
       if (row.length > stashedCopyOfRow.length) {
-        context.commit("replaceHexRow", { row, index });
-        context.commit("replaceHexRowInStash", { row: [...row], index });
+        context.commit('replaceHexRow', { row, index })
+        context.commit('replaceHexRowInStash', { row: [...row], index })
       } else {
-        context.commit("replaceHexRow", { row, index });
+        context.commit('replaceHexRow', { row, index })
       }
     },
   },
   getters: {
     tileSize(state, getter, rootState) {
-      const thresholdInPx = 45;
+      const thresholdInPx = 45
       if (state.tileSize * (rootState.viewportWidth / 100) > thresholdInPx) {
-        return state.tileSize;
+        return state.tileSize
       } else {
-        return (thresholdInPx / rootState.viewportWidth) * 100;
+        return (thresholdInPx / rootState.viewportWidth) * 100
       }
     },
   },

@@ -1,43 +1,53 @@
-import Vue from "vue";
+import Vue from 'vue'
+import { getRandomHexColor, getInvertedHexColor } from '@/helpers/getDynamicColor.js'
+import { getUniqueDefaultName } from '@/helpers/getUniqueName.js'
 
 export default {
   state: () => ({
-    parameters: [
+    data: [
       {
-        type: null,
-        max: null,
-        chance: null,
-        fraction: null,
+        name: '',
+        color: '#eeefff',
+        icon: '',
       },
     ],
-    visibleValues: false,
-    distributionMode: 'FRACTION'
   }),
   mutations: {
-    setResourceParameter(state, { value, resource, property }) {
-      value > 100 && (value = 100);
-      const object = state.parameters.filter((r) => r.type == resource.type)[0];
-      Vue.set(object, property, value);
+    setResourceParameter(state, { value, name, property }) {
+      const object = state.resources.find(r => r.name == name)
+      Vue.set(object, property, value)
     },
-    setInitialResourceParameters(state, payload) {
-      state.parameters = payload.parameters;
-      state.visibleValues = payload.visibleValues;
-      state.distributionMode = payload.distributionMode;
+    setInitialResourceData(state, payload) {
+      state.data = payload
     },
-    toggleResourceValuesVisibility(state) {
-      state.visibleValues = !state.visibleValues;
+    addResource(state) {
+      const color = getRandomHexColor(0, 50)
+
+      const defaultName = getUniqueDefaultName(
+        `resurs #${state.data.length + 1}`,
+        state.data
+      )
+
+      const payload = {
+        name: defaultName,
+        color,
+        invertedColor: getInvertedHexColor(color),
+      }
+
+      state.data.push(payload)
     },
-    toggleResourceDistributionMode(state) {
-      state.distributionMode =
-        state.distributionMode == "FRACTION"
-          ? "INDIVIDUAL"
-          : "FRACTION";
+    removeResource(state, { name }) {
+      const targetResourceIndex = state.data.findIndex(r => r.name == name)
+
+      state.data.splice(targetResourceIndex, 1)
     },
   },
   getters: {
-    resourceDistributionSum(state) {
-      const fractions = state.parameters.map((p) => p.fraction);
-      return fractions.reduce((a, b) => a + b, 0);
+    resourceColors(state) {
+      return Object.assign(...state.data.map(r => ({ [r.name]: r.color })))
+    },
+    invertedResourceColors(state) {
+      return Object.assign(...state.data.map(r => ({ [r.name]: r.invertedColor })))
     },
   },
-};
+}

@@ -3,3 +3,41 @@
 @tailwind components;
 
 @tailwind utilities;
+
+button:active {
+  @apply outline-none;
+}
+button:hover {
+  @apply bg-opacity-80 !important;
+}
+button {
+  @apply grid place-items-center whitespace-nowrap select-none;
+  padding-top: 0.125rem;
+  padding-bottom: 0.175rem;
+}
+
+body {
+  @apply font-sans antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  height: 20%;
+  background: #171a1da9;
+  border: 1px solid #eeeeee7d;
+  border-right: 2px solid #eeeeee7d;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #171a1de6;
+  border: 1px solid #1d96e7cd;
+  border-right: 2px solid #1d96e7a9;
+}

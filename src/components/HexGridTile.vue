@@ -5,10 +5,7 @@
         <span :style="`margin-top: ${size / 5}px;`">{{ tile.number }}</span>
         <transition name="fade" mode="out-in">
           <div
-            v-show="
-              $store.state.resources.distributionMode == 'INDIVIDUAL' &&
-                $store.state.resources.visibleValues
-            "
+            v-show="$store.state.grid.visibleResourceValues"
             class="resourceContainer"
             :style="{
               fontSize: `clamp(10px, ${size / 10}vw, 40px`,
@@ -16,14 +13,17 @@
             }"
           >
             <div
-              v-for="resource in resources"
-              :key="resource.type"
+              v-for="resource in tile.resources"
+              :key="resource.name"
               class="resourceItem"
-              :style="{ backgroundColor: colors.resources[resource.type] }"
+              :style="{
+                backgroundColor: resource.backgroundColor,
+                color: getInvertedHexcolorGrayscale(resource.backgroundColor),
+              }"
             >
-              <WoodIcon v-if="resource.type == 'wood' && tileIsLargeEnough" />
-              <StoneIcon v-if="resource.type == 'stone' && tileIsLargeEnough" />
-              <WheatIcon v-if="resource.type == 'wheat' && tileIsLargeEnough" />
+              <WoodIcon v-if="resource.name == 'wood' && tileIsLargeEnough" />
+              <StoneIcon v-if="resource.name == 'stone' && tileIsLargeEnough" />
+              <WheatIcon v-if="resource.name == 'wheat' && tileIsLargeEnough" />
               <span>{{ resource.amount }}</span>
             </div>
           </div>
@@ -34,14 +34,15 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
-import WoodIcon from "@/assets/icons/log.svg";
-import StoneIcon from "@/assets/icons/stone-block.svg";
-import WheatIcon from "@/assets/icons/wheat.svg";
-import colors from "@/assets/colors";
+import { mapGetters, mapState } from 'vuex'
+import { getInvertedHexcolorGrayscale } from '@/helpers/getDynamicColor.js'
+import WoodIcon from '@/assets/icons/log.svg'
+import StoneIcon from '@/assets/icons/stone-block.svg'
+import WheatIcon from '@/assets/icons/wheat.svg'
+import colors from '@/assets/colors'
 
 export default {
-  name: "ResourceTile",
+  name: 'ResourceTile',
   components: {
     WoodIcon,
     StoneIcon,
@@ -50,46 +51,51 @@ export default {
   data() {
     return {
       colors,
-    };
+    }
   },
   props: {
     tile: {
-      color: String,
-      number: Number,
+      number: {
+        type: Number,
+        required: true,
+      },
+      landscapeType: {
+        type: String,
+        required: true,
+      },
       resources: {
-        stone: Number,
-        wood: Number,
-        wheat: Number,
+        type: Array,
+        validator(value) {
+          value.every(r => r.hasOwnProperty('name') && r.hasOwnProperty('amount'))
+        },
       },
       required: true,
     },
   },
   computed: {
     ...mapState({
-      borderWidth: (state) => state.grid.tileBorderWidth,
-      viewportWidth: (state) => state.viewportWidth,
+      borderWidth: state => state.grid.tileBorderWidth,
+      viewportWidth: state => state.viewportWidth,
     }),
-    ...mapGetters({ size: "tileSize" }),
-    resources() {
-      return Object.entries(this.tile.resources)
-        .map(([type, amount]) => amount > 0 && { type, amount })
-        .filter((truthy) => truthy);
-    },
+    ...mapGetters({ size: 'tileSize' }),
     tileContentStyle() {
       return {
-        display: "flex",
+        display: 'flex',
         gap: `${this.size / 50}vw`,
         backgroundColor: this.tile.color,
         fontSize: `clamp(8px, ${this.size / 10}vw, 20px`,
         height: `${100 - this.borderWidth}%`,
         width: `${100 - this.borderWidth}%`,
-      };
+      }
     },
     tileIsLargeEnough() {
-      return this.size > 6 && this.viewportWidth > 800;
+      return this.size > 6 && this.viewportWidth > 800
     },
   },
-};
+  methods: {
+    getInvertedHexcolorGrayscale,
+  },
+}
 </script>
 
 <style scoped>
