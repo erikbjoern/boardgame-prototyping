@@ -10,7 +10,7 @@
         <input
           class="font-semibold w-full bg-transparent mr-2 transition-colors duration-300"
           name="name"
-          v-model.lazy="item.name"
+          v-model.lazy="name"
           :style="{ color: expanded ? item.color : item.invertedColor }"
           @keydown.esc="handleEscapeKey"
           :ref="item.name"
@@ -244,6 +244,26 @@ export default {
     }
   },
   computed: {
+    name: {
+      get() {
+        return this.item.name
+      },
+      set(value) {
+        const currentDataSet = this.tab.toLowerCase()
+
+        if (this.$store.state[currentDataSet].data.find(i => i.name == value)) {
+          const message = `Det finns redan ${
+            this.tab == 'LANDSCAPES' ? 'ett landskap' : 'en resurs'
+          } med detta namn`
+          alert(message)
+          this.$refs[this.item.name].value = this.item.name
+        } else {
+          const mutation =
+            this.tab == 'LANDSCAPES' ? 'setLandscapeParameter' : 'setResourceParameter'
+          this.$store.commit(mutation, { name: this.item.name, property: 'name', value })
+        }
+      },
+    },
     otherAvailableResources() {
       return this.$store.state.resources.data.filter(
         r => !this.item.resources.map(res => res.name).includes(r.name)
@@ -257,7 +277,10 @@ export default {
         if (value == '#000' || value == '#000000') {
           const rgbValues = getRGBValues(this.item.color)
           const max = Math.max(...rgbValues)
-          value = max <= 5 ? '#000000' : '#' + rgbValues.map(v => v == max ? '05' : '00').join("")
+          value =
+            max <= 5
+              ? '#000000'
+              : '#' + rgbValues.map(v => (v == max ? '05' : '00')).join('')
         }
         this.item.color = value
         this.item.invertedColor = getInvertedHexColor(value)
