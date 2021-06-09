@@ -1,4 +1,4 @@
-function getRGBValues(hexColor) {
+export function getRGBValues(hexColor) {
   const r =
     hexColor.length > 4
       ? hexColor.slice(1, 3)
@@ -21,6 +21,9 @@ export function getInvertedHexColor(hexColor) {
   const rgbValues = getRGBValues(hexColor)
 
   const max = Math.max(...rgbValues)
+
+  if (max == 0) return getInvertedHexcolorGrayscale('#000000')
+
   const average = rgbValues.reduce((a, b) => a + b, 0) / rgbValues.length
   const blueIsSingleMax = ![rgbValues[0], rgbValues[1]].includes(max)
 
@@ -39,6 +42,8 @@ export function getInvertedHexColor(hexColor) {
         multiplied += (rgbMax - multiplied) / 1.8
       } else if (blueIsSingleMax && index == 1) {
         multiplied += (rgbMax - multiplied) / 1.4
+      } else if (v == max) {
+        multiplied += (rgbMax - multiplied) / 3
       } else {
         multiplied += (rgbMax - multiplied) / 4
       }
@@ -46,15 +51,25 @@ export function getInvertedHexColor(hexColor) {
       multiplied -= multiplied * (2 / 3)
     }
 
-    // if result will be a dark shade, increase main hexColor slightly
+    // if result will be a dark shade, increase main r/g/b value slightly
     if (multiplied < rgbMax / 2 && v == max) {
       multiplied += 5
     }
 
-    return multiplied
+    return average < averageThreshold
+      ? Math.min((rgbMax - average) / 2 + multiplied / 2, rgbMax)
+      : multiplied
   }
 
   const adjustedValues = rgbValues.map((v, index) => getInvertedColorValue(v, index))
+
+  if (
+    adjustedValues[0] / 3 > adjustedValues[2] &&
+    adjustedValues[1] / 3 > adjustedValues[2]
+  ) {
+    adjustedValues[0] = adjustedValues[0] * 0.85
+    adjustedValues[1] = adjustedValues[1] * 0.85
+  }
 
   return (
     '#' +
@@ -106,9 +121,9 @@ export function getInvertedHexcolorGrayscale(hexColor) {
 
   const invertedGrayValues = rgbValues.map(v => {
     if (average > rgbMax / 2) {
-      return rgbMax / 2 - Math.min(rgbMax / 2, rgbMax - average * 1.1)
+      return rgbMax / 2 - Math.min(rgbMax / 2, (rgbMax - average + 75))
     } else {
-      return rgbMax / 2 + Math.min(rgbMax / 2, average * 1.1)
+      return rgbMax / 2 + Math.min(rgbMax / 2, (average + 75))
     }
   })
 

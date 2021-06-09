@@ -227,7 +227,7 @@ import WoodIcon from '@/assets/icons/log.svg'
 import StoneIcon from '@/assets/icons/stone-block.svg'
 import WheatIcon from '@/assets/icons/wheat.svg'
 import colors from '@/assets/colors'
-import { getInvertedHexColor } from '@/helpers/getDynamicColor'
+import { getInvertedHexColor, getRGBValues } from '@/helpers/getDynamicColor'
 
 export default {
   name: 'SettingsInputLandscapes',
@@ -254,6 +254,11 @@ export default {
         return this.item.color
       },
       set(value) {
+        if (value == '#000' || value == '#000000') {
+          const rgbValues = getRGBValues(this.item.color)
+          const max = Math.max(...rgbValues)
+          value = max <= 5 ? '#000000' : '#' + rgbValues.map(v => v == max ? '05' : '00').join("")
+        }
         this.item.color = value
         this.item.invertedColor = getInvertedHexColor(value)
       },
