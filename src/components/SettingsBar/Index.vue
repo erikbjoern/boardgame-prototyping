@@ -1,5 +1,5 @@
 <template>
-  <div class="input-bar-container h-24">
+  <div class="input-bar-container h-24 mx-auto" style="max-width: 1400px">
     <div class="board-inputs h-20">
       <GridSettingsItem
         v-for="property in gridProperties"
