@@ -1,7 +1,8 @@
 <template>
   <div
-    class="rounded bg-[#000000ef] py-6 pl-8 pr-[0.75rem] flex space-x-8"
+    class="relative rounded bg-[#000000ef] py-6 pl-8 pr-[0.75rem] flex space-x-8 -mt-1"
     :style="{ maxHeight: 'calc(100vh - 200px)' }"
+    id="resource-settings"
   >
     <div class="flex flex-col w-36 space-y-6 h4">
       <label class="flex items-center space-x-2 h-8">
@@ -172,3 +173,16 @@ export default {
   },
 }
 </script>
+
+<style>
+#resource-settings::after {
+  content: "";
+  background-color: #000000cc;
+  width: 8rem;
+  height: .55rem;
+  position: absolute;
+  transform: translateY(-100%);
+  right: .4rem;
+  top: .5px;
+}
+</style>

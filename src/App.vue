@@ -1,6 +1,7 @@
 <template>
   <div>
-    <AdjustmentsBar />
+    <SettingsBar />
+    <LandscapeOverview />
     <div class="mainContainer" ref="mainContainer">
       <HexGridContainer />
     </div>
@@ -8,16 +9,18 @@
 </template>
 
 <script>
-import AdjustmentsBar from '@/components/SettingsBar/Index'
+import SettingsBar from '@/components/SettingsBar/Index'
 import HexGridContainer from '@/components/HexGrid/HexGridContainer'
 import { scrollToCenter } from '@/helpers/scroll.js'
 import { dragToScrollStart, dragToScroll } from '@/helpers/scroll.js'
+import LandscapeOverview from './components/LandscapeOverview.vue'
 
 export default {
   name: 'App',
   components: {
     HexGridContainer,
-    AdjustmentsBar,
+    SettingsBar,
+    LandscapeOverview,
   },
   data() {
     return {
