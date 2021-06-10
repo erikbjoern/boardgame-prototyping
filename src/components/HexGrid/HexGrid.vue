@@ -15,7 +15,7 @@
 
 <script>
 import { mapGetters, mapState } from "vuex";
-import HexGridTile from "@/components/HexGridTile.vue";
+import HexGridTile from "@/components/HexGrid/HexGridTile.vue";
 
 export default {
   name: "HexGrid",

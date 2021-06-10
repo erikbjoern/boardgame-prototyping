@@ -5,7 +5,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import colors from '@/assets/colors'
-import HexGrid from '@/components/HexGrid.vue'
+import HexGrid from '@/components/HexGrid/HexGrid.vue'
 
 export default {
   name: 'HexGridContainer',

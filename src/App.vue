@@ -9,7 +9,7 @@
 
 <script>
 import AdjustmentsBar from '@/components/SettingsBar/Index'
-import HexGridContainer from '@/containers/HexGridContainer'
+import HexGridContainer from '@/components/HexGrid/HexGridContainer'
 import { scrollToCenter } from '@/helpers/scroll.js'
 import { dragToScrollStart, dragToScroll } from '@/helpers/scroll.js'
 
