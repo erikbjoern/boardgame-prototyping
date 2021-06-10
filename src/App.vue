@@ -1,7 +1,7 @@
 <template>
   <div>
     <SettingsBar />
-    <LandscapeOverview />
+    <LandscapeOverview v-if="$store.state.showOverview" />
     <div class="mainContainer" ref="mainContainer">
       <HexGridContainer />
     </div>
