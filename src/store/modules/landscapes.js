@@ -63,8 +63,24 @@ export default {
       const targetResourceIndex = targetLandscape.resources.findIndex(
         r => r.name == resourceName
       )
+      const updatedResource = {
+        ...targetLandscape.resources[targetResourceIndex],
+        [property]: value,
+      }
 
-      targetLandscape.resources[targetResourceIndex][property] = value
+      const landscapeResources = [
+        ...targetLandscape.resources.slice(0, targetResourceIndex),
+        updatedResource,
+        ...targetLandscape.resources.slice(targetResourceIndex + 1),
+      ]
+
+      Vue.set(targetLandscape, 'resources', landscapeResources)
+    },
+    removeResourceFromLandscape(state, { name, landscapeName }) {
+      const targetLandscape = state.data.find(l => l.name == landscapeName)
+      const targetResourceIndex = targetLandscape.resources.findIndex(r => r.name == name)
+
+      targetLandscape.resources.splice(targetResourceIndex, 1)
     },
     setLandscapePool(state, payload) {
       state.landscapePool = payload

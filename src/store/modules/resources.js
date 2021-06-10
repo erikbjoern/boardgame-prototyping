@@ -14,7 +14,7 @@ export default {
   }),
   mutations: {
     setResourceParameter(state, { value, name, property }) {
-      const object = state.resources.find(r => r.name == name)
+      const object = state.data.find(r => r.name == name)
       Vue.set(object, property, value)
     },
     setInitialResourceData(state, payload) {

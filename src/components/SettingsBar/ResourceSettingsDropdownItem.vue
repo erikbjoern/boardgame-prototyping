@@ -309,11 +309,16 @@ export default {
       if (resource) {
         mutation = 'setResourceValueOnLandscape'
 
-        if (property == 'max' && value < resource.min) {
-          value = resource.min
-        }
-        if (property == 'min' && value > resource.max) {
-          value = resource.max
+        if (
+          (property == 'max' && value < resource.min) ||
+          (property == 'min' && value > resource.max)
+        ) {
+          this.$store.commit(mutation, {
+            name: item.name,
+            property: property == 'max' ? 'min' : 'max',
+            value,
+            resourceName,
+          })
         }
       } else {
         mutation =
@@ -326,10 +331,6 @@ export default {
         value,
         ...(resourceName && { resourceName }),
       })
-
-      e.target.value = this.$store.state.landscapes.data
-        .find(l => l.name == item.name)
-        .resources.find(r => r.name == resourceName)[property]
 
       if (e.type == 'keydown') {
         e.target.blur()
@@ -351,7 +352,9 @@ export default {
 
       this.$store.commit(mutation, {
         name: item.name,
-        ...(mutation == 'removeResourceFromLandscape' && { landscape: this.item.name }),
+        ...(mutation == 'removeResourceFromLandscape' && {
+          landscapeName: this.item.name,
+        }),
       })
     },
   },
