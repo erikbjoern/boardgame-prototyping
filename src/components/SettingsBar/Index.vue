@@ -1,5 +1,5 @@
 <template>
-  <div class="input-bar-container h-24 mx-auto" style="max-width: 1400px">
+  <div class="input-bar-container h-24 mx-auto relative" style="max-width: 1400px">
     <div class="board-inputs h-20">
       <GridSettingsItem
         v-for="property in gridProperties"
@@ -23,6 +23,7 @@
       </div>
       <ResourceSettings v-if="resourceSettingsIsOpen" />
     </div>
+    <LandscapeSummary />
   </div>
 </template>
 
@@ -31,11 +32,13 @@ import GridSettingsItem from './GridSettingsItem'
 import ResourceSettings from './ResourceSettings'
 import { mapActions } from 'vuex'
 import { scrollToCenter } from '@/helpers/scroll'
+import LandscapeSummary from '@/components/LandscapeSummary.vue'
 
 export default {
   components: {
     GridSettingsItem,
     ResourceSettings,
+    LandscapeSummary,
   },
   name: 'SettingsBar',
   data() {

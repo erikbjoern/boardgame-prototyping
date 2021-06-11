@@ -14,6 +14,8 @@ export default class StoreConfig {
         viewportWidth: window.visualViewport?.width || 1400,
         showResourceValues: false,
         showOverview: false,
+        selectedTiles: [],
+        keysPressed: [],
       },
       grid: {
         rowCount: 13,

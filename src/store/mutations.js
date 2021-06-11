@@ -8,4 +8,18 @@ export default {
   toggleOverviewVisibility(state) {
     state.showOverview = !state.showOverview
   },
+  keydown(state, keyCode) {
+    if (!state.keysPressed.includes(keyCode)) {
+      state.keysPressed.push(keyCode)
+    }
+  },
+  keyup(state, keyCode) {
+    state.keysPressed.splice(state.keysPressed.indexOf(keyCode), 1)
+  },
+  addTileToSelection(state, tileId) { 
+    state.selectedTiles.push(tileId)
+  },
+  removeTileFromSelection(state, index) {
+    state.selectedTiles.splice(index, 1)
+  },
 }
