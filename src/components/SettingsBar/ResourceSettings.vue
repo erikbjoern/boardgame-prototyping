@@ -1,18 +1,31 @@
 <template>
   <div
-    class="rounded bg-[#000000ef] py-6 pl-8 pr-[0.75rem] flex space-x-8"
+    class="relative rounded bg-[#000000ef] py-6 pl-8 pr-[0.75rem] flex space-x-8 -mt-1"
     :style="{ maxHeight: 'calc(100vh - 200px)' }"
+    id="resource-settings"
   >
     <div class="flex flex-col w-36 space-y-6 h4">
-      <label class="flex items-center space-x-2 h-8">
-        <input
-          type="checkbox"
-          :checked="$store.state.grid.visibleResourceValues"
-          @click="toggleResourceValuesVisibility"
-        />
-        <span class="text-white text-sm font-sans font-light">Synliga resursvärden</span>
-      </label>
       <div class="w-full flex flex-col space-y-3">
+        <label class="flex items-center space-x-2 -mb-2">
+          <input
+            type="checkbox"
+            :checked="$store.state.showOverview"
+            @click="toggleOverviewVisibility"
+          />
+          <span class="text-white text-sm font-sans font-light">
+            Visa översikt
+          </span>
+        </label>
+        <label class="flex items-center space-x-2 !mb-1">
+          <input
+            type="checkbox"
+            :checked="$store.state.showResourceValues"
+            @click="toggleResourceValuesVisibility"
+          />
+          <span class="text-white text-sm font-sans font-light">
+            Synliga resursvärden
+          </span>
+        </label>
         <button
           class="!bg-[#669922] text-[#eaffea] !rounded-full flex px-3"
           @click="addNew('addLandscape', 'LANDSCAPES')"
@@ -160,6 +173,9 @@ export default {
     toggleResourceValuesVisibility() {
       this.$store.commit('toggleResourceValuesVisibility')
     },
+    toggleOverviewVisibility() {
+      this.$store.commit('toggleOverviewVisibility')
+    },
     switchTab(e, tabName) {
       this.tab = tabName
       e?.target.blur()
@@ -172,3 +188,16 @@ export default {
   },
 }
 </script>
+
+<style>
+#resource-settings::after {
+  content: '';
+  background-color: #000000cc;
+  width: 8rem;
+  height: 0.55rem;
+  position: absolute;
+  transform: translateY(-100%);
+  right: 0.4rem;
+  top: 0.5px;
+}
+</style>

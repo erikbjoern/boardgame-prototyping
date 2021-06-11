@@ -1,11 +1,15 @@
 <template>
-  <div class="hex-grid__item" :style="{ zIndex: tile.number }">
-    <div class="hex-grid-item__background">
+  <div
+    class="hex-grid__item"
+    :style="{ zIndex: tile.number }"
+    @click="toggleTileSelection(tile)"
+  >
+    <div class="hex-grid-item__background" :class="isSelected ? 'bg-green-500' : 'bg-white'">
       <div class="hex-grid-item__content" :style="{ ...tileContentStyle }">
         <span :style="`margin-top: ${size / 5}px;`">{{ tile.number }}</span>
         <transition name="fade" mode="out-in">
           <div
-            v-show="$store.state.grid.visibleResourceValues"
+            v-show="$store.state.showResourceValues"
             class="resourceContainer"
             :style="{
               fontSize: `clamp(10px, ${size / 10}vw, 40px`,
@@ -39,7 +43,6 @@ import { getInvertedHexcolorGrayscale } from '@/helpers/getDynamicColor.js'
 import WoodIcon from '@/assets/icons/log.svg'
 import StoneIcon from '@/assets/icons/stone-block.svg'
 import WheatIcon from '@/assets/icons/wheat.svg'
-import colors from '@/assets/colors'
 
 export default {
   name: 'ResourceTile',
@@ -47,11 +50,6 @@ export default {
     WoodIcon,
     StoneIcon,
     WheatIcon,
-  },
-  data() {
-    return {
-      colors,
-    }
   },
   props: {
     tile: {
@@ -91,9 +89,21 @@ export default {
     tileIsLargeEnough() {
       return this.size > 6 && this.viewportWidth > 800
     },
+    isSelected() {
+      return this.$store.state.selectedTiles.includes(this.tile.id )
+    }
   },
   methods: {
     getInvertedHexcolorGrayscale,
+    toggleTileSelection(tile) {
+      const foundIndex = this.$store.state.selectedTiles.indexOf(tile.id)
+
+      if (foundIndex !== -1) {
+        this.$store.commit('removeTileFromSelection', foundIndex)
+      } else {
+        this.$store.commit('addTileToSelection', tile.id)
+      }
+    },
   },
 }
 </script>
@@ -138,7 +148,6 @@ svg {
 }
 
 .hex-grid-item__background {
-  background-color: #efefef;
   clip-path: polygon(75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%, 25% 0);
   display: grid;
   height: 100%;

@@ -1,5 +1,5 @@
 <template>
-  <div class="grid-container">
+  <div id="grid-container">
     <div :style="{ ...gridRowsStyle, ...gridRowsOddStyle }">
       <div v-for="hex in rowsOdd().flat()" :key="hex.number">
         <HexGridTile :tile="hex" />
@@ -15,7 +15,7 @@
 
 <script>
 import { mapGetters, mapState } from "vuex";
-import HexGridTile from "@/components/HexGridTile.vue";
+import HexGridTile from "@/components/HexGrid/HexGridTile.vue";
 
 export default {
   name: "HexGrid",
@@ -75,8 +75,9 @@ export default {
 </script>
 
 <style scoped>
-.grid-container {
+#grid-container {
+  cursor: pointer; 
   display: grid;
-  padding-bottom: 10vh;
+  margin-bottom: 10vh;
 }
 </style>

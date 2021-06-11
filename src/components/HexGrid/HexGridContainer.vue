@@ -5,7 +5,8 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import colors from '@/assets/colors'
-import HexGrid from '@/components/HexGrid.vue'
+import HexGrid from '@/components/HexGrid/HexGrid.vue'
+import cuid from 'cuid'
 
 export default {
   name: 'HexGridContainer',
@@ -88,17 +89,20 @@ export default {
           let landscapeType
           let resources
           let color
+          let id
 
           if (!stashedTile) {
             landscapeType = this.getLandscapeType()
             resources = this.getResources(landscapeType)
             color = this.$store.getters.landscapeColors[landscapeType]
+            id = cuid()
           }
 
           tile = stashedTile || {
             landscapeType,
             resources,
             color,
+            id,
           }
         }
 

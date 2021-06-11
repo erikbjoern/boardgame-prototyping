@@ -25,6 +25,7 @@ export default {
     const savedTileStyle = JSON.parse(localStorage.getItem('tileStyle'))
     const savedResourceData = JSON.parse(localStorage.getItem('resourceData'))
     const savedLandscapeData = JSON.parse(localStorage.getItem('landscapeData'))
+    const savedSelectedTiles = JSON.parse(localStorage.getItem('selectedTiles'))
 
     const rowCount = savedRowCount || initialGridData.rowCount
     const columnCount = savedColumnCount || initialGridData.columnCount
@@ -47,6 +48,8 @@ export default {
     context.commit('setInitialResourceData', resourceData)
     context.commit('setInitialLandscapeData', landscapeData)
 
+    savedSelectedTiles?.map(t => context.commit('addTileToSelection', t))
+
     context.dispatch('arrangeLandscapePool')
   },
   updateLocalStorage(context) {
@@ -62,6 +65,7 @@ export default {
     const tileStyle = { gap, tileSize, tileBorderWidth }
     const resourceData = context.state.resources.data
     const landscapeData = context.state.landscapes.data
+    const selectedTiles = context.state.selectedTiles
 
     localStorage.setItem('rowCount', rowCount)
     localStorage.setItem('columnCount', columnCount)
@@ -70,6 +74,7 @@ export default {
     localStorage.setItem('tileStyle', JSON.stringify(tileStyle))
     localStorage.setItem('resourceData', JSON.stringify(resourceData))
     localStorage.setItem('landscapeData', JSON.stringify(landscapeData))
+    localStorage.setItem('selectedTiles', JSON.stringify(selectedTiles))
     localStorage.setItem('timeStamp', new Date())
   },
   resetAdjustments() {

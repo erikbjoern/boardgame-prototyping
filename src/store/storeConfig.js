@@ -12,6 +12,10 @@ export default class StoreConfig {
     this.initialState = {
       root: {
         viewportWidth: window.visualViewport?.width || 1400,
+        showResourceValues: false,
+        showOverview: false,
+        selectedTiles: [],
+        keysPressed: [],
       },
       grid: {
         rowCount: 13,
@@ -21,7 +25,6 @@ export default class StoreConfig {
         gap: 0,
         tileSize: 6,
         tileBorderWidth: 6,
-        visibleResourceValues: false,
       },
       resources: [
         {

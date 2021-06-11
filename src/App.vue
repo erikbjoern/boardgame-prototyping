@@ -1,6 +1,7 @@
 <template>
   <div>
-    <AdjustmentsBar />
+    <SettingsBar />
+    <LandscapeOverview v-if="$store.state.showOverview" />
     <div class="mainContainer" ref="mainContainer">
       <HexGridContainer />
     </div>
@@ -8,16 +9,18 @@
 </template>
 
 <script>
-import AdjustmentsBar from '@/components/SettingsBar/Index'
-import HexGridContainer from '@/containers/HexGridContainer'
+import SettingsBar from '@/components/SettingsBar/Index'
+import HexGridContainer from '@/components/HexGrid/HexGridContainer'
 import { scrollToCenter } from '@/helpers/scroll.js'
 import { dragToScrollStart, dragToScroll } from '@/helpers/scroll.js'
+import LandscapeOverview from './components/LandscapeOverview.vue'
 
 export default {
   name: 'App',
   components: {
     HexGridContainer,
-    AdjustmentsBar,
+    SettingsBar,
+    LandscapeOverview,
   },
   data() {
     return {
@@ -42,10 +45,30 @@ export default {
     },
     mouseDownHandler(e) {
       if (e.button !== 0 || e.which !== 1) return
+
+      if ([...e.target.classList, ...e.target.parentElement.classList].some(c => c.toLowerCase().includes('item'))) {
+        if (!this.$store.state.keysPressed.includes(32)) return
+      }
+
       this.dragToScrollStart.bind(this)(e)
 
       document.addEventListener('mousemove', this.mouseMoveHandler)
       document.addEventListener('mouseup', this.mouseUpHandler)
+    },
+    keydownHandler(e) {
+      if (e.keyCode == 32) {
+        e.preventDefault()
+        document.getElementById('grid-container').style.cursor = 'grab'
+      }
+
+      this.$store.commit('keydown', e.keyCode)
+    },
+    keyupHandler(e) {
+      if (e.keyCode == 32) {
+        document.getElementById('grid-container').style.cursor = 'pointer'
+      }
+
+      this.$store.commit('keyup', e.keyCode)
     },
   },
   mounted() {
@@ -54,6 +77,8 @@ export default {
     mainContainer.addEventListener('mousedown', this.mouseDownHandler)
     window.addEventListener('resize', this.scrollToCenter)
     window.addEventListener('resize', this.updateViewportWidth)
+    window.addEventListener('keydown', this.keydownHandler)
+    window.addEventListener('keyup', this.keyupHandler)
 
     window.scrollTo({ left: visualViewport.width / 2 })
     this.scrollToCenter()
@@ -64,6 +89,8 @@ export default {
     document.removeEventListener('mouseup', this.mouseUpHandler)
     window.removeEventListener('resize', this.scrollToCenter)
     window.removeEventListener('resize', this.updateViewportWidth)
+    window.removeEventListener('keydown', this.keydownHandler)
+    window.removeEventListener('keyup', this.keyupHandler)
   },
 }
 </script>

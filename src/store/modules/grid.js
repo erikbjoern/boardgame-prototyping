@@ -7,7 +7,6 @@ export default {
     gap: null,
     tileSize: null,
     tileBorderWidth: null,
-    visibleResourceValues: false,
   }),
   mutations: {
     setRowCount(state, payload) {
@@ -47,9 +46,6 @@ export default {
     },
     setTileBorderWidth(state, payload) {
       state.tileBorderWidth = payload
-    },
-    toggleResourceValuesVisibility(state) {
-      state.visibleResourceValues = !state.visibleResourceValues
     },
   },
   actions: {
