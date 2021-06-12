@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="Object.values(totalResources).some(v => !!v)"
+    v-if="selectedTileIds.length > 0"
     class="flex space-x-2 p-1 bg-[#efefef55] relative mr-auto mt-1 z-[1000] rounded-sm"
   >
     <div
@@ -12,7 +12,7 @@
         color: $store.getters.invertedResourceColors[name],
       }"
     >
-      {{ name }}
+      {{ name }}:
       {{ value }}
     </div>
   </div>
@@ -22,23 +22,48 @@
 export default {
   name: 'LandscapeSummary',
   computed: {
+    selectedTileIds() {
+      return this.$store.state.selectedTiles
+    },
     totalResources() {
-      const allTiles = this.$store.state.grid.hexRows.flat()
-      const selectedTiles = this.$store.state.selectedTiles.map(tileId =>
-        allTiles.find(t => t.id == tileId)
-      )
-      const accumulator = Object.assign(
-        ...this.$store.state.resources.data.map(r => ({ [r.name]: 0 }))
-      )
+      const allVisibleTiles = this.$store.state.grid.hexRows.flat()
+      const selectedTiles = this.selectedTileIds.map(tileId =>
+        allVisibleTiles.find(t => t.id == tileId)
+      ).filter(v => !!v)
+      
+      if (selectedTiles.length) {
+        const resourceTypesOnTiles = Array.from(
+          new Set(
+            selectedTiles
+              .map(t => {
+                const landscape = this.$store.state.landscapes.data.find(
+                  l => l.name == t.landscapeType
+                )
+                if (landscape) return landscape.resources.map(r => r.name)
+              })
+              .flat()
+              .filter(v => !!v)
+          )
+        )
 
-      const resourceSums = selectedTiles.reduce((acc, current) => {
-        current.resources.map(r => {
-          acc[r.name] += r.amount
-        })
-        return acc
-      }, accumulator)
+        if (resourceTypesOnTiles.length) {
+          const accumulator = Object.assign(
+            ...resourceTypesOnTiles.map(name => ({ [name]: 0 }))
+          )
 
-      return resourceSums
+          const resourceSums = selectedTiles.reduce((acc, current) => {
+            current.resources.map(r => {
+              if (r.name && r.amount) {
+                acc[r.name] += r.amount
+              }
+            })
+
+            return acc
+          }, accumulator)
+
+          return resourceSums
+        }
+      }
     },
   },
 }

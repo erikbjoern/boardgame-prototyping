@@ -82,11 +82,13 @@ export default {
     localStorage.removeItem('columnCount')
     localStorage.removeItem('hexRows')
     localStorage.removeItem('tileStyle')
+    localStorage.removeItem('selectedTiles')
     window.location.reload()
   },
   resetTiles() {
     localStorage.removeItem('hexRows')
     localStorage.removeItem('hexStash')
+    localStorage.removeItem('selectedTiles')
     window.location.reload()
   },
 }
