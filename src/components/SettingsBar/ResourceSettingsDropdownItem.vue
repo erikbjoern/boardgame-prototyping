@@ -49,12 +49,10 @@
           <transition name="fade" mode="out-in">
             <div
               v-if="!removalMode"
-              class="font-semibold bg-transparent text-sm w-full text-center"
+              class="w-full"
             >
-              <input class="absolute opacity-0" type="color" v-model="itemColor" />
-              <span :style="{ color: item.color }">
-                {{ item.color }}
-              </span>
+              <input v-model="itemColor" type="color" class="absolute opacity-0 ml-5" />
+              <input v-model.lazy="itemColor" type="text" @keydown.esc="handleEscapeKey" name="color" class="bg-transparent text-center w-full font-semibold text-sm" :style="{ color: item.color }" />
             </div>
             <button v-else @click="remove(item)">
               <svg
