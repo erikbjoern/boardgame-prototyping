@@ -1,7 +1,8 @@
 <template>
-  <div class="flex flex-col w-full flex-none rounded overflow-hidden">
+  <div class="flex flex-col" style="width: calc(310px - 1.25rem) !important">
     <div
-      class="flex w-full p-2 transition-colors duration-300"
+      class="flex w-full p-2 transition-colors duration-300 rounded"
+      :class="expanded && 'rounded-b-none'"
       :style="{
         backgroundColor: expanded ? item.invertedColor : item.color,
       }"
@@ -47,12 +48,16 @@
           :style="{ backgroundColor: removalMode ? '#992222' : item.invertedColor }"
         >
           <transition name="fade" mode="out-in">
-            <div
-              v-if="!removalMode"
-              class="w-full"
-            >
+            <div v-if="!removalMode" class="w-full">
               <input v-model="itemColor" type="color" class="absolute opacity-0 ml-5" />
-              <input v-model.lazy="itemColor" type="text" @keydown.esc="handleEscapeKey" name="color" class="bg-transparent text-center w-full font-semibold text-sm" :style="{ color: item.color }" />
+              <input
+                v-model.lazy="itemColor"
+                type="text"
+                @keydown.esc="handleEscapeKey"
+                name="color"
+                class="bg-transparent text-center w-full font-semibold text-sm"
+                :style="{ color: item.color }"
+              />
             </div>
             <button v-else @click="remove(item)">
               <svg
@@ -75,7 +80,7 @@
     </div>
     <div
       v-if="expanded"
-      class="flex flex-col items-stretch space-y-2 p-2"
+      class="flex flex-col items-stretch space-y-2 p-2 rounded-b"
       :style="{
         backgroundColor: item.color,
         color: item.invertedColor,
@@ -228,7 +233,7 @@ import colors from '@/assets/colors'
 import { getInvertedHexColor, getRGBValues } from '@/helpers/getDynamicColor'
 
 export default {
-  name: 'SettingsInputLandscapes',
+  name: 'ResourceSettingsItem',
   components: {
     WoodIcon,
     StoneIcon,
