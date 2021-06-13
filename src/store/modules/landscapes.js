@@ -31,7 +31,7 @@ export default {
       state.data = payload
     },
     addLandscape(state) {
-      const color = getRandomHexColor(0, 50)
+      const color = getRandomHexColor([1, 1, 0], [60, 60, 30])
 
       const defaultName = getUniqueDefaultName(
         `landskap #${state.data.length + 1}`,

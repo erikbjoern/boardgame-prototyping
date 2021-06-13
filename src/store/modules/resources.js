@@ -21,7 +21,7 @@ export default {
       state.data = payload
     },
     addResource(state) {
-      const color = getRandomHexColor(0, 50)
+      const color = getRandomHexColor([0, 0, 0], [55, 55, 55])
 
       const defaultName = getUniqueDefaultName(
         `resurs #${state.data.length + 1}`,
