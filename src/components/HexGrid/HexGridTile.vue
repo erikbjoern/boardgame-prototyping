@@ -45,7 +45,7 @@ import StoneIcon from '@/assets/icons/stone-block.svg'
 import WheatIcon from '@/assets/icons/wheat.svg'
 
 export default {
-  name: 'ResourceTile',
+  name: 'HexGridTile',
   components: {
     WoodIcon,
     StoneIcon,
@@ -96,6 +96,8 @@ export default {
   methods: {
     getInvertedHexcolorGrayscale,
     toggleTileSelection(tile) {
+      if (this.$store.state.keysPressed.includes(32)) return
+
       const foundIndex = this.$store.state.selectedTiles.indexOf(tile.id)
 
       if (foundIndex !== -1) {
