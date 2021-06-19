@@ -89,8 +89,8 @@ export function getInvertedHexColor(hexColor) {
     adjustedValues[0] / 3 > adjustedValues[2] &&
     adjustedValues[1] / 3 > adjustedValues[2]
   ) {
-    adjustedValues[0] = adjustedValues[0] * 0.85
-    adjustedValues[1] = adjustedValues[1] * 0.85
+    adjustedValues[0] = adjustedValues[0] * 0.75
+    adjustedValues[1] = adjustedValues[1] * 0.75
   }
 
   return (
