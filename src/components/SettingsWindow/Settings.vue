@@ -24,24 +24,21 @@
       class="shadow-inner border-black border-[10px] py-8 flex-1"
       :style="{ height: 'calc(100vh - 200px)', maxHeight: '80vh', minWidth: '40rem' }"
     >
-      <ResourceSettings v-if="activeTab == 'landscapesAndResources'" />
-      <GridSettings v-if="activeTab == 'boardAndTiles'" />
-      <SettingsActions v-if="activeTab == 'other'" @close="$emit('close')" />
+      <LandscapesAndResources v-if="activeTab == 'landscapesAndResources'" />
+      <BoardAndTiles v-if="activeTab == 'boardAndTiles'" @close="$emit('close')" />
     </div>
   </div>
 </template>
 
 <script>
-import ResourceSettings from './ResourceSettings'
-import GridSettings from './GridSettings'
-import SettingsActions from './SettingsActions'
+import LandscapesAndResources from './LandscapesAndResources'
+import BoardAndTiles from './BoardAndTiles'
 
 export default {
   name: 'Menu',
   components: {
-    ResourceSettings,
-    GridSettings,
-    SettingsActions,
+    LandscapesAndResources,
+    BoardAndTiles,
   },
   data() {
     return {
@@ -53,10 +50,6 @@ export default {
         {
           name: 'boardAndTiles',
           label: 'Bräde & Brickor',
-        },
-        {
-          name: 'other',
-          label: 'Övrigt',
         },
       ],
       activeTab: 'landscapesAndResources',

@@ -9,7 +9,7 @@ import cuid from 'cuid'
 import EventBus from '@/eventBus'
 
 export default {
-  name: 'HexGridContainer',
+  name: 'HexGridController',
   components: {
     HexGrid,
   },
@@ -152,6 +152,17 @@ export default {
         this.$store.commit('removeTileRow')
       }
     },
+    reassignResources() {
+      const updatedTileRows = this.tileRows.map(row => {
+        return row.map(tile => {
+          return { ...tile, resources: this.getResources(tile.landscapeType) }
+        })
+      })
+
+      const newBoardState = { ...this.$store.state.board, tileRows: updatedTileRows }
+
+      this.$store.commit('setBoardState', newBoardState)
+    },
   },
   watch: {
     rowCount(newValue, oldValue) {
@@ -180,6 +191,7 @@ export default {
     this.addTileRows(this.rowCount, stashedRowsCount)
 
     EventBus.$on('buildGrid', this.addTileRows)
+    EventBus.$on('reassignResources', this.reassignResources)
 
     this.$store.commit('initialised')
   },

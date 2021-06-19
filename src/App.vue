@@ -36,14 +36,14 @@
     <LandscapeSummary v-show="$store.state.preferences.showSummary" />
     <LandscapeOverview v-show="$store.state.preferences.showOverview" />
     <div class="mainContainer" ref="mainContainer">
-      <HexGridContainer />
+      <HexGridController />
     </div>
   </div>
 </template>
 
 <script>
 import SettingsWindow from '@/components/SettingsWindow/Settings'
-import HexGridContainer from '@/components/HexGrid/HexGridContainer'
+import HexGridController from '@/components/HexGrid/HexGridController'
 import { scrollToCenter } from '@/helpers/scroll.js'
 import { dragToScrollStart, dragToScroll } from '@/helpers/scroll.js'
 import LandscapeOverview from '@/components/LandscapeOverview.vue'
@@ -52,7 +52,7 @@ import LandscapeSummary from '@/components/LandscapeSummary.vue'
 export default {
   name: 'App',
   components: {
-    HexGridContainer,
+    HexGridController,
     SettingsWindow,
     LandscapeOverview,
     LandscapeSummary,

@@ -55,7 +55,7 @@ export default {
         commit('replaceTileRow', { row, index })
       }
     },
-    resetTiles({ commit, dispatch }) {
+    generateNewTiles({ commit, dispatch }) {
       commit('setBoardState', {
         tileRows: [],
         tileRowsStash: [],

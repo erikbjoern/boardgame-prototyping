@@ -205,7 +205,7 @@
 import ResourceSettingsItem from './ResourceSettingsItem'
 
 export default {
-  name: 'ResourceSettings',
+  name: 'LandscapesAndResources',
   components: {
     ResourceSettingsItem,
   },

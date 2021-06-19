@@ -1,9 +1,9 @@
 <template>
   <div class="flex w-full h-full">
     <div class="flex-1">
-      <div class="w-36 mx-auto">
+      <div class="mx-auto w-[min-content] flex flex-col space-y-3">
         <button
-          class="h-8 w-full border rounded !font-thin text-sm tracking-wide bg-black"
+          class="h-8 w-full border rounded !font-thin text-sm tracking-wide bg-black mb-6"
           :class="
             $store.state.preferences.showResourceValues
               ? '!border-green-500 text-green-200'
@@ -11,7 +11,21 @@
           "
           @click="toggleResourceValuesVisibility"
         >
-          {{ $store.state.preferences.showResourceValues ? 'Visar' : 'Visa' }} resursvärden
+          {{ $store.state.preferences.showResourceValues ? 'Visar' : 'Visa' }}
+          resursvärden
+        </button>
+
+        <button
+          class="h-8 w-full px-3 border rounded-full !font-thin text-sm tracking-wide bg-black border-gray-100 text-gray-100"
+          @click="generateNewResourceValues"
+        >
+          Generera nya resursvärden
+        </button>
+        <button
+          class="h-8 w-full px-3 border rounded-full !font-thin text-sm tracking-wide bg-black border-gray-100 text-gray-100"
+          @click="generateNewTiles"
+        >
+          Generera nytt bräde
         </button>
       </div>
     </div>
@@ -33,11 +47,12 @@
 </template>
 
 <script>
+import EventBus from '@/eventBus'
 import GridSettingsItem from './GridSettingsItem'
 import { scrollToCenter } from '@/helpers/scroll.js'
 
 export default {
-  name: 'GridSettings',
+  name: 'BoardAndTiles',
   components: {
     GridSettingsItem,
   },
@@ -96,6 +111,15 @@ export default {
     },
     resetAdjustments() {
       this.$store.dispatch('resetAdjustments')
+      scrollToCenter()
+    },
+    generateNewResourceValues() {
+      EventBus.$emit('reassignResources')
+      this.$emit('close')
+    },
+    generateNewTiles() {
+      this.$store.dispatch('generateNewTiles')
+      this.$emit('close')
       scrollToCenter()
     },
   },
