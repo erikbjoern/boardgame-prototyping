@@ -114,7 +114,7 @@ export default {
 
       return reducedRow
     },
-    addHexColumns() {
+    addTileColumns() {
       const { rowCount, tileRows } = this
       this.hexNumber = 0
 
@@ -137,7 +137,7 @@ export default {
         this.storeTileRow({ row, index })
       }
     },
-    removeHexColumns() {
+    removeTileColumns() {
       this.hexNumber = 0
 
       for (let index = 0; index < this.rowCount; index++) {
@@ -167,9 +167,9 @@ export default {
       if (oldValue == null) return
 
       if (newValue > oldValue) {
-        this.addHexColumns()
+        this.addTileColumns()
       } else {
-        this.removeHexColumns()
+        this.removeTileColumns()
       }
     },
   },

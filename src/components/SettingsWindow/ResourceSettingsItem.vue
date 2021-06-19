@@ -17,7 +17,7 @@
           :ref="item.name"
         />
       </div>
-      <div v-if="tab == 'LANDSCAPES'" class="grid place-items-center h-full w-8">
+      <div v-if="tab == 'landscapes'" class="grid place-items-center h-full w-8">
         <svg
           class="transition-all duration-300 select-none cursor-pointer hover:opacity-50 transform"
           :class="expanded ? 'rotate-180 translate-y-px' : '-translate-y-0'"
@@ -254,13 +254,13 @@ export default {
 
         if (this.$store.state[currentDataSet].data.find(i => i.name == value)) {
           const message = `Det finns redan ${
-            this.tab == 'LANDSCAPES' ? 'ett landskap' : 'en resurs'
+            this.tab == 'landscapes' ? 'ett landskap' : 'en resurs'
           } med detta namn`
           alert(message)
           this.$refs[this.item.name].value = this.item.name
         } else {
           const mutation =
-            this.tab == 'LANDSCAPES' ? 'setLandscapeParameter' : 'setResourceParameter'
+            this.tab == 'landscapes' ? 'setLandscapeParameter' : 'setResourceParameter'
           this.$store.commit(mutation, { name: this.item.name, property: 'name', value })
         }
       },
@@ -322,7 +322,7 @@ export default {
         }
       } else {
         mutation =
-          this.tab == 'LANDSCAPES' ? 'setLandscapeParameter' : 'setResourceParameter'
+          this.tab == 'landscapes' ? 'setLandscapeParameter' : 'setResourceParameter'
       }
 
       this.$store.commit(mutation, {
@@ -344,9 +344,9 @@ export default {
     remove(item) {
       let action
 
-      if (this.tab == 'RESOURCES') action = 'removeResource'
+      if (this.tab == 'resources') action = 'removeResource'
 
-      if (this.tab == 'LANDSCAPES') {
+      if (this.tab == 'landscapes') {
         action = item == this.item ? 'removeLandscape' : 'removeResourceFromLandscape'
       }
 
@@ -360,12 +360,11 @@ export default {
   },
   mounted() {
     if (this.focusAddedItem) {
-      const currentDataSet =
-        this.tab == 'LANDSCAPES'
-          ? this.$store.state.landscapes.data
-          : this.$store.state.resources.data
+      const currentDataSet = this.$store.state[this.tab].data
 
-      if (currentDataSet.slice(-1)[0].name == this.item.name) {
+      const lastItem = currentDataSet.slice(-1)[0]
+
+      if (lastItem?.name == this.item.name) {
         this.$refs[this.item.name]?.focus()
         this.$emit('didFocusAddedItem')
       }

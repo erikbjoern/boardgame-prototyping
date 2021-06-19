@@ -15,10 +15,14 @@ export default {
   }),
   getters: {
     resourceColors(state) {
-      return Object.assign(...state.data.map(r => ({ [r.name]: r.color })))
+      if (state.data.length) {
+        return Object.assign(...state.data.map(r => ({ [r.name]: r.color })))
+      }
     },
     invertedResourceColors(state) {
-      return Object.assign(...state.data.map(r => ({ [r.name]: r.invertedColor })))
+      if (state.data.length) {
+        return Object.assign(...state.data.map(r => ({ [r.name]: r.invertedColor })))
+      }
     },
   },
   mutations: {
@@ -58,6 +62,11 @@ export default {
     removeResource({ commit, dispatch }, { name }) {
       commit('removeResource', { name })
       dispatch('removeResourceFromLandscapes', name)
+    },
+    removeAllResources({ state, commit, dispatch }) {
+      state.data.forEach(r => dispatch('removeResourceFromLandscapes', r.name))
+
+      state.data = []
     },
     addMissingResources({ state, commit }, resourcesOnLandscapes) {
       resourcesOnLandscapes.forEach(resourceName => {

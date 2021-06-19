@@ -4,7 +4,7 @@
       <div class="h-full flex flex-col space-y-3 w-36 mx-auto pt-[3.5rem]">
         <button
           class="!bg-[#197c4a] text-[#eaffea] !rounded-full flex px-3"
-          @click="addNew('addLandscape', 'LANDSCAPES')"
+          @click="addNew('addLandscape', 'landscapes')"
         >
           <svg
             fill="none"
@@ -25,7 +25,7 @@
         </button>
         <button
           class="!bg-[#197c4a] text-[#eaffea] !rounded-full flex px-3"
-          @click="addNew('addResource', 'RESOURCES')"
+          @click="addNew('addResource', 'resources')"
         >
           <svg
             fill="none"
@@ -131,8 +131,8 @@
         <div class="flex w-full rounded overflow-hidden">
           <button
             v-for="([tabName, label], index) in [
-              ['LANDSCAPES', 'Landskap'],
-              ['RESOURCES', 'Resurser'],
+              ['landscapes', 'Landskap'],
+              ['resources', 'Resurser'],
             ]"
             :key="label"
             class="flex-1 bg-black border h-8"
@@ -140,9 +140,9 @@
               tab == tabName
                 ? '!bg-opacity-100 text-[#eeeeee] border-green-500 border hover:!bg-opacity-100'
                 : '!bg-opacity-10 text-[#9f9f9f]',
-              tabName == 'LANDSCAPES' ? 'rounded-tl rounded-bl' : 'rounded-tr rounded-br',
-              tab == 'LANDSCAPES' && index == 1 && 'border-l-0',
-              tab == 'RESOURCES' && index == 0 && 'border-r-0',
+              tabName == 'landscapes' ? 'rounded-tl rounded-bl' : 'rounded-tr rounded-br',
+              tab == 'landscapes' && index == 1 && 'border-l-0',
+              tab == 'resources' && index == 0 && 'border-r-0',
             ]"
             @click="e => switchTab(e, tabName)"
           >
@@ -151,27 +151,57 @@
         </div>
       </div>
       <div
-        class="w-full flex flex-col space-y-3 flex-1 min-h-0 max-h-full overflow-auto items-start"
+        class="w-full flex flex-col flex-1 min-h-0 max-h-full overflow-auto items-start"
       >
-        <ResourceSettingsItem
-          class="pl-[1.25rem]"
-          v-for="(landscape, index) in tab == 'LANDSCAPES'
-            ? landscapeParameters
-            : resourceParameters"
-          :key="landscape.name + '' + index"
-          :item="landscape"
-          :tab="tab"
-          :focusAddedItem="focusAddedItem"
-          @didFocusAddedItem="focusAddedItem = false"
-          :removalMode="removalMode"
-        />
+        <transition-group
+          name="fade"
+          mode="out-in"
+          :duration="{ enter: 500, leave: 0 }"
+          :key="renderKey"
+        >
+          <ResourceSettingsItem
+            v-for="(item, index) in currentDataSet"
+            class="pl-[1.25rem]"
+            :class="index !== 0 && 'mt-3'"
+            :key="item.name"
+            :item="item"
+            :tab="tab"
+            :focusAddedItem="focusAddedItem"
+            @didFocusAddedItem="focusAddedItem = false"
+            :removalMode="removalMode"
+          />
+        </transition-group>
       </div>
+      <transition name="height" mode="out-in">
+        <div v-if="removalMode" class="!m-0">
+          <button
+            class="text-[#eaffea] !rounded-full flex px-3 !bg-[#901312] my-6"
+            @click="removeAll"
+          >
+            <svg
+              fill="none"
+              viewBox="0 0 24 24"
+              height="15"
+              width="15"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                xmlns="http://www.w3.org/2000/svg"
+                d="M5.29289 5.29289C5.68342 4.90237 6.31658 4.90237 6.70711 5.29289L12 10.5858L17.2929 5.29289C17.6834 4.90237 18.3166 4.90237 18.7071 5.29289C19.0976 5.68342 19.0976 6.31658 18.7071 6.70711L13.4142 12L18.7071 17.2929C19.0976 17.6834 19.0976 18.3166 18.7071 18.7071C18.3166 19.0976 17.6834 19.0976 17.2929 18.7071L12 13.4142L6.70711 18.7071C6.31658 19.0976 5.68342 19.0976 5.29289 18.7071C4.90237 18.3166 4.90237 17.6834 5.29289 17.2929L10.5858 12L5.29289 6.70711C4.90237 6.31658 4.90237 5.68342 5.29289 5.29289Z"
+                fill="#fff"
+              ></path>
+            </svg>
+            <span class="inline-block flex-1 text-left ml-1">
+              Ta bort alla
+            </span>
+          </button>
+        </div>
+      </transition>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import ResourceSettingsItem from './ResourceSettingsItem'
 
 export default {
@@ -181,15 +211,17 @@ export default {
   },
   data() {
     return {
-      tab: 'LANDSCAPES',
+      tab: 'landscapes',
       focusAddedItem: false,
       removalMode: false,
+      renderKey: 0,
     }
   },
-  computed: mapState({
-    landscapeParameters: state => state.landscapes.data,
-    resourceParameters: state => state.resources.data,
-  }),
+  computed: {
+    currentDataSet() {
+      return this.$store.state[this.tab].data
+    },
+  },
   methods: {
     toggleVisibility(e, item) {
       this.$store.commit('toggleVisibility', item)
@@ -198,16 +230,40 @@ export default {
     switchTab(e, tabName) {
       this.tab = tabName
       e?.currentTarget.blur()
+      this.renderKey++
     },
     addNew(mutation, tabName) {
       this.$store.commit(mutation)
-      this.switchTab(undefined, tabName)
-      this.focusAddedItem = true
+
+      if (tabName !== this.tab) {
+        this.focusAddedItem = true
+        this.switchTab(undefined, tabName)
+      }
     },
     resetState() {
-      const action = this.tab == 'LANDSCAPES' ? 'resetLandscapes' : 'resetResources'
+      const action = this.tab == 'landscapes' ? 'resetLandscapes' : 'resetResources'
+      this.$store.dispatch(action)
+      this.renderKey++
+    },
+    async removeAll() {
+      const action =
+        this.tab == 'landscapes' ? 'removeAllLandscapes' : 'removeAllResources'
       this.$store.dispatch(action)
     },
   },
 }
 </script>
+
+<style>
+.height-enter-active,
+.height-leave-active {
+  transition: max-height 0.3s;
+  max-height: 5rem !important;
+  overflow: hidden;
+}
+
+.height-enter,
+.height-leave-to {
+  max-height: 0 !important;
+}
+</style>

@@ -134,6 +134,9 @@ export default {
     removeLandscape({ commit }, { name }) {
       commit('removeLandscape', { name })
     },
+    removeAllLandscapes({ state, commit }) {
+      state.data = []
+    },
     removeResourceFromLandscape({ commit }, { name, landscapeName }) {
       commit('removeResourceFromLandscape', { name, landscapeName })
     },

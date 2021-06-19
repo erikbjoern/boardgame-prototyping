@@ -6,71 +6,76 @@
     <div
       class="overflow-auto pl-2"
       style="max-width: 13rem; max-height: calc(80vh - 1rem)"
-      :class="expandedLandscapes.length <=2 ? 'w-[max-content]' : 'w-[min-content]'"
+      :class="expandedLandscapes.length <= 2 ? 'w-[max-content]' : 'w-[min-content]'"
     >
-      <div class="flex flex-col space-y-2">
-        <div
-          v-for="landscape in landscapes"
-          :key="landscape.name"
-          class="rounded-sm p-2 pt-1 shadow cursor-pointer flex gap-1 justify-end"
-          :class="
-            isExpanded(landscape.name) ? 'flex-col items-start' : 'flex-wrap items-center'
-          "
-          :style="{
-            backgroundColor: landscape.color,
-            color: landscape.invertedColor,
-            direction: 'ltr',
-          }"
-          @click="toggleExpanded(landscape.name)"
-        >
+      <div class="flex flex-col">
+        <transition-group name="fade" mode="out-in">
           <div
-            class="flex justify-between items-baseline pb-1 flex-1"
-            :class="isExpanded(landscape.name) && 'w-full'"
-          >
-            <p class="font-bold truncate">
-              {{ landscape.name }}
-            </p>
-            <span v-if="isExpanded(landscape.name)">
-              <span
-                class="text-sm font-mono px-[3px]"
-                v-text="
-                  $store.state.board.tileRows
-                    .flat()
-                    .filter(tile => tile.landscapeType == landscape.name).length
-                "
-              />
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="11"
-                height="11"
-                viewBox="0 0 24 24"
-                class="fill-current inline"
-              >
-                <path
-                  d="M16.839 4l4.857 8.5-4.857 8.5h-9.678l-4.857-8.5 4.857-8.5h9.678zm1.161-2h-12l-6 10.5 6 10.5h12l6-10.5-6-10.5z"
-                />
-              </svg>
-            </span>
-          </div>
-          <div
-            v-for="resource in landscape.resources"
-            :key="resource.name"
-            class="rounded px-2 flex justify-between font-mono space-x-6"
-            :class="isExpanded(landscape.name) && 'w-full'"
+            v-for="(landscape, index) in landscapes"
+            :key="landscape.name"
+            class="rounded-sm p-2 pt-1 shadow cursor-pointer flex gap-1 justify-end"
+            :class="[
+              isExpanded(landscape.name)
+                ? 'flex-col items-start'
+                : 'flex-wrap items-center',
+              index !== 0 && 'mt-2',
+            ]"
             :style="{
-              backgroundColor: $store.getters.resourceColors[resource.name],
-              color: $store.getters.invertedResourceColors[resource.name],
+              backgroundColor: landscape.color,
+              color: landscape.invertedColor,
+              direction: 'ltr',
             }"
+            @click="toggleExpanded(landscape.name)"
           >
-            <p v-if="isExpanded(landscape.name)" class="font-semibold truncate">
-              {{ resource.name }}
-            </p>
-            <span class="whitespace-nowrap">
-              {{ resource.min
-              }}{{ resource.min !== resource.max ? `-${resource.max}` : '' }}
-            </span>
+            <div
+              class="flex justify-between items-baseline pb-1 flex-1"
+              :class="isExpanded(landscape.name) && 'w-full'"
+            >
+              <p class="font-bold truncate">
+                {{ landscape.name }}
+              </p>
+              <span v-if="isExpanded(landscape.name)">
+                <span
+                  class="text-sm font-mono px-[3px]"
+                  v-text="
+                    $store.state.board.tileRows
+                      .flat()
+                      .filter(tile => tile.landscapeType == landscape.name).length
+                  "
+                />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="11"
+                  height="11"
+                  viewBox="0 0 24 24"
+                  class="fill-current inline"
+                >
+                  <path
+                    d="M16.839 4l4.857 8.5-4.857 8.5h-9.678l-4.857-8.5 4.857-8.5h9.678zm1.161-2h-12l-6 10.5 6 10.5h12l6-10.5-6-10.5z"
+                  />
+                </svg>
+              </span>
+            </div>
+            <div
+              v-for="resource in landscape.resources.filter(v => !!v.name)"
+              :key="resource.name"
+              class="rounded px-2 flex justify-between font-mono space-x-6"
+              :class="isExpanded(landscape.name) && 'w-full'"
+              :style="{
+                backgroundColor: $store.getters.resourceColors[resource.name],
+                color: $store.getters.invertedResourceColors[resource.name],
+              }"
+            >
+              <p v-if="isExpanded(landscape.name)" class="font-semibold truncate">
+                {{ resource.name }}
+              </p>
+              <span class="whitespace-nowrap">
+                {{ resource.min
+                }}{{ resource.min !== resource.max ? `-${resource.max}` : '' }}
+              </span>
+            </div>
           </div>
-        </div>
+        </transition-group>
       </div>
     </div>
   </div>
