@@ -16,10 +16,4 @@ export default {
   keyup(state, keyCode) {
     state.keysPressed.splice(state.keysPressed.indexOf(keyCode), 1)
   },
-  addTileToSelection(state, tileId) { 
-    state.selectedTiles.push(tileId)
-  },
-  removeTileFromSelection(state, index) {
-    state.selectedTiles.splice(index, 1)
-  },
 }

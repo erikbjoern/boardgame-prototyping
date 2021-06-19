@@ -23,10 +23,10 @@ export default {
   name: 'LandscapeSummary',
   computed: {
     selectedTileIds() {
-      return this.$store.state.selectedTiles
+      return this.$store.state.board.selectedTiles
     },
     totalResources() {
-      const allVisibleTiles = this.$store.state.grid.hexRows.flat()
+      const allVisibleTiles = this.$store.state.board.tileRows.flat()
       const selectedTiles = this.selectedTileIds.map(tileId =>
         allVisibleTiles.find(t => t.id == tileId)
       ).filter(v => !!v)

@@ -13,12 +13,14 @@ export default {
     ],
   }),
   mutations: {
+    setInitialResources(state, payload) {
+      Object.keys(payload).forEach(property => {
+        state.hasOwnProperty(property) && (state[property] = payload[property])
+      })
+    },
     setResourceParameter(state, { value, name, property }) {
       const object = state.data.find(r => r.name == name)
       Vue.set(object, property, value)
-    },
-    setInitialResourceData(state, payload) {
-      state.data = payload
     },
     addResource(state) {
       const color = getRandomHexColor([0, 0, 0], [55, 55, 55])

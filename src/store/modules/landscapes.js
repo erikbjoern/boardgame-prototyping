@@ -22,13 +22,15 @@ export default {
     landscapePool: [],
   }),
   mutations: {
+    setInitialLandscapes(state, payload) {
+      Object.keys(payload).forEach(property => {
+        state.hasOwnProperty(property) && (state[property] = payload[property])
+      })
+    },
     setLandscapeParameter(state, { value, name, property }) {
       value > 100 && (value = 100)
       const object = state.data.find(l => l.name == name)
       Vue.set(object, property, value)
-    },
-    setInitialLandscapeData(state, payload) {
-      state.data = payload
     },
     addLandscape(state) {
       const color = getRandomHexColor([1, 1, 0], [60, 60, 30])

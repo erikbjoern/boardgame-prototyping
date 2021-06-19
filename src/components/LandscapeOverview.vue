@@ -22,7 +22,7 @@
             </p>
             <p v-if="isExpanded(landscape.name)" class="text-sm font-mono">
               {{
-                $store.state.grid.hexRows
+                $store.state.board.tileRows
                   .flat()
                   .filter(tile => tile.landscapeType == landscape.name).length
               }}st

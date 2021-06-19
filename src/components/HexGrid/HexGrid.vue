@@ -26,7 +26,7 @@ export default {
     ...mapState({
       gap: (state) => state.grid.gap,
       columnCount: (state) => state.grid.columnCount,
-      hexRows: (state) => state.grid.hexRows,
+      tileRows: (state) => state.board.tileRows,
     }),
     ...mapGetters(["tileSize"]),
     gridRowsStyle() {
@@ -65,10 +65,10 @@ export default {
   },
   methods: {
     rowsOdd() {
-      return this.hexRows.filter((a, index) => index % 2 == 0);
+      return this.tileRows.filter((a, index) => index % 2 == 0);
     },
     rowsEven() {
-      return this.hexRows.filter((a, index) => index % 2 == 1);
+      return this.tileRows.filter((a, index) => index % 2 == 1);
     },
   },
 };

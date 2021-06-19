@@ -23,8 +23,8 @@ export default {
     ...mapState({
       rowCount: state => state.grid.rowCount,
       columnCount: state => state.grid.columnCount,
-      hexRows: state => state.grid.hexRows,
-      hexRowsStash: state => state.grid.hexRowsStash,
+      tileRows: state => state.board.tileRows,
+      tileRowsStash: state => state.board.tileRowsStash,
       landscapeParameters: state => state.landscapes.data,
     }),
   },
@@ -37,7 +37,7 @@ export default {
       'updateLocalStorage',
     ]),
     getCurrentHexTotal() {
-      return [...this.$store.state.grid.hexRows].flat().length
+      return [...this.$store.state.board.tileRows].flat().length
     },
     getResources(landscapeType) {
       const resources = []
@@ -84,7 +84,7 @@ export default {
         if (!!row[t]) {
           tile = row[t]
         } else {
-          const stashedRow = this.hexRowsStash[rowIndex]
+          const stashedRow = this.tileRowsStash[rowIndex]
           const stashedTile = stashedRow ? stashedRow[newRow.length] : null
           let landscapeType
           let resources
@@ -127,17 +127,17 @@ export default {
       return reducedRow
     },
     addHexColumns() {
-      const { rowCount, hexRows } = this
+      const { rowCount, tileRows } = this
       this.hexNumber = 0
 
       for (let index = 0; index < rowCount; index++) {
-        const targetRow = hexRows[index]
+        const targetRow = tileRows[index]
         const extendedRow = this.buildHexRow([...targetRow], index)
 
         this.storeModifiedHexRow({ row: extendedRow, index })
       }
     },
-    async addHexRows(difference, oldRowTotal) {
+    async addTileRows(difference, oldRowTotal) {
       const newTotal = oldRowTotal + difference
       this.hexNumber = this.getCurrentHexTotal()
 
@@ -154,13 +154,13 @@ export default {
       this.hexNumber = 0
 
       for (let index = 0; index < this.rowCount; index++) {
-        const targetRow = this.hexRows[index]
+        const targetRow = this.tileRows[index]
         const reducedRow = this.reduceHexRow(targetRow, index)
 
         this.storeModifiedHexRow({ row: reducedRow, index })
       }
     },
-    removeHexRows(difference) {
+    removeTileRows(difference) {
       while (difference--) {
         this.$store.commit('removeHexRow')
       }
@@ -173,9 +173,9 @@ export default {
       const difference = Math.abs(newValue - oldValue)
 
       if (newValue > oldValue) {
-        this.addHexRows(difference, oldValue)
+        this.addTileRows(difference, oldValue)
       } else {
-        this.removeHexRows(difference)
+        this.removeTileRows(difference)
       }
     },
     columnCount(newValue, oldValue) {
@@ -188,12 +188,12 @@ export default {
       }
     },
   },
-  created() {
-    this.setInitialState()
+  async created() {
+    await this.setInitialState()
 
-    const stashedRowsCount = this.hexRows.length
+    const stashedRowsCount = this.tileRows.length
     const difference = this.rowCount - stashedRowsCount
-    this.addHexRows(difference, stashedRowsCount)
+    this.addTileRows(difference, stashedRowsCount)
   },
 }
 </script>

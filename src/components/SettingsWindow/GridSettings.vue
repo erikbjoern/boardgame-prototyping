@@ -93,8 +93,9 @@ export default {
       this.$store.commit('toggleResourceValuesVisibility')
       e.currentTarget.blur()
     },
-    resetAdjustments() {
-      this.$store.dispatch('resetAdjustments')
+    async resetAdjustments() {
+      await this.$store.dispatch('resetAdjustments')
+      window.location.reload()
     },
   },
 }

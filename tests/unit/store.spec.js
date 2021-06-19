@@ -17,8 +17,8 @@ describe("store", () => {
       grid: {
         rowCount: null,
         columnCount: null,
-        hexRows: [],
-        hexRowsStash: [],
+        tileRows: [],
+        tileRowsStash: [],
         gap: null,
         tileSize: null,
         tileBorderWidth: null,

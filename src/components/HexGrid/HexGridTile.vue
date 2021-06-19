@@ -4,7 +4,11 @@
     :style="{ zIndex: tile.number }"
     @click="toggleTileSelection(tile)"
   >
-    <div class="hex-grid-item__background" :class="isSelected ? 'bg-green-500' : 'bg-white'">
+    <div
+      class="hex-grid-item__background"
+      :class="isSelected ? 'bg-green-500' : 'bg-white'"
+      :style="`margin: -${borderWidth}`"
+    >
       <div class="hex-grid-item__content" :style="{ ...tileContentStyle }">
         <span :style="`margin-top: ${size / 5}px;`">{{ tile.number }}</span>
         <transition name="fade" mode="out-in">
@@ -90,15 +94,15 @@ export default {
       return this.size > 6 && this.viewportWidth > 800
     },
     isSelected() {
-      return this.$store.state.selectedTiles.includes(this.tile.id )
-    }
+      return this.$store.state.board.selectedTiles.includes(this.tile.id)
+    },
   },
   methods: {
     getInvertedHexcolorGrayscale,
     toggleTileSelection(tile) {
       if (this.$store.state.keysPressed.includes(32)) return
 
-      const foundIndex = this.$store.state.selectedTiles.indexOf(tile.id)
+      const foundIndex = this.$store.state.board.selectedTiles.indexOf(tile.id)
 
       if (foundIndex !== -1) {
         this.$store.commit('removeTileFromSelection', foundIndex)
