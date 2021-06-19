@@ -21,7 +21,7 @@
             }"
           >
             <div
-              v-for="resource in tile.resources"
+              v-for="resource in resources"
               :key="resource.name"
               class="resourceItem"
               :style="{
@@ -96,6 +96,9 @@ export default {
     isSelected() {
       return this.$store.state.board.selectedTiles.includes(this.tile.id)
     },
+    resources() {
+      return [...this.tile.resources].filter(r => r.amount > 0).sort((a, b) => a.amount - b.amount)
+    }
   },
   methods: {
     getInvertedHexcolorGrayscale,
