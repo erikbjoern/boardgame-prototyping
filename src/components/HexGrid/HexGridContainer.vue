@@ -43,13 +43,15 @@ export default {
       const resources = []
       const parameters = this.landscapeParameters.find(l => l.name == landscapeType)
 
-      for (const { name, min, max } of parameters.resources) {
-        const amount = min + Math.floor(Math.random() * (max - min + 1))
-        resources.push({
-          name,
-          amount,
-          backgroundColor: this.$store.getters.resourceColors[name],
-        })
+      if (parameters?.resources) {
+        for (const { name, min, max } of parameters.resources) {
+          const amount = min + Math.floor(Math.random() * (max - min + 1))
+          resources.push({
+            name,
+            amount,
+            backgroundColor: this.$store.getters.resourceColors[name],
+          })
+        }
       }
 
       return resources

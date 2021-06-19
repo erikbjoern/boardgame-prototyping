@@ -91,7 +91,7 @@ export default {
   },
   methods: {
     toggleResourceValuesVisibility(e) {
-      this.$store.commit('toggleResourceValuesVisibility')
+      this.$store.commit('toggleVisibility', 'ResourceValues')
       e.currentTarget.blur()
     },
     resetAdjustments() {

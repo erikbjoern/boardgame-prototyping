@@ -4,7 +4,7 @@ import { storeConfig } from '@/store'
 async function performTimeStampCheck(params) {
   const timeStamp = await localForage.getItem('timeStamp')
 
-  if (new Date(timeStamp) < new Date('2021-06-10T18:18:56.926Z')) {
+  if (new Date(timeStamp) < new Date('2021-06-19T18:18:56.926Z')) {
     const grid = localForage.removeItem('grid')
     const landscapes = localForage.removeItem('landscapes')
     const resources = localForage.removeItem('resources')
@@ -70,9 +70,9 @@ export default {
       'setInitialPreferences',
     ].map(action => dispatch(action))
 
-    dispatch('arrangeLandscapePool')
-
     await Promise.all(promises)
+
+    dispatch('arrangeLandscapePool')
   },
   updateLocalStorage({ state }) {
     localForage.setItem('preferences', state.preferences)

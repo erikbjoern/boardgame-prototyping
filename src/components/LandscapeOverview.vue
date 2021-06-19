@@ -6,6 +6,7 @@
     <div
       class="overflow-auto pl-2"
       style="max-width: 13rem; max-height: calc(80vh - 1rem)"
+      :class="expandedLandscapes.length <=2 ? 'w-[max-content]' : 'w-[min-content]'"
     >
       <div class="flex flex-col space-y-2">
         <div
@@ -29,9 +30,8 @@
             <p class="font-bold truncate">
               {{ landscape.name }}
             </p>
-            <span>
+            <span v-if="isExpanded(landscape.name)">
               <span
-                v-if="isExpanded(landscape.name)"
                 class="text-sm font-mono px-[3px]"
                 v-text="
                   $store.state.board.tileRows

@@ -32,8 +32,9 @@
 			c2.497,0,4.524,2.026,4.524,4.525S46.267,16.921,43.77,16.921z"
       />
     </svg>
-    <SettingsWindow v-if="settingsAreOpen" @close="settingsAreOpen = false" />
-    <LandscapeOverview v-if="$store.state.preferences.showOverview" />
+    <SettingsWindow v-show="settingsAreOpen" @close="settingsAreOpen = false" />
+    <LandscapeSummary v-show="$store.state.preferences.showSummary" />
+    <LandscapeOverview v-show="$store.state.preferences.showOverview" />
     <div class="mainContainer" ref="mainContainer">
       <HexGridContainer />
     </div>
@@ -46,6 +47,7 @@ import HexGridContainer from '@/components/HexGrid/HexGridContainer'
 import { scrollToCenter } from '@/helpers/scroll.js'
 import { dragToScrollStart, dragToScroll } from '@/helpers/scroll.js'
 import LandscapeOverview from './components/LandscapeOverview.vue'
+import LandscapeSummary from './components/LandscapeSummary.vue'
 
 export default {
   name: 'App',
@@ -53,6 +55,7 @@ export default {
     HexGridContainer,
     SettingsWindow,
     LandscapeOverview,
+    LandscapeSummary,
   },
   data() {
     return {

@@ -1,7 +1,8 @@
 export default {
   state: () => ({
-    showResourceValues: false,
-    showOverview: false,
+    showResourceValues: true,
+    showOverview: true,
+    showSummary: true,
   }),
   mutations: {
     setPreferencesState(state, payload) {
@@ -9,11 +10,9 @@ export default {
         state.hasOwnProperty(property) && (state[property] = payload[property])
       })
     },
-    toggleResourceValuesVisibility(state) {
-      state.showResourceValues = !state.showResourceValues
-    },
-    toggleOverviewVisibility(state) {
-      state.showOverview = !state.showOverview
+    toggleVisibility(state, item) {
+      const propertyName = 'show' + item
+      state[propertyName] = !state[propertyName]
     },
   },
 }

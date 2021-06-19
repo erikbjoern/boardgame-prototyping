@@ -120,8 +120,9 @@ const initialState = {
     ],
   },
   preferences: {
-    showOverview: false,
-    showResourceValues: false,
+    showOverview: true,
+    showResourceValues: true,
+    showSummary: true,
   },
 }
 
