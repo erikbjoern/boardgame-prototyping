@@ -14,9 +14,9 @@
 export default {
   name: 'SettingsActions',
   methods: {
-    async resetTiles() {
-      await this.$store.dispatch('resetTiles')
-      window.location.reload()
+    resetTiles() {
+      this.$store.dispatch('resetTiles')
+      this.$emit('close')
     }
   },
 }

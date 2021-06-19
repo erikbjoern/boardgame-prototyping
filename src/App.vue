@@ -32,7 +32,7 @@
 			c2.497,0,4.524,2.026,4.524,4.525S46.267,16.921,43.77,16.921z"
       />
     </svg>
-    <SettingsWindow v-if="settingsAreOpen" />
+    <SettingsWindow v-if="settingsAreOpen" @close="settingsAreOpen = false" />
     <LandscapeOverview v-if="$store.state.showOverview" />
     <div class="mainContainer" ref="mainContainer">
       <HexGridContainer />

@@ -34,6 +34,7 @@
 
 <script>
 import GridSettingsItem from './GridSettingsItem'
+import { scrollToCenter } from '@/helpers/scroll.js'
 
 export default {
   name: 'GridSettings',
@@ -93,9 +94,9 @@ export default {
       this.$store.commit('toggleResourceValuesVisibility')
       e.currentTarget.blur()
     },
-    async resetAdjustments() {
-      await this.$store.dispatch('resetAdjustments')
-      window.location.reload()
+    resetAdjustments() {
+      this.$store.dispatch('resetAdjustments')
+      scrollToCenter()
     },
   },
 }

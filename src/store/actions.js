@@ -1,5 +1,6 @@
-import { storeConfig } from '@/store'
 import localForage from 'localforage'
+import EventBus from '@/eventBus'
+import { storeConfig } from '@/store'
 
 function performTimeStampCheck(params) {
   const timeStamp = localStorage.getItem('timeStamp')
@@ -23,17 +24,17 @@ export default {
       gridData[key] = savedData[key] || value
     })
 
-    commit('setInitialGrid', gridData || storeConfig.initialState.grid)
+    commit('setGridState', gridData || storeConfig.initialState.grid)
   },
   async setInitialLandscapes({ commit }) {
     const savedData = (await localForage.getItem('landscapes')) || {}
 
-    commit('setInitialLandscapes', savedData || storeConfig.initialState.landscapes)
+    commit('setLandscapeState', savedData || storeConfig.initialState.landscapes)
   },
   async setInitialResources({ commit }) {
     const savedData = (await localForage.getItem('resources')) || {}
 
-    commit('setInitialResources', savedData || storeConfig.initialState.resources)
+    commit('setResourceState', savedData || storeConfig.initialState.resources)
   },
   async setInitialBoard({ commit }) {
     const savedData = (await localForage.getItem('board')) || {}
@@ -48,7 +49,7 @@ export default {
       }
     }
 
-    commit('setInitialBoard', tileData || storeConfig.initialState.board)
+    commit('setBoardState', tileData || storeConfig.initialState.board)
   },
   async setInitialState({ dispatch }) {
     performTimeStampCheck()
@@ -74,11 +75,16 @@ export default {
     localForage.setItem('board', state.board)
     localForage.setItem('timeStamp', new Date())
   },
-  async resetAdjustments({ dispatch, state }) {
-    await localForage.setItem('grid', null)
-    await localForage.setItem('board', { ...state.board, tileRows: [] })
+  resetAdjustments({ commit }) {
+    commit('setGridState', storeConfig.initialState.grid)
   },
-  async resetTiles({ dispatch }) {
-    await localForage.setItem('board', null)
+  resetTiles({ commit }) {
+    commit('setBoardState', {
+      tileRows: [],
+      tileRowsStash: [],
+      selectedTiles: [],
+    })
+
+    EventBus.$emit('buildGrid')
   },
 }

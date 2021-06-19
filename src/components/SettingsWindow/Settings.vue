@@ -26,31 +26,8 @@
     >
       <ResourceSettings v-if="activeTab == 'landscapesAndResources'" />
       <GridSettings v-if="activeTab == 'boardAndTiles'" />
-      <SettingsActions v-if="activeTab == 'other'" />
+      <SettingsActions v-if="activeTab == 'other'" @close="$emit('close')" />
     </div>
-    <!-- <div class="w-72 flex flex-col items-center">
-      <div class="p-4">
-        <h2>Inställningar</h2>
-        <button>Bräde & Brickor</button>
-        <button @click="resourceSettingsIsOpen = true">Landskap & Resurser</button>
-      </div>
-      <div class="p-4">
-        <button>Generera nytt bräde</button>
-        <button>Centrera bräde</button>
-        <select
-          @change="reset"
-          class="cursor-pointer h-[1.9rem] rounded w-[140px] border border-gray-400 shadow-sm bg-gray-100 text-gray-900"
-        >
-          <option disabled selected>Återställ...</option>
-          <option value="resetAdjustments">Inställningar bräde</option>
-          <option value="resetAdjustments">Inställningar brickor</option>
-          <option value="resetLandscapes">Inställningar Landskap</option>
-          <option value="resetResources">Inställningar Resurser</option>
-          <option value="resetCurrentSelections">Aktuell Markering</option>
-          <option value="resetEverything">Allt</option>
-        </select>
-      </div> -->
-    <!-- </div> -->
   </div>
 </template>
 
@@ -81,8 +58,8 @@ export default {
         },
         {
           name: 'other',
-          label: 'Övrigt'
-        }
+          label: 'Övrigt',
+        },
       ],
       activeTab: 'landscapesAndResources',
     }

@@ -5,7 +5,7 @@ export default {
     selectedTiles: [],
   }),
   mutations: {
-    setInitialBoard(state, payload) {
+    setBoardState(state, payload) {
       Object.keys(payload).forEach(property => {
         state.hasOwnProperty(property) && (state[property] = payload[property])
       })
@@ -33,24 +33,24 @@ export default {
     },
   },
   actions: {
-    getRowFromStash(context, index) {
-      return context.state.tileRowsStash[index] || null
+    getRowFromStash({ state }, index) {
+      return state.tileRowsStash[index] || null
     },
-    storeHexRow(context, { row, index }) {
-      context.commit('addHexRow', { row, index })
+    storeHexRow({ commit, state }, { row, index }) {
+      commit('addHexRow', { row, index })
 
-      if (index == context.state.tileRowsStash.length) {
-        context.commit('addHexRowToStash', { row: [...row], index })
+      if (index == state.tileRowsStash.length) {
+        commit('addHexRowToStash', { row: [...row], index })
       }
     },
-    storeModifiedHexRow(context, { row, index }) {
-      const stashedCopyOfRow = context.state.tileRowsStash[index]
+    storeModifiedHexRow({ commit, state }, { row, index }) {
+      const stashedCopyOfRow = state.tileRowsStash[index]
 
       if (row.length > stashedCopyOfRow.length) {
-        context.commit('replaceHexRow', { row, index })
-        context.commit('replaceHexRowInStash', { row: [...row], index })
+        commit('replaceHexRow', { row, index })
+        commit('replaceHexRowInStash', { row: [...row], index })
       } else {
-        context.commit('replaceHexRow', { row, index })
+        commit('replaceHexRow', { row, index })
       }
     },
   },

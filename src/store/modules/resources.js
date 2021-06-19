@@ -13,7 +13,7 @@ export default {
     ],
   }),
   mutations: {
-    setInitialResources(state, payload) {
+    setResourceState(state, payload) {
       Object.keys(payload).forEach(property => {
         state.hasOwnProperty(property) && (state[property] = payload[property])
       })

@@ -7,6 +7,7 @@ import { mapActions, mapState } from 'vuex'
 import colors from '@/assets/colors'
 import HexGrid from '@/components/HexGrid/HexGrid.vue'
 import cuid from 'cuid'
+import EventBus from '@/eventBus'
 
 export default {
   name: 'HexGridContainer',
@@ -137,11 +138,10 @@ export default {
         this.storeModifiedHexRow({ row: extendedRow, index })
       }
     },
-    async addTileRows(difference, oldRowTotal) {
-      const newTotal = oldRowTotal + difference
+    async addTileRows(newTotal = this.rowCount, oldTotal = 0) {
       this.hexNumber = this.getCurrentHexTotal()
 
-      for (let index = oldRowTotal; index < newTotal; index++) {
+      for (let index = oldTotal; index < newTotal; index++) {
         const stashedRow = await this.getRowFromStash(index)
         const row = stashedRow
           ? this.buildHexRow([...stashedRow], index)
@@ -170,12 +170,10 @@ export default {
     rowCount(newValue, oldValue) {
       if (oldValue == null) return
 
-      const difference = Math.abs(newValue - oldValue)
-
       if (newValue > oldValue) {
-        this.addTileRows(difference, oldValue)
+        this.addTileRows(newValue, oldValue)
       } else {
-        this.removeTileRows(difference)
+        this.removeTileRows(oldValue - newValue)
       }
     },
     columnCount(newValue, oldValue) {
@@ -192,8 +190,12 @@ export default {
     await this.setInitialState()
 
     const stashedRowsCount = this.tileRows.length
-    const difference = this.rowCount - stashedRowsCount
-    this.addTileRows(difference, stashedRowsCount)
+    this.addTileRows(this.rowCount, stashedRowsCount)
+
+    EventBus.$on('buildGrid', this.addTileRows)
   },
+  destroyed() {
+    EventBus.$off('buildGrid', this.addTileRows)
+  }
 }
 </script>

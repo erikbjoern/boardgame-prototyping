@@ -7,7 +7,7 @@ export default {
     tileBorderWidth: null,
   }),
   mutations: {
-    setInitialGrid(state, payload) {
+    setGridState(state, payload) {
       Object.keys(payload).forEach(property => {
         state.hasOwnProperty(property) && (state[property] = payload[property])
       })

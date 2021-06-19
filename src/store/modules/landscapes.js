@@ -22,7 +22,7 @@ export default {
     landscapePool: [],
   }),
   mutations: {
-    setInitialLandscapes(state, payload) {
+    setLandscapeState(state, payload) {
       Object.keys(payload).forEach(property => {
         state.hasOwnProperty(property) && (state[property] = payload[property])
       })
