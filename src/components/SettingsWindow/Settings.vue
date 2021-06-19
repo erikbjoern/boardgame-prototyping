@@ -32,12 +32,10 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
 import ResourceSettings from './ResourceSettings'
 import GridSettings from './GridSettings'
 import SettingsActions from './SettingsActions'
 
-import { scrollToCenter } from '@/helpers/scroll'
 export default {
   name: 'Menu',
   components: {
@@ -65,21 +63,6 @@ export default {
     }
   },
   methods: {
-    scrollToCenter,
-    center(e) {
-      this.scrollToCenter()
-      e.target.blur()
-    },
-    showResourceInputs() {
-      this.resourceSettingsIsOpen = true
-    },
-    hideResourceInputs(e) {
-      this.resourceSettingsIsOpen = false
-      e.target.blur()
-    },
-    reset(e) {
-      this.$store.dispatch(e.target.value)
-    },
     selectTab(e, name) {
       this.activeTab = name
       e.currentTarget.blur()

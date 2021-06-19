@@ -46,8 +46,8 @@ import SettingsWindow from '@/components/SettingsWindow/Settings'
 import HexGridContainer from '@/components/HexGrid/HexGridContainer'
 import { scrollToCenter } from '@/helpers/scroll.js'
 import { dragToScrollStart, dragToScroll } from '@/helpers/scroll.js'
-import LandscapeOverview from './components/LandscapeOverview.vue'
-import LandscapeSummary from './components/LandscapeSummary.vue'
+import LandscapeOverview from '@/components/LandscapeOverview.vue'
+import LandscapeSummary from '@/components/LandscapeSummary.vue'
 
 export default {
   name: 'App',

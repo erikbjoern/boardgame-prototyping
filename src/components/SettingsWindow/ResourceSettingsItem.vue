@@ -229,7 +229,6 @@
 import WoodIcon from '@/assets/icons/log.svg'
 import StoneIcon from '@/assets/icons/stone-block.svg'
 import WheatIcon from '@/assets/icons/wheat.svg'
-import colors from '@/assets/colors'
 import { getInvertedHexColor, getRGBValues } from '@/helpers/getDynamicColor'
 
 export default {
@@ -242,7 +241,6 @@ export default {
   props: ['item', 'tab', 'focusAddedItem', 'removalMode'],
   data() {
     return {
-      colors,
       expanded: false,
     }
   },
@@ -291,7 +289,6 @@ export default {
     },
   },
   methods: {
-    getInvertedHexColor,
     submitChange(e, resourceName = null) {
       const item = this.item
       const property = e.target.name
@@ -378,12 +375,6 @@ export default {
 </script>
 
 <style scoped>
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-}
-
 input::-webkit-inner-spin-button,
 input::-webkit-outer-spin-button {
   -webkit-appearance: none;

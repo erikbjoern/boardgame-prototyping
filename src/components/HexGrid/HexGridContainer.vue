@@ -4,7 +4,6 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import colors from '@/assets/colors'
 import HexGrid from '@/components/HexGrid/HexGrid.vue'
 import cuid from 'cuid'
 import EventBus from '@/eventBus'
@@ -16,7 +15,6 @@ export default {
   },
   data() {
     return {
-      colors,
       hexNumber: 0,
     }
   },
@@ -55,22 +53,6 @@ export default {
       }
 
       return resources
-    },
-    getRandomColor() {
-      return this.colors.random[Math.floor(Math.random() * this.colors.random.length)]
-    },
-    getColor() {
-      const colorsByDistribution = []
-
-      this.$store.state.resources.parameters.map(r => {
-        let count = r.fraction
-        while (count > 0) {
-          colorsByDistribution.push(colors.backgrounds[r.type])
-          count--
-        }
-      })
-
-      return colorsByDistribution[Math.floor(Math.random() * colorsByDistribution.length)]
     },
     getLandscapeType() {
       const landscapePool = this.$store.state.landscapes.landscapePool
