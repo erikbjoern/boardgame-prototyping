@@ -2,7 +2,7 @@
   <div
     :class="
       `h-[80vh] rounded overflow-hidden bg-black bg-opacity-95 
-      fixed right-0 mr-12 top-1/2 transform -translate-y-1/2 z-[1000] flex flex-col`
+      fixed right-0 mr-12 top-1/2 transform -translate-y-1/2 z-[1100] flex flex-col`
     "
   >
     <div class="flex border-b-2 border-black mx-px h-10">

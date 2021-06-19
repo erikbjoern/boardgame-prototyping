@@ -1,3 +1,5 @@
+import { storeConfig } from '@/store'
+
 export default {
   state: () => ({
     rowCount: null,

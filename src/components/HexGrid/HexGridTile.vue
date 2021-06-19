@@ -130,7 +130,6 @@ svg {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  height: 80%;
   justify-content: center;
   width: 66%;
 }
@@ -141,8 +140,8 @@ svg {
   box-shadow: 0.5px 0.5px 2px #44444499;
   display: flex;
   justify-content: space-evenly;
-  padding: 1px;
-  width: 40%;
+  line-height: 1rem;
+  flex: 1 1 1rem;
 }
 
 .hex-grid__item {

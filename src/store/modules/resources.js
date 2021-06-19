@@ -58,7 +58,6 @@ export default {
       commit('setResourceState', storeConfig.initialState.resources)
     },
     addMissingResources({ state, commit }, resourcesOnLandscapes) {
-      debugger
       resourcesOnLandscapes.forEach(resourceName => {
         if (!state.data.some(r => r.name == resourceName)) {
           commit('addResource', resourceName)
