@@ -5,13 +5,13 @@
         <button
           class="h-8 w-full border rounded !font-thin text-sm tracking-wide bg-black"
           :class="
-            $store.state.showResourceValues
+            $store.state.preferences.showResourceValues
               ? '!border-green-500 text-green-200'
               : 'border-gray-300 text-gray-300 !bg-opacity-10'
           "
           @click="toggleResourceValuesVisibility"
         >
-          {{ $store.state.showResourceValues ? 'Visar' : 'Visa' }} resursvärden
+          {{ $store.state.preferences.showResourceValues ? 'Visar' : 'Visa' }} resursvärden
         </button>
       </div>
     </div>
@@ -23,7 +23,7 @@
         :property="property"
       />
       <button
-        class="h-8 w-36 mx-auto border rounded !font-thin text-sm tracking-wide bg-black border-gray-100 text-gray-100"
+        class="h-8 w-36 mx-auto border rounded-full !font-thin text-sm tracking-wide bg-black border-gray-100 text-gray-100"
         @click="resetAdjustments"
       >
         Återställ justeringar

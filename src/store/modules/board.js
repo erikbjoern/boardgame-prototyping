@@ -1,3 +1,5 @@
+import EventBus from '@/eventBus'
+
 export default {
   state: () => ({
     tileRows: [],
@@ -10,19 +12,19 @@ export default {
         state.hasOwnProperty(property) && (state[property] = payload[property])
       })
     },
-    addHexRow(state, { row, index }) {
+    addTileRow(state, { row, index }) {
       state.tileRows.push(row)
     },
-    addHexRowToStash(state, { row, index }) {
+    addTileRowToStash(state, { row, index }) {
       state.tileRowsStash.push(row)
     },
-    removeHexRow(state) {
+    removeTileRow(state) {
       state.tileRows.pop()
     },
-    replaceHexRow(state, { row, index }) {
+    replaceTileRow(state, { row, index }) {
       state.tileRows[index] = row
     },
-    replaceHexRowInStash(state, { row, index }) {
+    replaceTileRowInStash(state, { row, index }) {
       state.tileRowsStash[index] = row
     },
     addTileToSelection(state, tileId) {
@@ -36,22 +38,31 @@ export default {
     getRowFromStash({ state }, index) {
       return state.tileRowsStash[index] || null
     },
-    storeHexRow({ commit, state }, { row, index }) {
-      commit('addHexRow', { row, index })
+    storeTileRow({ commit, state }, { row, index }) {
+      commit('addTileRow', { row, index })
 
       if (index == state.tileRowsStash.length) {
-        commit('addHexRowToStash', { row: [...row], index })
+        commit('addTileRowToStash', { row: [...row], index })
       }
     },
-    storeModifiedHexRow({ commit, state }, { row, index }) {
+    storeModifiedTileRow({ commit, state }, { row, index }) {
       const stashedCopyOfRow = state.tileRowsStash[index]
 
       if (row.length > stashedCopyOfRow.length) {
-        commit('replaceHexRow', { row, index })
-        commit('replaceHexRowInStash', { row: [...row], index })
+        commit('replaceTileRow', { row, index })
+        commit('replaceTileRowInStash', { row: [...row], index })
       } else {
-        commit('replaceHexRow', { row, index })
+        commit('replaceTileRow', { row, index })
       }
+    },
+    resetTiles({ commit }) {
+      commit('setBoardState', {
+        tileRows: [],
+        tileRowsStash: [],
+        selectedTiles: [],
+      })
+
+      EventBus.$emit('buildGrid')
     },
   },
 }

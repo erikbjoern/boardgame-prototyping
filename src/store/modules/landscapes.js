@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import { getRandomHexColor, getInvertedHexColor } from '@/helpers/getDynamicColor.js'
 import { getUniqueDefaultName } from '@/helpers/getUniqueName.js'
+import { storeConfig } from '@/store'
 
 export default {
   state: () => ({
@@ -99,6 +100,20 @@ export default {
       }
 
       commit('setLandscapePool', landscapePool)
+    },
+    resetLandscapes({ commit, dispatch }) {
+      commit('setLandscapeState', storeConfig.initialState.landscapes)
+
+      const resourcesOnLandscapes = Array.from(
+        new Set(
+          storeConfig.initialState.landscapes.data.flatMap(l =>
+            l.resources.map(r => r.name)
+          )
+        )
+      )
+
+      dispatch('addMissingResources', resourcesOnLandscapes)
+      dispatch('arrangeLandscapePool')
     },
   },
   getters: {

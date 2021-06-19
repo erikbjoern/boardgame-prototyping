@@ -13,7 +13,7 @@
         <span :style="`margin-top: ${size / 5}px;`">{{ tile.number }}</span>
         <transition name="fade" mode="out-in">
           <div
-            v-show="$store.state.showResourceValues"
+            v-show="$store.state.preferences.showResourceValues"
             class="resourceContainer"
             :style="{
               fontSize: `clamp(10px, ${size / 10}vw, 40px`,

@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col w-36 mx-auto space-y-3">
     <button
-      class="h-8 border rounded !font-thin text-sm tracking-wide bg-black border-gray-100 text-gray-100"
+      class="h-8 border rounded-full !font-thin text-sm tracking-wide bg-black border-gray-100 text-gray-100"
       @click="resetTiles"
     >
       Generera nytt bräde

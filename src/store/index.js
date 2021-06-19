@@ -8,14 +8,18 @@ export const storeConfig = new StoreConfig()
 
 const store = new Vuex.Store(storeConfig.create())
 
-store.watch(
-  state => state,
-  () => {
-    store.dispatch('updateLocalStorage')
-  },
-  {
-    deep: true,
+let updateLocalStorageTimer = undefined
+
+store.subscribe((mutation, state) => {
+  if (!state.initialised) return
+
+  if (updateLocalStorageTimer) {
+    clearTimeout(updateLocalStorageTimer)
   }
-)
+
+  updateLocalStorageTimer = setTimeout(() => {
+    store.dispatch('updateLocalStorage')
+  }, 1000)
+})
 
 export default store

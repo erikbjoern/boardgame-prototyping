@@ -23,7 +23,7 @@ export default {
   name: 'LandscapeSummary',
   computed: {
     selectedTileIds() {
-      return this.$store.state.board.selectedTiles
+      return this.$store.state.board.tselectedTiles
     },
     totalResources() {
       const allVisibleTiles = this.$store.state.board.tileRows.flat()

@@ -1,12 +1,9 @@
 export default {
+  initialised(state) {
+    state.initialised = true
+  },
   updateViewportWidth(state) {
     state.viewportWidth = visualViewport.width
-  },
-  toggleResourceValuesVisibility(state) {
-    state.showResourceValues = !state.showResourceValues
-  },
-  toggleOverviewVisibility(state) {
-    state.showOverview = !state.showOverview
   },
   keydown(state, keyCode) {
     if (!state.keysPressed.includes(keyCode)) {

@@ -6,6 +6,16 @@ export default {
     tileSize: null,
     tileBorderWidth: null,
   }),
+  getters: {
+    tileSize(state, getter, rootState) {
+      const thresholdInPx = 45
+      if (state.tileSize * (rootState.viewportWidth / 100) > thresholdInPx) {
+        return state.tileSize
+      } else {
+        return (thresholdInPx / rootState.viewportWidth) * 100
+      }
+    },
+  },
   mutations: {
     setGridState(state, payload) {
       Object.keys(payload).forEach(property => {
@@ -30,14 +40,9 @@ export default {
       state.tileBorderWidth = payload
     },
   },
-  getters: {
-    tileSize(state, getter, rootState) {
-      const thresholdInPx = 45
-      if (state.tileSize * (rootState.viewportWidth / 100) > thresholdInPx) {
-        return state.tileSize
-      } else {
-        return (thresholdInPx / rootState.viewportWidth) * 100
-      }
+  actions: {
+    resetAdjustments({ commit }) {
+      commit('setGridState', storeConfig.initialState.grid)
     },
   },
 }

@@ -33,9 +33,8 @@ export default {
     ...mapActions([
       'getRowFromStash',
       'setInitialState',
-      'storeHexRow',
-      'storeModifiedHexRow',
-      'updateLocalStorage',
+      'storeTileRow',
+      'storeModifiedTileRow',
     ]),
     getCurrentHexTotal() {
       return [...this.$store.state.board.tileRows].flat().length
@@ -46,7 +45,11 @@ export default {
 
       for (const { name, min, max } of parameters.resources) {
         const amount = min + Math.floor(Math.random() * (max - min + 1))
-        resources.push({ name, amount, backgroundColor: this.$store.getters.resourceColors[name] })
+        resources.push({
+          name,
+          amount,
+          backgroundColor: this.$store.getters.resourceColors[name],
+        })
       }
 
       return resources
@@ -75,7 +78,7 @@ export default {
       const { columnCount } = this
       return Math.floor(columnCount / 2) + (columnCount % 2) * (rowIndex % 2)
     },
-    buildHexRow(row, rowIndex) {
+    buildTileRow(row, rowIndex) {
       const tileCount = this.getTileCount(rowIndex)
       let newRow = []
 
@@ -116,7 +119,7 @@ export default {
 
       return newRow
     },
-    reduceHexRow(targetRow, rowIndex) {
+    reduceTileRow(targetRow, rowIndex) {
       const tileCount = this.getTileCount(rowIndex)
       let reducedRow = []
 
@@ -133,9 +136,9 @@ export default {
 
       for (let index = 0; index < rowCount; index++) {
         const targetRow = tileRows[index]
-        const extendedRow = this.buildHexRow([...targetRow], index)
+        const extendedRow = this.buildTileRow([...targetRow], index)
 
-        this.storeModifiedHexRow({ row: extendedRow, index })
+        this.storeModifiedTileRow({ row: extendedRow, index })
       }
     },
     async addTileRows(newTotal = this.rowCount, oldTotal = 0) {
@@ -144,10 +147,10 @@ export default {
       for (let index = oldTotal; index < newTotal; index++) {
         const stashedRow = await this.getRowFromStash(index)
         const row = stashedRow
-          ? this.buildHexRow([...stashedRow], index)
-          : this.buildHexRow([], index)
+          ? this.buildTileRow([...stashedRow], index)
+          : this.buildTileRow([], index)
 
-        this.storeHexRow({ row, index })
+        this.storeTileRow({ row, index })
       }
     },
     removeHexColumns() {
@@ -155,14 +158,14 @@ export default {
 
       for (let index = 0; index < this.rowCount; index++) {
         const targetRow = this.tileRows[index]
-        const reducedRow = this.reduceHexRow(targetRow, index)
+        const reducedRow = this.reduceTileRow(targetRow, index)
 
-        this.storeModifiedHexRow({ row: reducedRow, index })
+        this.storeModifiedTileRow({ row: reducedRow, index })
       }
     },
     removeTileRows(difference) {
       while (difference--) {
-        this.$store.commit('removeHexRow')
+        this.$store.commit('removeTileRow')
       }
     },
   },
@@ -193,9 +196,11 @@ export default {
     this.addTileRows(this.rowCount, stashedRowsCount)
 
     EventBus.$on('buildGrid', this.addTileRows)
+
+    this.$store.commit('initialised')
   },
   destroyed() {
     EventBus.$off('buildGrid', this.addTileRows)
-  }
+  },
 }
 </script>
