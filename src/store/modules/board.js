@@ -55,12 +55,13 @@ export default {
         commit('replaceTileRow', { row, index })
       }
     },
-    resetTiles({ commit }) {
+    resetTiles({ commit, dispatch }) {
       commit('setBoardState', {
         tileRows: [],
         tileRowsStash: [],
         selectedTiles: [],
       })
+      dispatch('arrangeLandscapePool') 
 
       EventBus.$emit('buildGrid')
     },

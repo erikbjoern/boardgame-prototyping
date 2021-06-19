@@ -345,17 +345,17 @@ export default {
       e.target.blur()
     },
     remove(item) {
-      let mutation
+      let action
 
-      if (this.tab == 'RESOURCES') mutation = 'removeResource'
+      if (this.tab == 'RESOURCES') action = 'removeResource'
 
       if (this.tab == 'LANDSCAPES') {
-        mutation = item == this.item ? 'removeLandscape' : 'removeResourceFromLandscape'
+        action = item == this.item ? 'removeLandscape' : 'removeResourceFromLandscape'
       }
 
-      this.$store.commit(mutation, {
+      this.$store.dispatch(action, {
         name: item.name,
-        ...(mutation == 'removeResourceFromLandscape' && {
+        ...(action == 'removeResourceFromLandscape' && {
           landscapeName: this.item.name,
         }),
       })

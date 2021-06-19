@@ -57,6 +57,10 @@ export default {
     resetResources({ commit }) {
       commit('setResourceState', storeConfig.initialState.resources)
     },
+    removeResource({ commit, dispatch }, { name }) {
+      commit('removeResource', { name })
+      dispatch('removeResourceFromLandscapes', name)
+    },
     addMissingResources({ state, commit }, resourcesOnLandscapes) {
       resourcesOnLandscapes.forEach(resourceName => {
         if (!state.data.some(r => r.name == resourceName)) {

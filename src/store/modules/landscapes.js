@@ -115,6 +115,23 @@ export default {
       dispatch('addMissingResources', resourcesOnLandscapes)
       dispatch('arrangeLandscapePool')
     },
+    removeLandscape({ commit }, { name }) {
+      commit('removeLandscape', { name })
+    },
+    removeResourceFromLandscape({ commit }, { name, landscapeName }) {
+      commit('removeResourceFromLandscape', { name, landscapeName })
+    },
+    removeResourceFromLandscapes({ state, commit }, resourceName) {
+      state.data.forEach(l => {
+        const targetResourceIndex = l.resources.findIndex(r => r.name == resourceName)
+
+        targetResourceIndex > -1 &&
+          commit('removeResourceFromLandscape', {
+            name: resourceName,
+            landscapeName: l.name,
+          })
+      })
+    },
   },
   getters: {
     landscapeDistributions(state, getters) {
