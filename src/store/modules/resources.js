@@ -24,7 +24,8 @@ export default {
   mutations: {
     setResourceState(state, payload) {
       Object.keys(payload).forEach(property => {
-        state.hasOwnProperty(property) && (state[property] = payload[property])
+        state.hasOwnProperty(property) &&
+          (state[property] = JSON.parse(JSON.stringify(payload[property])))
       })
     },
     setResourceParameter(state, { value, name, property }) {
@@ -34,10 +35,7 @@ export default {
     addResource(state, name) {
       const color = getRandomHexColor([0, 0, 0], [55, 55, 55])
 
-      name ||= getUniqueDefaultName(
-        `resurs #${state.data.length + 1}`,
-        state.data
-      )
+      name ||= getUniqueDefaultName(`resurs #${state.data.length + 1}`, state.data)
 
       const payload = {
         name,
@@ -66,7 +64,7 @@ export default {
         if (!state.data.some(r => r.name == resourceName)) {
           commit('addResource', resourceName)
         }
-      });
-    }
+      })
+    },
   },
 }

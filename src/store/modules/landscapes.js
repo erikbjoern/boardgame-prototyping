@@ -22,10 +22,23 @@ export default {
     ],
     landscapePool: [],
   }),
+  getters: {
+    landscapeDistributions(state, getters) {
+      return state.data.map(l => l.fraction)
+    },
+    landscapeDistributionSum(state) {
+      const fractions = state.data.map(l => l.fraction)
+      return fractions.reduce((a, b) => a + b, 0)
+    },
+    landscapeColors(state) {
+      return Object.assign(...state.data.map(l => ({ [l.name]: l.color })))
+    },
+  },
   mutations: {
     setLandscapeState(state, payload) {
       Object.keys(payload).forEach(property => {
-        state.hasOwnProperty(property) && (state[property] = payload[property])
+        state.hasOwnProperty(property) &&
+          (state[property] = JSON.parse(JSON.stringify(payload[property])))
       })
     },
     setLandscapeParameter(state, { value, name, property }) {
@@ -112,7 +125,10 @@ export default {
         )
       )
 
-      dispatch('addMissingResources', resourcesOnLandscapes)
+      if (resourcesOnLandscapes.length) {
+        dispatch('addMissingResources', resourcesOnLandscapes)
+      }
+
       dispatch('arrangeLandscapePool')
     },
     removeLandscape({ commit }, { name }) {
@@ -131,18 +147,6 @@ export default {
             landscapeName: l.name,
           })
       })
-    },
-  },
-  getters: {
-    landscapeDistributions(state, getters) {
-      return state.data.map(l => l.fraction)
-    },
-    landscapeDistributionSum(state) {
-      const fractions = state.data.map(l => l.fraction)
-      return fractions.reduce((a, b) => a + b, 0)
-    },
-    landscapeColors(state) {
-      return Object.assign(...state.data.map(l => ({ [l.name]: l.color })))
     },
   },
 }
