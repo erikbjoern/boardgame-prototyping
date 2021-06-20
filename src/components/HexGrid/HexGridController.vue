@@ -120,6 +120,7 @@ export default {
 
       for (let index = 0; index < rowCount; index++) {
         const targetRow = tileRows[index]
+        debugger
         const extendedRow = this.buildTileRow([...targetRow], index)
 
         this.storeModifiedTileRow({ row: extendedRow, index })
@@ -174,7 +175,7 @@ export default {
         this.removeTileRows(oldValue - newValue)
       }
     },
-    columnCount(newValue, oldValue) {
+      columnCount(newValue, oldValue) {
       if (oldValue == null) return
 
       if (newValue > oldValue) {

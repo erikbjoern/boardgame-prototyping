@@ -7,6 +7,7 @@ export default {
     gap: null,
     tileSize: null,
     tileBorderWidth: null,
+    scale: null,
   }),
   getters: {
     tileSize(state, getter, rootState) {
@@ -24,22 +25,12 @@ export default {
         state.hasOwnProperty(property) && (state[property] = payload[property])
       })
     },
-    setRowCount(state, payload) {
-      const rowCount = payload > 23 ? 23 : payload < 3 ? 3 : payload
-      state.rowCount = rowCount
-    },
-    setColumnCount(state, payload) {
-      const columnCount = payload > 23 ? 23 : payload < 3 ? 3 : payload
-      state.columnCount = columnCount
-    },
-    setGap(state, payload) {
-      state.gap = payload
-    },
-    setTileSize(state, payload) {
-      state.tileSize = payload
-    },
-    setTileBorderWidth(state, payload) {
-      state.tileBorderWidth = payload
+    setGridProperty(state, { property, value }) {
+      if (['rowCount', 'columnCount'].includes(value)) {
+        value > 23 && (value = 23)
+        value < 3 && (value = 3)
+      }
+      state[property] = value
     },
   },
   actions: {

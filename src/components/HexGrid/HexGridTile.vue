@@ -83,15 +83,15 @@ export default {
     tileContentStyle() {
       return {
         display: 'flex',
-        gap: `${this.size / 50}vw`,
+        gap: `${1 / 50}vw`,
         backgroundColor: this.tile.color,
-        fontSize: `clamp(8px, ${this.size / 10}vw, 20px`,
+        fontSize: `clamp(8px, ${1 / 10}vw, 20px`,
         height: `${100 - this.borderWidth}%`,
         width: `${100 - this.borderWidth}%`,
       }
     },
     tileIsLargeEnough() {
-      return this.size > 6 && this.viewportWidth > 800
+      return 1 > 6 && this.viewportWidth > 800
     },
     isSelected() {
       return this.$store.state.board.selectedTiles.includes(this.tile.id)

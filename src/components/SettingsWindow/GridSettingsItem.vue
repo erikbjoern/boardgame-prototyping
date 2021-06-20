@@ -22,8 +22,8 @@
         @keydown="keydownHandler"
       />
       <input
+        v-else
         class="mx-2"
-        v-if="!property.showValue"
         :id="property.name"
         type="range"
         :min="property.min"
@@ -59,9 +59,6 @@ export default {
       get() {
         return this.propertyValue
       },
-      set() {
-        null
-      },
     },
     propertyValue: {
       get() {
@@ -69,10 +66,12 @@ export default {
         return value * this.property.multiple
       },
       set(value) {
-        this.$store.commit(
-          `set${this.pascalCasedPropertyName}`,
-          value / this.property.multiple
-        )
+        requestAnimationFrame(() => {
+          this.$store.commit('setGridProperty', {
+            property: this.property.name,
+            value: value / this.property.multiple,
+          })
+        })
       },
     },
     pascalCasedPropertyName() {

@@ -35,7 +35,7 @@
     <SettingsWindow v-show="settingsAreOpen" @close="settingsAreOpen = false" />
     <LandscapeSummary v-show="$store.state.preferences.showSummary" />
     <LandscapeOverview v-show="$store.state.preferences.showOverview" />
-    <div class="mainContainer" ref="mainContainer">
+    <div class="mainContainer" ref="mainContainer" :style="`transform: scale(${$store.state.grid.scale}); transition: transform 0.3s ease`">
       <HexGridController />
     </div>
   </div>

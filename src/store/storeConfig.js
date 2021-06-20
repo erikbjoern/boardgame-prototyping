@@ -26,6 +26,7 @@ const initialState = {
     gap: 0,
     tileSize: 6,
     tileBorderWidth: 6,
+    scale: 1,
   },
   resources: {
     data: [
@@ -121,7 +122,7 @@ const initialState = {
   },
   preferences: {
     showOverview: true,
-    showResourceValues: true,
+    showResourceValues: false,
     showSummary: true,
   },
 }

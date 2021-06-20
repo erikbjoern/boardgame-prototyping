@@ -1,7 +1,7 @@
 <template>
   <div
     class="flex space-x-2 p-1 bg-[#efefef55] fixed top-2 left-1/2 transform -translate-x-1/2 z-[1000] rounded-sm"
-    v-show="selectedTileIds.length"
+    v-show="selectedTileIds.length > 0"
   >
     <div
       class="py-px px-1 rounded-sm text-xs font-semibold"
@@ -16,8 +16,7 @@
       {{ value }}
     </div>
     <button
-      class="absolute right-[-.5rem] top-px transform translate-x-full px-1 border rounded-full flex items-center justify-start text-sm tracking-wide border-gray-900 text-gray-900 overflow-hidden max-w-[1.5rem] h-6 hover:max-w-[9rem] w-[9rem]"
-      style="transition: max-width 0.2s"
+      class="absolute right-[-.5rem] top-px transform translate-x-full px-[3.5px] border rounded-full flex items-center justify-start text-sm tracking-wide border-gray-900 text-gray-900 overflow-hidden max-w-[1.5rem] h-6 hover:max-w-[9rem] w-[9rem] bg-[#efefef55] hover:bg-[#ffffffbb] transition-all"
       @click="clearSelection"
     >
       <svg

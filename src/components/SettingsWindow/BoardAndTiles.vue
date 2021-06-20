@@ -78,11 +78,11 @@ export default {
           flexGrow: 10,
         },
         {
-          name: 'tileSize',
-          min: 60,
-          max: 225,
+          name: 'scale',
+          min: 20,
+          max: 50,
           text: 'Storlek',
-          multiple: 15,
+          multiple: 40,
           flexGrow: 7,
         },
         {
