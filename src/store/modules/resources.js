@@ -17,12 +17,12 @@ export default {
     resourceColors(state) {
       if (state.data.length) {
         return Object.assign(...state.data.map(r => ({ [r.name]: r.color })))
-      }
+      } else return []
     },
     invertedResourceColors(state) {
       if (state.data.length) {
         return Object.assign(...state.data.map(r => ({ [r.name]: r.invertedColor })))
-      }
+      } else return []
     },
   },
   mutations: {

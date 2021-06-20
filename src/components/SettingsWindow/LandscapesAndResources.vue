@@ -159,7 +159,7 @@
           :duration="{ enter: 500, leave: 0 }"
           :key="renderKey"
         >
-          <ResourceSettingsItem
+          <LandscapeOrResourceItem
             v-for="(item, index) in currentDataSet"
             class="pl-[1.25rem]"
             :class="index !== 0 && 'mt-3'"
@@ -202,12 +202,12 @@
 </template>
 
 <script>
-import ResourceSettingsItem from './ResourceSettingsItem'
+import LandscapeOrResourceItem from './LandscapeOrResourceItem'
 
 export default {
   name: 'LandscapesAndResources',
   components: {
-    ResourceSettingsItem,
+    LandscapeOrResourceItem,
   },
   data() {
     return {
