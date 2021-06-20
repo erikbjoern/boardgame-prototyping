@@ -1,21 +1,25 @@
-import Vue from "vue";
-import Vuex from "vuex";
-import StoreConfig from "./storeConfig"
+import Vue from 'vue'
+import Vuex from 'vuex'
+import { StoreConfig } from './storeConfig'
 
-Vue.use(Vuex);
+Vue.use(Vuex)
 
 export const storeConfig = new StoreConfig()
 
-const store = new Vuex.Store(storeConfig.create());
+const store = new Vuex.Store(storeConfig.create())
 
-store.watch(
-  (state) => state,
-  () => {
-    store.dispatch("updateLocalStorage");
-  },
-  {
-    deep: true,
+let updateLocalStorageTimer = undefined
+
+store.subscribe((mutation, state) => {
+  if (!state.initialised) return
+
+  if (updateLocalStorageTimer) {
+    clearTimeout(updateLocalStorageTimer)
   }
-);
 
-export default store;
+  updateLocalStorageTimer = setTimeout(() => {
+    store.dispatch('updateLocalStorage')
+  }, 1000)
+})
+
+export default store

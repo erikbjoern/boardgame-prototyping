@@ -4,12 +4,16 @@
     :style="{ zIndex: tile.number }"
     @click="toggleTileSelection(tile)"
   >
-    <div class="hex-grid-item__background" :class="isSelected ? 'bg-green-500' : 'bg-white'">
+    <div
+      class="hex-grid-item__background"
+      :class="isSelected ? 'bg-green-500' : 'bg-white'"
+      :style="`margin: -${borderWidth}`"
+    >
       <div class="hex-grid-item__content" :style="{ ...tileContentStyle }">
         <span :style="`margin-top: ${size / 5}px;`">{{ tile.number }}</span>
         <transition name="fade" mode="out-in">
           <div
-            v-show="$store.state.showResourceValues"
+            v-show="$store.state.preferences.showResourceValues"
             class="resourceContainer"
             :style="{
               fontSize: `clamp(10px, ${size / 10}vw, 40px`,
@@ -17,7 +21,7 @@
             }"
           >
             <div
-              v-for="resource in tile.resources"
+              v-for="resource in resources"
               :key="resource.name"
               class="resourceItem"
               :style="{
@@ -45,7 +49,7 @@ import StoneIcon from '@/assets/icons/stone-block.svg'
 import WheatIcon from '@/assets/icons/wheat.svg'
 
 export default {
-  name: 'ResourceTile',
+  name: 'HexGridTile',
   components: {
     WoodIcon,
     StoneIcon,
@@ -79,24 +83,29 @@ export default {
     tileContentStyle() {
       return {
         display: 'flex',
-        gap: `${this.size / 50}vw`,
+        gap: `${1 / 50}vw`,
         backgroundColor: this.tile.color,
-        fontSize: `clamp(8px, ${this.size / 10}vw, 20px`,
+        fontSize: `clamp(8px, ${1 / 10}vw, 20px`,
         height: `${100 - this.borderWidth}%`,
         width: `${100 - this.borderWidth}%`,
       }
     },
     tileIsLargeEnough() {
-      return this.size > 6 && this.viewportWidth > 800
+      return 1 > 6 && this.viewportWidth > 800
     },
     isSelected() {
-      return this.$store.state.selectedTiles.includes(this.tile.id )
+      return this.$store.state.board.selectedTiles.includes(this.tile.id)
+    },
+    resources() {
+      return [...this.tile.resources].filter(r => r.amount > 0).sort((a, b) => a.amount - b.amount)
     }
   },
   methods: {
     getInvertedHexcolorGrayscale,
     toggleTileSelection(tile) {
-      const foundIndex = this.$store.state.selectedTiles.indexOf(tile.id)
+      if (this.$store.state.keysPressed.includes(32)) return
+
+      const foundIndex = this.$store.state.board.selectedTiles.indexOf(tile.id)
 
       if (foundIndex !== -1) {
         this.$store.commit('removeTileFromSelection', foundIndex)
@@ -124,7 +133,6 @@ svg {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  height: 80%;
   justify-content: center;
   width: 66%;
 }
@@ -135,8 +143,8 @@ svg {
   box-shadow: 0.5px 0.5px 2px #44444499;
   display: flex;
   justify-content: space-evenly;
-  padding: 1px;
-  width: 40%;
+  line-height: 1rem;
+  flex: 1 1 1rem;
 }
 
 .hex-grid__item {

@@ -1,7 +1,8 @@
 <template>
-  <div class="flex flex-col w-full flex-none rounded overflow-hidden">
+  <div class="flex flex-col" style="width: calc(310px - 1.25rem) !important">
     <div
-      class="flex w-full p-2 transition-colors duration-300"
+      class="flex w-full p-2 transition-colors duration-300 rounded"
+      :class="expanded && 'rounded-b-none'"
       :style="{
         backgroundColor: expanded ? item.invertedColor : item.color,
       }"
@@ -16,7 +17,7 @@
           :ref="item.name"
         />
       </div>
-      <div v-if="tab == 'LANDSCAPES'" class="grid place-items-center h-full w-8">
+      <div v-if="tab == 'landscapes'" class="grid place-items-center h-full w-8">
         <svg
           class="transition-all duration-300 select-none cursor-pointer hover:opacity-50 transform"
           :class="expanded ? 'rotate-180 translate-y-px' : '-translate-y-0'"
@@ -47,14 +48,16 @@
           :style="{ backgroundColor: removalMode ? '#992222' : item.invertedColor }"
         >
           <transition name="fade" mode="out-in">
-            <div
-              v-if="!removalMode"
-              class="font-semibold bg-transparent text-sm w-full text-center"
-            >
-              <input class="absolute opacity-0" type="color" v-model="itemColor" />
-              <span :style="{ color: item.color }">
-                {{ item.color }}
-              </span>
+            <div v-if="!removalMode" class="w-full">
+              <input v-model="itemColor" type="color" class="absolute opacity-0 ml-5" />
+              <input
+                v-model.lazy="itemColor"
+                type="text"
+                @keydown.esc="handleEscapeKey"
+                name="color"
+                class="bg-transparent text-center w-full font-semibold text-sm"
+                :style="{ color: item.color }"
+              />
             </div>
             <button v-else @click="remove(item)">
               <svg
@@ -77,7 +80,7 @@
     </div>
     <div
       v-if="expanded"
-      class="flex flex-col items-stretch space-y-2 p-2"
+      class="flex flex-col items-stretch space-y-2 p-2 rounded-b"
       :style="{
         backgroundColor: item.color,
         color: item.invertedColor,
@@ -226,11 +229,10 @@
 import WoodIcon from '@/assets/icons/log.svg'
 import StoneIcon from '@/assets/icons/stone-block.svg'
 import WheatIcon from '@/assets/icons/wheat.svg'
-import colors from '@/assets/colors'
 import { getInvertedHexColor, getRGBValues } from '@/helpers/getDynamicColor'
 
 export default {
-  name: 'SettingsInputLandscapes',
+  name: 'ResourceSettingsItem',
   components: {
     WoodIcon,
     StoneIcon,
@@ -239,7 +241,6 @@ export default {
   props: ['item', 'tab', 'focusAddedItem', 'removalMode'],
   data() {
     return {
-      colors,
       expanded: false,
     }
   },
@@ -253,13 +254,13 @@ export default {
 
         if (this.$store.state[currentDataSet].data.find(i => i.name == value)) {
           const message = `Det finns redan ${
-            this.tab == 'LANDSCAPES' ? 'ett landskap' : 'en resurs'
+            this.tab == 'landscapes' ? 'ett landskap' : 'en resurs'
           } med detta namn`
           alert(message)
           this.$refs[this.item.name].value = this.item.name
         } else {
           const mutation =
-            this.tab == 'LANDSCAPES' ? 'setLandscapeParameter' : 'setResourceParameter'
+            this.tab == 'landscapes' ? 'setLandscapeParameter' : 'setResourceParameter'
           this.$store.commit(mutation, { name: this.item.name, property: 'name', value })
         }
       },
@@ -288,7 +289,6 @@ export default {
     },
   },
   methods: {
-    getInvertedHexColor,
     submitChange(e, resourceName = null) {
       const item = this.item
       const property = e.target.name
@@ -322,7 +322,7 @@ export default {
         }
       } else {
         mutation =
-          this.tab == 'LANDSCAPES' ? 'setLandscapeParameter' : 'setResourceParameter'
+          this.tab == 'landscapes' ? 'setLandscapeParameter' : 'setResourceParameter'
       }
 
       this.$store.commit(mutation, {
@@ -342,17 +342,17 @@ export default {
       e.target.blur()
     },
     remove(item) {
-      let mutation
+      let action
 
-      if (this.tab == 'RESOURCES') mutation = 'removeResource'
+      if (this.tab == 'resources') action = 'removeResource'
 
-      if (this.tab == 'LANDSCAPES') {
-        mutation = item == this.item ? 'removeLandscape' : 'removeResourceFromLandscape'
+      if (this.tab == 'landscapes') {
+        action = item == this.item ? 'removeLandscape' : 'removeResourceFromLandscape'
       }
 
-      this.$store.commit(mutation, {
+      this.$store.dispatch(action, {
         name: item.name,
-        ...(mutation == 'removeResourceFromLandscape' && {
+        ...(action == 'removeResourceFromLandscape' && {
           landscapeName: this.item.name,
         }),
       })
@@ -360,12 +360,11 @@ export default {
   },
   mounted() {
     if (this.focusAddedItem) {
-      const currentDataSet =
-        this.tab == 'LANDSCAPES'
-          ? this.$store.state.landscapes.data
-          : this.$store.state.resources.data
+      const currentDataSet = this.$store.state[this.tab].data
 
-      if (currentDataSet.slice(-1)[0].name == this.item.name) {
+      const lastItem = currentDataSet.slice(-1)[0]
+
+      if (lastItem?.name == this.item.name) {
         this.$refs[this.item.name]?.focus()
         this.$emit('didFocusAddedItem')
       }
@@ -375,12 +374,6 @@ export default {
 </script>
 
 <style scoped>
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-}
-
 input::-webkit-inner-spin-button,
 input::-webkit-outer-spin-button {
   -webkit-appearance: none;

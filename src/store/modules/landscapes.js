@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import { getRandomHexColor, getInvertedHexColor } from '@/helpers/getDynamicColor.js'
 import { getUniqueDefaultName } from '@/helpers/getUniqueName.js'
+import { storeConfig } from '@/store'
 
 export default {
   state: () => ({
@@ -21,17 +22,32 @@ export default {
     ],
     landscapePool: [],
   }),
+  getters: {
+    landscapeDistributions(state, getters) {
+      return state.data.map(l => l.fraction)
+    },
+    landscapeDistributionSum(state) {
+      const fractions = state.data.map(l => l.fraction)
+      return fractions.reduce((a, b) => a + b, 0)
+    },
+    landscapeColors(state) {
+      return Object.assign(...state.data.map(l => ({ [l.name]: l.color })))
+    },
+  },
   mutations: {
+    setLandscapeState(state, payload) {
+      Object.keys(payload).forEach(property => {
+        state.hasOwnProperty(property) &&
+          (state[property] = JSON.parse(JSON.stringify(payload[property])))
+      })
+    },
     setLandscapeParameter(state, { value, name, property }) {
       value > 100 && (value = 100)
       const object = state.data.find(l => l.name == name)
       Vue.set(object, property, value)
     },
-    setInitialLandscapeData(state, payload) {
-      state.data = payload
-    },
     addLandscape(state) {
-      const color = getRandomHexColor(0, 50)
+      const color = getRandomHexColor([1, 1, 0], [60, 60, 30])
 
       const defaultName = getUniqueDefaultName(
         `landskap #${state.data.length + 1}`,
@@ -98,17 +114,42 @@ export default {
 
       commit('setLandscapePool', landscapePool)
     },
-  },
-  getters: {
-    landscapeDistributions(state, getters) {
-      return state.data.map(l => l.fraction)
+    resetLandscapes({ commit, dispatch }) {
+      commit('setLandscapeState', storeConfig.initialState.landscapes)
+
+      const resourcesOnLandscapes = Array.from(
+        new Set(
+          storeConfig.initialState.landscapes.data.flatMap(l =>
+            l.resources.map(r => r.name)
+          )
+        )
+      )
+
+      if (resourcesOnLandscapes.length) {
+        dispatch('addMissingResources', resourcesOnLandscapes)
+      }
+
+      dispatch('arrangeLandscapePool')
     },
-    landscapeDistributionSum(state) {
-      const fractions = state.data.map(l => l.fraction)
-      return fractions.reduce((a, b) => a + b, 0)
+    removeLandscape({ commit }, { name }) {
+      commit('removeLandscape', { name })
     },
-    landscapeColors(state) {
-      return Object.assign(...state.data.map(l => ({ [l.name]: l.color })))
+    removeAllLandscapes({ state, commit }) {
+      state.data = []
+    },
+    removeResourceFromLandscape({ commit }, { name, landscapeName }) {
+      commit('removeResourceFromLandscape', { name, landscapeName })
+    },
+    removeResourceFromLandscapes({ state, commit }, resourceName) {
+      state.data.forEach(l => {
+        const targetResourceIndex = l.resources.findIndex(r => r.name == resourceName)
+
+        targetResourceIndex > -1 &&
+          commit('removeResourceFromLandscape', {
+            name: resourceName,
+            landscapeName: l.name,
+          })
+      })
     },
   },
 }

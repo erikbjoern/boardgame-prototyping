@@ -4,18 +4,17 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import colors from '@/assets/colors'
 import HexGrid from '@/components/HexGrid/HexGrid.vue'
 import cuid from 'cuid'
+import EventBus from '@/eventBus'
 
 export default {
-  name: 'HexGridContainer',
+  name: 'HexGridController',
   components: {
     HexGrid,
   },
   data() {
     return {
-      colors,
       hexNumber: 0,
     }
   },
@@ -23,8 +22,8 @@ export default {
     ...mapState({
       rowCount: state => state.grid.rowCount,
       columnCount: state => state.grid.columnCount,
-      hexRows: state => state.grid.hexRows,
-      hexRowsStash: state => state.grid.hexRowsStash,
+      tileRows: state => state.board.tileRows,
+      tileRowsStash: state => state.board.tileRowsStash,
       landscapeParameters: state => state.landscapes.data,
     }),
   },
@@ -32,39 +31,28 @@ export default {
     ...mapActions([
       'getRowFromStash',
       'setInitialState',
-      'storeHexRow',
-      'storeModifiedHexRow',
-      'updateLocalStorage',
+      'storeTileRow',
+      'storeModifiedTileRow',
     ]),
     getCurrentHexTotal() {
-      return [...this.$store.state.grid.hexRows].flat().length
+      return [...this.$store.state.board.tileRows].flat().length
     },
     getResources(landscapeType) {
       const resources = []
       const parameters = this.landscapeParameters.find(l => l.name == landscapeType)
 
-      for (const { name, min, max } of parameters.resources) {
-        const amount = min + Math.floor(Math.random() * (max - min + 1))
-        resources.push({ name, amount, backgroundColor: this.$store.getters.resourceColors[name] })
+      if (parameters?.resources) {
+        for (const { name, min, max } of parameters.resources) {
+          const amount = min + Math.floor(Math.random() * (max - min + 1))
+          resources.push({
+            name,
+            amount,
+            backgroundColor: this.$store.getters.resourceColors[name],
+          })
+        }
       }
 
       return resources
-    },
-    getRandomColor() {
-      return this.colors.random[Math.floor(Math.random() * this.colors.random.length)]
-    },
-    getColor() {
-      const colorsByDistribution = []
-
-      this.$store.state.resources.parameters.map(r => {
-        let count = r.fraction
-        while (count > 0) {
-          colorsByDistribution.push(colors.backgrounds[r.type])
-          count--
-        }
-      })
-
-      return colorsByDistribution[Math.floor(Math.random() * colorsByDistribution.length)]
     },
     getLandscapeType() {
       const landscapePool = this.$store.state.landscapes.landscapePool
@@ -74,7 +62,7 @@ export default {
       const { columnCount } = this
       return Math.floor(columnCount / 2) + (columnCount % 2) * (rowIndex % 2)
     },
-    buildHexRow(row, rowIndex) {
+    buildTileRow(row, rowIndex) {
       const tileCount = this.getTileCount(rowIndex)
       let newRow = []
 
@@ -84,7 +72,7 @@ export default {
         if (!!row[t]) {
           tile = row[t]
         } else {
-          const stashedRow = this.hexRowsStash[rowIndex]
+          const stashedRow = this.tileRowsStash[rowIndex]
           const stashedTile = stashedRow ? stashedRow[newRow.length] : null
           let landscapeType
           let resources
@@ -115,7 +103,7 @@ export default {
 
       return newRow
     },
-    reduceHexRow(targetRow, rowIndex) {
+    reduceTileRow(targetRow, rowIndex) {
       const tileCount = this.getTileCount(rowIndex)
       let reducedRow = []
 
@@ -126,74 +114,90 @@ export default {
 
       return reducedRow
     },
-    addHexColumns() {
-      const { rowCount, hexRows } = this
+    addTileColumns() {
+      const { rowCount, tileRows } = this
       this.hexNumber = 0
 
       for (let index = 0; index < rowCount; index++) {
-        const targetRow = hexRows[index]
-        const extendedRow = this.buildHexRow([...targetRow], index)
+        const targetRow = tileRows[index]
+        debugger
+        const extendedRow = this.buildTileRow([...targetRow], index)
 
-        this.storeModifiedHexRow({ row: extendedRow, index })
+        this.storeModifiedTileRow({ row: extendedRow, index })
       }
     },
-    async addHexRows(difference, oldRowTotal) {
-      const newTotal = oldRowTotal + difference
+    async addTileRows(newTotal = this.rowCount, oldTotal = 0) {
       this.hexNumber = this.getCurrentHexTotal()
 
-      for (let index = oldRowTotal; index < newTotal; index++) {
+      for (let index = oldTotal; index < newTotal; index++) {
         const stashedRow = await this.getRowFromStash(index)
         const row = stashedRow
-          ? this.buildHexRow([...stashedRow], index)
-          : this.buildHexRow([], index)
+          ? this.buildTileRow([...stashedRow], index)
+          : this.buildTileRow([], index)
 
-        this.storeHexRow({ row, index })
+        this.storeTileRow({ row, index })
       }
     },
-    removeHexColumns() {
+    removeTileColumns() {
       this.hexNumber = 0
 
       for (let index = 0; index < this.rowCount; index++) {
-        const targetRow = this.hexRows[index]
-        const reducedRow = this.reduceHexRow(targetRow, index)
+        const targetRow = this.tileRows[index]
+        const reducedRow = this.reduceTileRow(targetRow, index)
 
-        this.storeModifiedHexRow({ row: reducedRow, index })
+        this.storeModifiedTileRow({ row: reducedRow, index })
       }
     },
-    removeHexRows(difference) {
+    removeTileRows(difference) {
       while (difference--) {
-        this.$store.commit('removeHexRow')
+        this.$store.commit('removeTileRow')
       }
+    },
+    reassignResources() {
+      const updatedTileRows = this.tileRows.map(row => {
+        return row.map(tile => {
+          return { ...tile, resources: this.getResources(tile.landscapeType) }
+        })
+      })
+
+      const newBoardState = { ...this.$store.state.board, tileRows: updatedTileRows }
+
+      this.$store.commit('setBoardState', newBoardState)
     },
   },
   watch: {
     rowCount(newValue, oldValue) {
       if (oldValue == null) return
 
-      const difference = Math.abs(newValue - oldValue)
-
       if (newValue > oldValue) {
-        this.addHexRows(difference, oldValue)
+        this.addTileRows(newValue, oldValue)
       } else {
-        this.removeHexRows(difference)
+        this.removeTileRows(oldValue - newValue)
       }
     },
-    columnCount(newValue, oldValue) {
+      columnCount(newValue, oldValue) {
       if (oldValue == null) return
 
       if (newValue > oldValue) {
-        this.addHexColumns()
+        this.addTileColumns()
       } else {
-        this.removeHexColumns()
+        this.removeTileColumns()
       }
     },
   },
-  created() {
-    this.setInitialState()
+  async created() {
+    await this.setInitialState()
 
-    const stashedRowsCount = this.hexRows.length
-    const difference = this.rowCount - stashedRowsCount
-    this.addHexRows(difference, stashedRowsCount)
+    const stashedRowsCount = this.tileRows.length
+    this.addTileRows(this.rowCount, stashedRowsCount)
+
+    EventBus.$on('buildGrid', this.addTileRows)
+    EventBus.$on('reassignResources', this.reassignResources)
+
+    this.$store.commit('initialised')
+  },
+  destroyed() {
+    EventBus.$off('buildGrid', this.addTileRows)
   },
 }
 </script>
