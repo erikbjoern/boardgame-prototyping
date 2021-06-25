@@ -119,7 +119,6 @@ export default {
     },
     generateNewTiles() {
       this.$store.dispatch('generateNewTiles')
-      this.$emit('close')
       scrollToCenter()
     },
   },

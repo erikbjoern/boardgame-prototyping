@@ -12,10 +12,10 @@ export default {
         state.hasOwnProperty(property) && (state[property] = payload[property])
       })
     },
-    addTileRow(state, { row, index }) {
+    addTileRow(state, { row }) {
       state.tileRows.push(row)
     },
-    addTileRowToStash(state, { row, index }) {
+    addTileRowToStash(state, { row }) {
       state.tileRowsStash.push(row)
     },
     removeTileRow(state) {
@@ -33,6 +33,10 @@ export default {
     removeTileFromSelection(state, index) {
       state.selectedTiles.splice(index, 1)
     },
+    setResourceValueOnTile(state, { tile, resource, value }) {
+      const targetResource = state.tileRows[tile.rowIndex][tile.index].resources.find(r => r.name == resource.name)
+      targetResource && (targetResource.amount = value)
+    }
   },
   actions: {
     getRowFromStash({ state }, index) {

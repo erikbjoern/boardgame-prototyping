@@ -33,7 +33,8 @@ export default {
       return {
         display: 'grid',
         gridAutoRows: `${this.tileSize * 0.866}vw`,
-        gap: `${this.gapValue}vw`,
+        columnGap: `${this.gapValue * 2}vw`,
+        rowGap: `${this.gapValue}vw`,
         gridColumnStart: 1,
         gridRowStart: 1,
       }
@@ -41,7 +42,7 @@ export default {
     gridRowsOddStyle() {
       return {
         gridTemplateColumns: `repeat(${this.rowsOddLength}, ${this.tileSpaceX}vw)`,
-        marginLeft: `${this.tileSpaceX / 2 + this.gapValue / 2}vw`,
+        marginLeft: `${this.tileSpaceX / 2 + this.gapValue}vw`,
       }
     },
     gridRowsEvenStyle() {
@@ -76,7 +77,7 @@ export default {
 
 <style scoped>
 #grid-container {
-  cursor: pointer;
+  cursor: default;
   display: grid;
   margin-bottom: 10vh;
 }

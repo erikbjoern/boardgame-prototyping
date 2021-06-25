@@ -32,7 +32,17 @@
               <WoodIcon v-if="resource.name == 'wood' && tileIsLargeEnough" />
               <StoneIcon v-if="resource.name == 'stone' && tileIsLargeEnough" />
               <WheatIcon v-if="resource.name == 'wheat' && tileIsLargeEnough" />
-              <span>{{ resource.amount }}</span>
+              <div class="w-8 text-center">
+                <input
+                  class="w-full bg-transparent text-center"
+                  :value="resource.amount"
+                  @change="e => updateResource(e, resource)"
+                  v-show="$store.state.keysPressed.length == 0"
+                />
+                <span class="w-full" v-show="$store.state.keysPressed.length > 0">
+                  {{ resource.amount }}
+                </span>
+              </div>
             </div>
           </div>
         </transition>
@@ -97,13 +107,15 @@ export default {
       return this.$store.state.board.selectedTiles.includes(this.tile.id)
     },
     resources() {
-      return [...this.tile.resources].filter(r => r.amount > 0).sort((a, b) => a.amount - b.amount)
-    }
+      return [...this.tile.resources]
+        .filter(r => r.amount > 0)
+        .sort((a, b) => a.amount - b.amount)
+    },
   },
   methods: {
     getInvertedHexcolorGrayscale,
     toggleTileSelection(tile) {
-      if (this.$store.state.keysPressed.includes(32)) return
+      if (!this.$store.state.keysPressed.includes(93)) return
 
       const foundIndex = this.$store.state.board.selectedTiles.indexOf(tile.id)
 
@@ -112,6 +124,12 @@ export default {
       } else {
         this.$store.commit('addTileToSelection', tile.id)
       }
+    },
+    updateResource(e, resource) {
+      const tile = (({ rowIndex, index }) => ({ rowIndex, index }))(this.tile)
+      const value = parseInt(e.target.value)
+
+      this.$store.commit('setResourceValueOnTile', { tile, resource, value })
     },
   },
 }
@@ -144,7 +162,6 @@ svg {
   display: flex;
   justify-content: space-evenly;
   line-height: 1rem;
-  flex: 1 1 1rem;
 }
 
 .hex-grid__item {
@@ -170,6 +187,6 @@ svg {
   display: flex;
   flex-direction: column;
   font-size: 0.7vw;
-  justify-content: start;
+  justify-content: flex-start;
 }
 </style>

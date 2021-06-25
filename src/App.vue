@@ -35,7 +35,13 @@
     <SettingsWindow v-show="settingsAreOpen" @close="settingsAreOpen = false" />
     <LandscapeSummary v-show="$store.state.preferences.showSummary" />
     <LandscapeOverview v-show="$store.state.preferences.showOverview" />
-    <div class="mainContainer" ref="mainContainer" :style="`transform: scale(${$store.state.grid.scale}); transition: transform 0.3s ease`">
+    <div
+      class="mainContainer"
+      ref="mainContainer"
+      :style="
+        `transform: scale(${$store.state.grid.scale}); transition: transform 0.3s ease`
+      "
+    >
       <HexGridController />
     </div>
   </div>
@@ -98,17 +104,24 @@ export default {
     keydownHandler(e) {
       if (e.keyCode == 32) {
         e.preventDefault()
-        document.getElementById('grid-container').style.cursor = 'grab'
+
+        if (this.$store.state.keysPressed.length == 0) {
+          document.getElementById('grid-container').style.cursor = 'grab'
+          this.$store.commit('keydown', e.keyCode)
+        }
       }
 
-      this.$store.commit('keydown', e.keyCode)
+      if (e.keyCode == 93 && this.$store.state.keysPressed.length == 0) {
+        document.getElementById('grid-container').style.cursor = 'pointer'
+        this.$store.commit('keydown', e.keyCode)
+      }
     },
     keyupHandler(e) {
-      if (e.keyCode == 32) {
-        document.getElementById('grid-container').style.cursor = 'pointer'
-      }
-
       this.$store.commit('keyup', e.keyCode)
+
+      if (this.$store.state.keysPressed.length == 0) {
+        document.getElementById('grid-container').style.cursor = 'default'
+      }
     },
     toggleSettings(e) {
       this.settingsAreOpen = !this.settingsAreOpen
