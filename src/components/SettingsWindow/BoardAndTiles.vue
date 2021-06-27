@@ -80,7 +80,7 @@ export default {
         {
           name: 'scale',
           min: 20,
-          max: 50,
+          max: 80,
           text: 'Storlek',
           multiple: 40,
           flexGrow: 7,
