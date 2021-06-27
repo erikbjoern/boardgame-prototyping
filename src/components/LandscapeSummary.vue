@@ -1,7 +1,7 @@
 <template>
   <div
     class="flex space-x-2 p-1 bg-[#efefef55] fixed top-2 left-1/2 transform -translate-x-1/2 z-[1000] rounded-sm"
-    v-show="selectedTileIds.length > 0"
+    v-show="selectedTileIds.length > 0 && $store.state.initialised"
   >
     <div
       class="py-px px-1 rounded-sm text-xs font-semibold"

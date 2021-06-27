@@ -7,10 +7,10 @@ export default {
   state: () => ({
     data: [
       {
-        name: 'Sten',
-        fraction: 1,
-        color: '#eeefff',
-        invertedColor: '#111000',
+        name: '',
+        fraction: 0,
+        color: '#efefef',
+        invertedColor: '#0f0f0f',
         resources: [
           {
             name: '',

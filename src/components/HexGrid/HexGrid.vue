@@ -1,5 +1,5 @@
 <template>
-  <div id="grid-container">
+  <div class="grid mb-[10vh]">
     <div :style="{ ...gridRowsStyle, ...gridRowsOddStyle }">
       <div v-for="tile in rowsOdd().flat()" :key="tile.id">
         <HexGridTile :tile="tile" />
@@ -74,11 +74,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-#grid-container {
-  cursor: default;
-  display: grid;
-  margin-bottom: 10vh;
-}
-</style>

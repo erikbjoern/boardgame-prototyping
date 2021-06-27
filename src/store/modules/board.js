@@ -22,10 +22,10 @@ export default {
       state.tileRows.pop()
     },
     replaceTileRow(state, { row, index }) {
-      state.tileRows[index] = row
+      state.tileRows.splice(index, 1, row)
     },
     replaceTileRowInStash(state, { row, index }) {
-      state.tileRowsStash[index] = row
+      state.tileRowsStash.splice(index, 1, row)
     },
     addTileToSelection(state, tileId) {
       state.selectedTiles.push(tileId)

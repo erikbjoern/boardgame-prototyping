@@ -1,18 +1,12 @@
-<template>
-  <HexGrid />
-</template>
+<template></template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import HexGrid from '@/components/HexGrid/HexGrid.vue'
 import cuid from 'cuid'
 import EventBus from '@/eventBus'
 
 export default {
   name: 'HexGridController',
-  components: {
-    HexGrid,
-  },
   data() {
     return {
       hexNumber: 0,
@@ -175,7 +169,7 @@ export default {
         this.removeTileRows(oldValue - newValue)
       }
     },
-      columnCount(newValue, oldValue) {
+    columnCount(newValue, oldValue) {
       if (oldValue == null) return
 
       if (newValue > oldValue) {

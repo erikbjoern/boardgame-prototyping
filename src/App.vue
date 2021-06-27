@@ -42,23 +42,23 @@
         `transform: scale(${$store.state.grid.scale}); transition: transform 0.3s ease`
       "
     >
-      <HexGridController />
+      <Board />
     </div>
   </div>
 </template>
 
 <script>
 import SettingsWindow from '@/components/SettingsWindow/Settings'
-import HexGridController from '@/components/HexGrid/HexGridController'
+import Board from '@/components/Board'
 import { scrollToCenter } from '@/helpers/scroll.js'
 import { dragToScrollStart, dragToScroll } from '@/helpers/scroll.js'
-import LandscapeOverview from '@/components/LandscapeOverview.vue'
-import LandscapeSummary from '@/components/LandscapeSummary.vue'
+import LandscapeOverview from '@/components/LandscapeOverview'
+import LandscapeSummary from '@/components/LandscapeSummary'
 
 export default {
   name: 'App',
   components: {
-    HexGridController,
+    Board,
     SettingsWindow,
     LandscapeOverview,
     LandscapeSummary,
@@ -106,13 +106,13 @@ export default {
         e.preventDefault()
 
         if (this.$store.state.keysPressed.length == 0) {
-          document.getElementById('grid-container').style.cursor = 'grab'
+          document.getElementById('board-container').style.cursor = 'grab'
           this.$store.commit('keydown', e.keyCode)
         }
       }
 
       if (e.keyCode == 93 && this.$store.state.keysPressed.length == 0) {
-        document.getElementById('grid-container').style.cursor = 'pointer'
+        document.getElementById('board-container').style.cursor = 'pointer'
         this.$store.commit('keydown', e.keyCode)
       }
     },
@@ -120,7 +120,7 @@ export default {
       this.$store.commit('keyup', e.keyCode)
 
       if (this.$store.state.keysPressed.length == 0) {
-        document.getElementById('grid-container').style.cursor = 'default'
+        document.getElementById('board-container').style.cursor = 'default'
       }
     },
     toggleSettings(e) {
