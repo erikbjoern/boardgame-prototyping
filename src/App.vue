@@ -89,11 +89,10 @@ export default {
       if (e.button !== 0 || e.which !== 1) return
 
       if (
-        [...e.target.classList, ...e.target.parentElement.classList].some(c =>
-          c.toLowerCase().includes('item')
-        )
+        !this.$store.state.keysPressed.includes(32) &&
+        !e.target.classList.contains('mainContainer')
       ) {
-        if (!this.$store.state.keysPressed.includes(32)) return
+        return
       }
 
       this.dragToScrollStart.bind(this)(e)

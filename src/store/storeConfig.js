@@ -17,6 +17,7 @@ const initialState = {
     tileRows: [],
     tileRowsStash: [],
     selectedTiles: [],
+    draggableItems: [],
   },
   grid: {
     rowCount: 13,

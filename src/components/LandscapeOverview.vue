@@ -1,12 +1,12 @@
 <template>
   <div
-    class="max-h-[80vh] fixed left-2 top-5 z-[1000] p-2 pl-2 bg-[#efefef] bg-opacity-20 rounded overflow-hidden"
+    class="max-h-[80vh] fixed left-2 top-5 z-[1000] p-2 bg-[#efefef] bg-opacity-20 rounded overflow-hidden"
     style="direction: rtl"
     v-if="$store.state.initialised"
   >
     <div
       class="overflow-auto pl-2"
-      style="max-width: 13rem; max-height: calc(80vh - 1rem)"
+      style="max-width: 13.5rem; max-height: calc(80vh - 1rem)"
       :class="expandedLandscapes.length <= 2 ? 'w-[max-content]' : 'w-[min-content]'"
     >
       <div class="flex flex-col">
@@ -32,7 +32,7 @@
               class="flex justify-between items-baseline pb-1 flex-1"
               :class="isExpanded(landscape.name) && 'w-full'"
             >
-              <p class="font-bold truncate">
+              <p class="font-bold truncate mr-1">
                 {{ landscape.name }}
               </p>
               <span v-if="isExpanded(landscape.name)">

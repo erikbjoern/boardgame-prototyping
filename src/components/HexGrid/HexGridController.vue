@@ -114,7 +114,6 @@ export default {
 
       for (let index = 0; index < rowCount; index++) {
         const targetRow = tileRows[index]
-        debugger
         const extendedRow = this.buildTileRow([...targetRow], index)
 
         this.storeModifiedTileRow({ row: extendedRow, index })

@@ -5,6 +5,19 @@ export default {
     tileRows: [],
     tileRowsStash: [],
     selectedTiles: [],
+    draggableItems: [
+      {
+        id: '1',
+        color: '#afa',
+        invertedColorGrayScale: '#070',
+        title: '',
+        text: '',
+        position: {
+          x: 0,
+          y: 0,
+        },
+      },
+    ],
   }),
   mutations: {
     setBoardState(state, payload) {
@@ -34,9 +47,15 @@ export default {
       state.selectedTiles.splice(index, 1)
     },
     setResourceValueOnTile(state, { tile, resource, value }) {
-      const targetResource = state.tileRows[tile.rowIndex][tile.index].resources.find(r => r.name == resource.name)
+      const targetResource = state.tileRows[tile.rowIndex][tile.index].resources.find(
+        r => r.name == resource.name
+      )
       targetResource && (targetResource.amount = value)
-    }
+    },
+    updateDraggableItem(state, { id, property, value }) {
+      const targetItem = state.draggableItems.find(i => i.id == id)
+      targetItem?.hasOwnProperty(property) && (targetItem[property] = value)
+    },
   },
   actions: {
     getRowFromStash({ state }, index) {
@@ -65,7 +84,7 @@ export default {
         tileRowsStash: [],
         selectedTiles: [],
       })
-      dispatch('arrangeLandscapePool') 
+      dispatch('arrangeLandscapePool')
 
       EventBus.$emit('buildGrid')
     },
