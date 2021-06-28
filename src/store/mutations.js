@@ -13,4 +13,10 @@ export default {
   keyup(state, keyCode) {
     state.keysPressed.splice(state.keysPressed.indexOf(keyCode), 1)
   },
+  inputFocused(state) {
+    state.hasFocusedInput = true
+  },
+  inputBlurred(state) {
+    state.hasFocusedInput = false
+  },
 }

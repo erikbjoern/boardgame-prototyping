@@ -101,7 +101,7 @@ export default {
       document.addEventListener('mouseup', this.mouseUpHandler)
     },
     keydownHandler(e) {
-      if (e.keyCode == 32) {
+      if (e.keyCode == 32 && !this.$store.state.hasFocusedInput) {
         e.preventDefault()
 
         if (this.$store.state.keysPressed.length == 0) {

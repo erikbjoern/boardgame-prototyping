@@ -12,6 +12,7 @@ const initialState = {
     initialised: false,
     viewportWidth: window.visualViewport?.width || 1400,
     keysPressed: [],
+    hasFocusedInput: false,
   },
   board: {
     tileRows: [],

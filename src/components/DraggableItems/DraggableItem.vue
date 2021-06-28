@@ -11,6 +11,8 @@
       left: offsetLeft,
     }"
     v-model="itemText"
+    @focus="$store.commit('inputFocused')"
+    @blur="$store.commit('inputBlurred')"
   ></textarea>
 </template>
 
