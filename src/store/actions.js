@@ -48,6 +48,7 @@ export default {
         tileRows: savedData.tileRows,
         tileRowsStash: savedData.tileRowsStash || [],
         selectedTiles: savedData.selectedTiles || [],
+        draggableItems: savedData.draggableItems || [],
       }
     }
 

@@ -3,7 +3,7 @@
     <div class="flex-1">
       <div class="mx-auto w-[min-content] flex flex-col space-y-3">
         <button
-          class="h-8 w-full border rounded !font-thin text-sm tracking-wide bg-black mb-6"
+          class="h-8 w-full border rounded  text-sm tracking-wide bg-black mb-6"
           :class="
             $store.state.preferences.showResourceValues
               ? '!border-green-500 text-green-200'
@@ -16,13 +16,13 @@
         </button>
 
         <button
-          class="h-8 w-full px-3 border rounded-full !font-thin text-sm tracking-wide bg-black border-gray-100 text-gray-100"
+          class="h-8 w-full px-3 border rounded-full  text-sm tracking-wide bg-black border-gray-100 text-gray-100"
           @click="generateNewResourceValues"
         >
           Generera nya resursvärden
         </button>
         <button
-          class="h-8 w-full px-3 border rounded-full !font-thin text-sm tracking-wide bg-black border-gray-100 text-gray-100"
+          class="h-8 w-full px-3 border rounded-full  text-sm tracking-wide bg-black border-gray-100 text-gray-100"
           @click="generateNewTiles"
         >
           Generera nytt bräde
@@ -37,7 +37,7 @@
         :property="property"
       />
       <button
-        class="h-8 w-36 mx-auto border rounded-full !font-thin text-sm tracking-wide bg-black border-gray-100 text-gray-100"
+        class="h-8 w-36 mx-auto border rounded-full  text-sm tracking-wide bg-black border-gray-100 text-gray-100"
         @click="resetAdjustments"
       >
         Återställ justeringar

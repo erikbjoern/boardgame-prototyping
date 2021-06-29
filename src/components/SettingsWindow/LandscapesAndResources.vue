@@ -103,7 +103,7 @@
           </span>
         </button>
         <button
-          class="h-8 border rounded !font-thin text-sm tracking-wide bg-black !mt-auto"
+          class="h-8 border rounded  text-sm tracking-wide bg-black !mt-auto"
           :class="
             $store.state.preferences.showOverview
               ? '!border-green-500 text-green-200'
@@ -114,7 +114,7 @@
           {{ $store.state.preferences.showOverview ? 'Visar' : 'Visa' }} översikt
         </button>
         <button
-          class="h-8 border rounded !font-thin text-sm tracking-wide bg-black"
+          class="h-8 border rounded  text-sm tracking-wide bg-black"
           :class="
             $store.state.preferences.showSummary
               ? '!border-green-500 text-green-200'
