@@ -8,7 +8,6 @@
     "jest": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "@tailwindcss/postcss7-compat": "^2.2.4",
     "core-js": "^3.6.5",
     "cuid": "^2.1.8",
     "localforage": "^1.9.0",
@@ -16,16 +15,14 @@
     "vuex": "^3.4.0"
   },
   "devDependencies": {
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.1.2",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-unit-jest": "~4.5.0",
     "@vue/cli-plugin-vuex": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
     "@vue/test-utils": "^1.0.3",
-    "autoprefixer": "^9",
     "node-sass": "^4.12.0",
-    "postcss": "^7",
     "sass-loader": "^8.0.2",
-    "tailwindcss": "npm:@tailwindcss/postcss7-compat",
     "vue-cli-plugin-tailwind": "~2.0.6",
     "vue-svg-loader": "^0.16.0",
     "vue-template-compiler": "^2.6.12"
