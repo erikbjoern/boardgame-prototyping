@@ -2,7 +2,7 @@
   <textarea
     @mousedown="e => $emit('dragstart', e, item)"
     @mouseup="e => $emit('dragend', e)"
-    class="rounded-[1.5rem] absolute z-[999]"
+    class="rounded-[1.5rem] absolute z-[999] resize-none"
     :class="item.text.length ? 'p-6' : 'w-12 h-12'"
     :style="{
       backgroundColor: item.color,
