@@ -5,6 +5,7 @@
       :key="item.id + item.position.x + item.position.y"
       :item="item"
       :temporaryPosition="temporaryPosition"
+      :isBeingDragged="itemBeingDragged && item.id == itemBeingDragged.id"
       @dragstart="onDragstart"
     />
   </div>
@@ -23,12 +24,14 @@ export default {
       temporaryPosition: null,
       originalPosition: null,
       originalPositionOnPage: null,
+      itemBeingDragged: null,
     }
   },
   methods: {
     onDragstart(e, item) {
       this.originalPositionOnPage = { x: e.pageX, y: e.pageY }
-      
+      this.itemBeingDragged = item
+
       this.temporaryPosition = {
         x: item.position.x,
         y: item.position.y,
@@ -39,12 +42,8 @@ export default {
         y: item.position.y,
       }
 
-      this.onDragendListener = () => {
-        this.onDragend(item)
-      }
-
       document.addEventListener('mousemove', this.onDrag)
-      document.addEventListener('mouseup', this.onDragendListener)
+      document.addEventListener('mouseup', this.onDragend)
     },
     onDrag(e) {
       const dX = e.pageX - this.originalPositionOnPage.x
@@ -55,17 +54,19 @@ export default {
         y: this.originalPosition.y + dY / this.$store.state.grid.scale,
       }
     },
-    onDragend(item) {
-      const id = item.id
+    onDragend() {
+      const id = this.itemBeingDragged?.id
       const property = 'position'
-      const value = this.temporaryPosition ?? item.position
+      const value = this.temporaryPosition ?? this.itemBeingDragged.position
 
       this.$store.commit('updateDraggableItem', { id, property, value })
 
       this.temporaryPosition = null
+      this.originalPosition = null
+      this.itemBeingDragged = null
 
       document.removeEventListener('mousemove', this.onDrag)
-      document.removeEventListener('mouseup', this.onDragEndListener)
+      document.removeEventListener('mouseup', this.onDragend)
     },
   },
 }

@@ -1,23 +1,16 @@
 import EventBus from '@/eventBus'
+import cuid from 'cuid'
+import {
+  getRandomHexColor,
+  getInvertedHexcolorGrayscale,
+} from '../../helpers/getDynamicColor'
 
 export default {
   state: () => ({
     tileRows: [],
     tileRowsStash: [],
     selectedTiles: [],
-    draggableItems: [
-      {
-        id: '1',
-        color: '#afa',
-        invertedColorGrayScale: '#070',
-        title: '',
-        text: '',
-        position: {
-          x: 0,
-          y: 0,
-        },
-      },
-    ],
+    draggableItems: [],
   }),
   mutations: {
     setBoardState(state, payload) {
@@ -51,6 +44,28 @@ export default {
         r => r.name == resource.name
       )
       targetResource && (targetResource.amount = value)
+    },
+    addDraggableItem(state) {
+      const board = document.getElementById('board-container')
+      const height = board.offsetHeight
+      const width = board.offsetWidth
+      const randomX = Math.random() * width
+      const randomY = Math.random() * height
+      const randomColor = getRandomHexColor()
+
+      const newItem = {
+        id: cuid(),
+        color: randomColor,
+        invertedColorGrayScale: getInvertedHexcolorGrayscale(randomColor),
+        title: '',
+        text: '',
+        position: {
+          x: randomX,
+          y: randomY,
+        },
+      }
+
+      state.draggableItems.push(newItem)
     },
     updateDraggableItem(state, { id, property, value }) {
       const targetItem = state.draggableItems.find(i => i.id == id)

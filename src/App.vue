@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="relative">
     <svg
       class="fixed top-3 right-3 w-8 h-8 grid place-items-center z-[1000] text-gray-200 fill-current bg-black opacity-90 rounded p-[0.3rem] hover:opacity-75 cursor-pointer"
       :class="settingsAreOpen && 'border-2 border-green-500'"
@@ -31,6 +31,19 @@
 			C53.403,13.589,53.465,13,53.465,12.395z M43.77,16.921c-2.5,0-4.527-2.026-4.527-4.525S41.27,7.87,43.77,7.87
 			c2.497,0,4.524,2.026,4.524,4.525S46.267,16.921,43.77,16.921z"
       />
+    </svg>
+    <svg
+      class="fixed top-3 right-[3.25rem] w-8 h-8 grid place-items-center z-[1000] text-gray-200 fill-current bg-black opacity-90 rounded p-[0.3rem] hover:opacity-75 cursor-pointer"
+      viewBox="0 0 24 24"
+      height="24"
+      width="24"
+      xmlns="http://www.w3.org/2000/svg"
+      @click="addDraggableItem"
+    >
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        d="M12 4C12.5523 4 13 4.44772 13 5V11H19C19.5523 11 20 11.4477 20 12C20 12.5523 19.5523 13 19 13H13V19C13 19.5523 12.5523 20 12 20C11.4477 20 11 19.5523 11 19V13H5C4.44772 13 4 12.5523 4 12C4 11.4477 4.44772 11 5 11H11V5C11 4.44772 11.4477 4 12 4Z"
+      ></path>
     </svg>
     <SettingsWindow v-show="settingsAreOpen" @close="settingsAreOpen = false" />
     <LandscapeSummary v-show="$store.state.preferences.showSummary" />
@@ -126,6 +139,9 @@ export default {
       this.settingsAreOpen = !this.settingsAreOpen
       e.currentTarget.blur()
     },
+    addDraggableItem() {
+      this.$store.commit('addDraggableItem')
+    }
   },
   mounted() {
     const mainContainer = this.$refs.mainContainer

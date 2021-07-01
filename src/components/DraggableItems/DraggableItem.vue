@@ -55,13 +55,21 @@ export default {
     temporaryPosition: {
       type: [Object, null],
     },
+    isBeingDragged: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     offsetTop() {
-      return `${this.temporaryPosition?.y ?? this.item.position?.y}px`
+      return `${
+        this.isBeingDragged ? this.temporaryPosition?.y : this.item.position?.y
+      }px`
     },
     offsetLeft() {
-      return `${this.temporaryPosition?.x ?? this.item.position?.x}px`
+      return `${
+        this.isBeingDragged ? this.temporaryPosition?.x : this.item.position?.x
+      }px`
     },
     itemText: {
       get() {
