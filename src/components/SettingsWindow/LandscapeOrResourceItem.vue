@@ -15,6 +15,8 @@
           :style="{ color: expanded ? item.color : item.invertedColor }"
           @keydown.esc="handleEscapeKey"
           :ref="item.name"
+          @focus="$store.commit('inputFocused')"
+          @blur="$store.commit('inputBlurred')"
         />
       </div>
       <div v-if="tab == 'landscapes'" class="grid place-items-center h-full w-8">
