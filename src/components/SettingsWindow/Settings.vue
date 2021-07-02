@@ -4,6 +4,7 @@
       `h-[80vh] rounded overflow-hidden bg-black bg-opacity-95 
       fixed right-0 mr-12 top-1/2 transform -translate-y-1/2 z-[1100] flex flex-col`
     "
+    v-click-outside="onClickOutside"
   >
     <div class="flex border-b-2 border-black mx-px h-10">
       <button
@@ -33,6 +34,7 @@
 <script>
 import LandscapesAndResources from './LandscapesAndResources'
 import BoardAndTiles from './BoardAndTiles'
+import vClickOutside from 'v-click-outside'
 
 export default {
   name: 'Menu',
@@ -55,11 +57,17 @@ export default {
       activeTab: 'landscapesAndResources',
     }
   },
+  directives: {
+    clickOutside: vClickOutside.directive
+  },
   methods: {
     selectTab(e, name) {
       this.activeTab = name
       e.currentTarget.blur()
     },
+    onClickOutside() {
+      this.$emit('close')
+    }
   },
 }
 </script>
