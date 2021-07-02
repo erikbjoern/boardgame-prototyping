@@ -44,6 +44,8 @@ export default {
 
       document.addEventListener('mousemove', this.onDrag)
       document.addEventListener('mouseup', this.onDragend)
+
+      this.$store.commit('putDraggableItemOnTop', item.id)
     },
     onDrag(e) {
       const dX = e.pageX - this.originalPositionOnPage.x

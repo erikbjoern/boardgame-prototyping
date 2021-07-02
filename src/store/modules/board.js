@@ -46,11 +46,7 @@ export default {
       targetResource && (targetResource.amount = value)
     },
     addDraggableItem(state) {
-      const board = document.getElementById('board-container')
-      const height = board.offsetHeight
-      const width = board.offsetWidth
-      const randomX = Math.random() * width
-      const randomY = Math.random() * height
+      const boardWidth = document.getElementById('board-container').offsetWidth
       const randomColor = getRandomHexColor()
 
       const newItem = {
@@ -60,12 +56,19 @@ export default {
         title: '',
         text: '',
         position: {
-          x: randomX,
-          y: randomY,
+          x: boardWidth,
+          y: 0,
         },
       }
 
       state.draggableItems.push(newItem)
+    },
+    putDraggableItemOnTop(state, id) {
+      const targetItemIndex = state.draggableItems.findIndex(i => i.id == id)
+      const targetItem = state.draggableItems[targetItemIndex]
+
+      state.draggableItems.push(targetItem)
+      state.draggableItems.splice(targetItemIndex, 1)
     },
     updateDraggableItem(state, { id, property, value }) {
       const targetItem = state.draggableItems.find(i => i.id == id)
