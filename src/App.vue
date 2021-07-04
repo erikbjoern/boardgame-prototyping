@@ -165,7 +165,7 @@ export default {
       e.currentTarget.blur()
     },
     addDraggableItem() {
-      this.$store.commit('addDraggableItem')
+      this.$store.dispatch('addDraggableItem')
     },
   },
   mounted() {

@@ -45,23 +45,8 @@ export default {
       )
       targetResource && (targetResource.amount = value)
     },
-    addDraggableItem(state) {
-      const boardWidth = document.getElementById('board-container').offsetWidth
-      const randomColor = getRandomHexColor()
-
-      const newItem = {
-        id: cuid(),
-        color: randomColor,
-        invertedColorGrayScale: getInvertedHexcolorGrayscale(randomColor),
-        title: '',
-        text: '',
-        position: {
-          x: boardWidth,
-          y: 0,
-        },
-      }
-
-      state.draggableItems.push(newItem)
+    addDraggableItem(state, payload) {
+      state.draggableItems.push(payload)
     },
     putDraggableItemOnTop(state, id) {
       const targetItemIndex = state.draggableItems.findIndex(i => i.id == id)
@@ -80,6 +65,28 @@ export default {
     },
   },
   actions: {
+    addDraggableItem({ commit, rootState }) {
+      const board = document.getElementById('board-container')
+      const randomColor = getRandomHexColor()
+      const initialX =
+        (visualViewport.width - 140 - board.getBoundingClientRect().left) /
+        rootState.grid.scale
+      const initialY = (70 - board.getBoundingClientRect().top) / rootState.grid.scale
+
+      const newItem = {
+        id: cuid(),
+        color: randomColor,
+        invertedColorGrayScale: getInvertedHexcolorGrayscale(randomColor),
+        title: '',
+        text: '',
+        position: {
+          x: initialX,
+          y: initialY,
+        },
+      }
+
+      commit('addDraggableItem', newItem)
+    },
     getRowFromStash({ state }, index) {
       return state.tileRowsStash[index] || null
     },
