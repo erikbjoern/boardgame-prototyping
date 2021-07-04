@@ -19,4 +19,10 @@ export default {
   inputBlurred(state) {
     state.hasFocusedInput = false
   },
+  draggableIsOnDropzone(state, payload) {
+    state.draggableIsOnDropzone = payload
+  },
+  draggableIsBeingDragged(state, payload) {
+    state.draggableIsBeingDragged = payload
+  },
 }

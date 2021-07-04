@@ -46,10 +46,23 @@ export default {
       document.addEventListener('mouseup', this.onDragend)
 
       this.$store.commit('putDraggableItemOnTop', item.id)
+      this.$store.commit('draggableIsBeingDragged', true)
     },
     onDrag(e) {
       const dX = e.pageX - this.originalPositionOnPage.x
       const dY = e.pageY - this.originalPositionOnPage.y
+
+      const screenHeight = visualViewport.height
+
+      if (e.screenX < 100 && e.screenY > screenHeight - 100) {
+        if (!this.$store.state.draggableIsOnDropzone) {
+          this.$store.commit('draggableIsOnDropzone', true)
+        }
+      } else {
+        if (this.$store.state.draggableIsOnDropzone) {
+          this.$store.commit('draggableIsOnDropzone', false)
+        }
+      }
 
       this.temporaryPosition = {
         x: this.originalPosition.x + dX / this.$store.state.grid.scale,
@@ -61,7 +74,13 @@ export default {
       const property = 'position'
       const value = this.temporaryPosition ?? this.itemBeingDragged.position
 
-      this.$store.commit('updateDraggableItem', { id, property, value })
+      if (this.$store.state.draggableIsOnDropzone) {
+        this.$store.commit('deleteDraggableItem', id)
+        this.$store.commit('draggableIsOnDropzone', false)
+      } else {
+        this.$store.commit('updateDraggableItem', { id, property, value })
+      }
+      this.$store.commit('draggableIsBeingDragged', false)
 
       this.temporaryPosition = null
       this.originalPosition = null

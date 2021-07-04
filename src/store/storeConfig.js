@@ -13,6 +13,8 @@ const initialState = {
     viewportWidth: window.visualViewport?.width || 1400,
     keysPressed: [],
     hasFocusedInput: false,
+    draggableIsBeingDragged: false,
+    draggableIsOnDropzone: false,
   },
   board: {
     tileRows: [],

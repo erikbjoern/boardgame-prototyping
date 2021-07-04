@@ -74,6 +74,10 @@ export default {
       const targetItem = state.draggableItems.find(i => i.id == id)
       targetItem?.hasOwnProperty(property) && (targetItem[property] = value)
     },
+    deleteDraggableItem(state, id) {
+      const targetItemIndex = state.draggableItems.findIndex(i => i.id == id)
+      state.draggableItems.splice(targetItemIndex, 1)
+    },
   },
   actions: {
     getRowFromStash({ state }, index) {
