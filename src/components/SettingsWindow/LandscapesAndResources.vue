@@ -1,9 +1,9 @@
 <template>
   <div class="relative rounded flex h-full items-stretch" id="resource-settings">
     <div class="flex-1">
-      <div class="h-full flex flex-col space-y-3 w-36 mx-auto pt-[3.5rem]">
+      <div class="h-full flex flex-col space-y-3 w-[11rem] mx-auto pt-[3.5rem]">
         <button
-          class="!bg-[#197c4a] text-[#eaffea] !rounded-full flex px-3"
+          class="!bg-[#197c4a] text-[#eaffea] !rounded-full flex px-3 w-full"
           @click="addNew('addLandscape', 'landscapes')"
         >
           <svg
@@ -24,7 +24,7 @@
           </span>
         </button>
         <button
-          class="!bg-[#197c4a] text-[#eaffea] !rounded-full flex px-3"
+          class="!bg-[#197c4a] text-[#eaffea] !rounded-full flex px-3 w-full"
           @click="addNew('addResource', 'resources')"
         >
           <svg
@@ -45,7 +45,7 @@
           </span>
         </button>
         <button
-          class="text-[#eaffea] !rounded-full flex px-3 bg-yellow-600"
+          class="text-[#eaffea] !rounded-full flex px-3 bg-yellow-600 w-full"
           @click="
             e => {
               resetState()
@@ -69,7 +69,7 @@
           <span class="ml-1">Återställ</span>
         </button>
         <button
-          class="text-[#eaffea] !rounded-full flex px-3"
+          class="text-[#eaffea] !rounded-full flex px-3 w-full"
           :class="removalMode ? '!bg-[#369]' : '!bg-[#901312]'"
           @click="
             e => {
@@ -103,23 +103,14 @@
           </span>
         </button>
         <button
-          class="h-8 border rounded  text-sm tracking-wide bg-black !mt-auto"
-          :class="
-            $store.state.preferences.showOverview
-              ? '!border-green-500 text-green-200'
-              : 'border-gray-300 text-gray-300 !bg-opacity-10'
-          "
+          class="btn w-full !mt-auto"
+          :class="$store.state.preferences.showOverview && 'btn-active'"
           @click="e => toggleVisibility(e, 'Overview')"
         >
           {{ $store.state.preferences.showOverview ? 'Visar' : 'Visa' }} översikt
         </button>
         <button
-          class="h-8 border rounded  text-sm tracking-wide bg-black"
-          :class="
-            $store.state.preferences.showSummary
-              ? '!border-green-500 text-green-200'
-              : 'border-gray-300 text-gray-300 !bg-opacity-10'
-          "
+          :class="$store.state.preferences.showSummary ? 'btn w-full btn-active' : 'btn'"
           @click="e => toggleVisibility(e, 'Summary')"
         >
           {{ $store.state.preferences.showSummary ? 'Visar' : 'Visa' }} summering
