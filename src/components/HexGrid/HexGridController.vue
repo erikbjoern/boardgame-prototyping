@@ -24,7 +24,7 @@ export default {
   methods: {
     ...mapActions([
       'getRowFromStash',
-      'setInitialState',
+      'setApplicationState',
       'storeTileRow',
       'storeModifiedTileRow',
     ]),
@@ -179,7 +179,7 @@ export default {
     },
   },
   async created() {
-    await this.setInitialState()
+    await this.setApplicationState()
 
     const stashedRowsCount = this.tileRows.length
     this.addTileRows(this.rowCount, stashedRowsCount)

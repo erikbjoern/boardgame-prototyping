@@ -50,3 +50,10 @@ body {
   border: 1px solid #197c4acc;
   border-right: 2px solid #197c4acc;
 }
+
+.swal2-container {
+  z-index: 1200;
+}
+.swal2-confirm {
+  background-color: #197c4a !important;
+}

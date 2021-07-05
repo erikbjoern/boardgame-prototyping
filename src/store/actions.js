@@ -1,5 +1,6 @@
 import localForage from 'localforage'
 import { storeConfig } from '@/store'
+import cuid from 'cuid'
 
 async function performTimeStampCheck(params) {
   const timeStamp = await localForage.getItem('timeStamp')
@@ -17,7 +18,7 @@ async function performTimeStampCheck(params) {
 }
 
 export default {
-  async setInitialGrid({ commit }) {
+  async setInitialGrid({ commit }, settings) {
     const savedData = (await localForage.getItem('grid')) || {}
 
     let gridData = {}
@@ -26,19 +27,19 @@ export default {
       gridData[key] = savedData[key] || value
     })
 
-    commit('setGridState', gridData || storeConfig.initialState.grid)
+    commit('setGridState', (settings?.grid ?? gridData) || storeConfig.initialState.grid)
   },
-  async setInitialLandscapes({ commit }) {
+  async setInitialLandscapes({ commit }, settings) {
     const savedData = (await localForage.getItem('landscapes')) || null
 
-    commit('setLandscapeState', savedData || storeConfig.initialState.landscapes)
+    commit('setLandscapeState', (settings?.landscapes ?? savedData) || storeConfig.initialState.landscapes)
   },
-  async setInitialResources({ commit }) {
+  async setInitialResources({ commit }, settings) {
     const savedData = (await localForage.getItem('resources')) || null
 
-    commit('setResourceState', savedData || storeConfig.initialState.resources)
+    commit('setResourceState', (settings?.resources ?? savedData) || storeConfig.initialState.resources)
   },
-  async setInitialBoard({ commit }) {
+  async setInitialBoard({ commit }, settings) {
     const savedData = (await localForage.getItem('board')) || {}
 
     let tileData
@@ -52,24 +53,24 @@ export default {
       }
     }
 
-    commit('setBoardState', tileData || storeConfig.initialState.board)
+    commit('setBoardState', (settings?.board ?? tileData) || storeConfig.initialState.board)
   },
-  async setInitialPreferences({ commit }) {
+  async setInitialPreferences({ commit }, settings) {
     const savedData = (await localForage.getItem('preferences')) || null
 
-    commit('setPreferencesState', savedData || storeConfig.initialState)
+    commit('setPreferencesState', (settings?.preferences ?? savedData) || storeConfig.initialState.preferences)
   },
-  async setInitialState({ dispatch }) {
+  async setApplicationState({ dispatch }, settings = null) {
     performTimeStampCheck()
 
-    await dispatch('setInitialResources')
+    await dispatch('setInitialResources', settings)
 
     const promises = [
       'setInitialGrid',
       'setInitialLandscapes',
       'setInitialBoard',
       'setInitialPreferences',
-    ].map(action => dispatch(action))
+    ].map(action => dispatch(action, settings))
 
     await Promise.all(promises)
 
@@ -83,4 +84,26 @@ export default {
     localForage.setItem('board', state.board)
     localForage.setItem('timeStamp', new Date())
   },
+  async saveSettings({ state }, name) {
+    const id = cuid()
+    const settings = Object.assign(
+      ...Object.entries(state)
+        .filter(([k, v]) => !Object.keys(storeConfig.initialState.root).includes(k))
+        .map(([k, v]) => ({ [k]: v }))
+    )
+
+    const newMetaEntry = { id, name, date: new Date() }
+    const allMetaEntries = [newMetaEntry]
+    const savedSettingsMeta = await localForage.getItem('savedSettingsMeta')
+
+    if (savedSettingsMeta?.length) allMetaEntries.push(...savedSettingsMeta)
+
+    localForage.setItem(`savedSettings:${id}`, settings)
+    localForage.setItem('savedSettingsMeta', allMetaEntries)
+  },
+  async loadSettings({ dispatch }, id) {
+    const savedSettings = await localForage.getItem(`savedSettings:${id}`)
+
+    dispatch('setApplicationState', savedSettings)
+  }
 }

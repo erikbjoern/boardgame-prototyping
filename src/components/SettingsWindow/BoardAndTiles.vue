@@ -29,7 +29,6 @@
 </template>
 
 <script>
-import EventBus from '@/eventBus'
 import GridSettingsItem from './GridSettingsItem'
 import { scrollToCenter } from '@/helpers/scroll.js'
 

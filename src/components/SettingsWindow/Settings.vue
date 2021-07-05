@@ -19,6 +19,12 @@
         <button class="btn w-full rounded-full" @click="generateNewTiles">
           Generera nytt bräde
         </button>
+        <button class="btn w-full rounded-full" @click="saveSettings">
+          Spara
+        </button>
+        <button class="btn w-full rounded-full" @click="loadSettings">
+          Ladda
+        </button>
       </div>
     </div>
     <div class="flex flex-col">
@@ -52,12 +58,18 @@
 import LandscapesAndResources from './LandscapesAndResources'
 import BoardAndTiles from './BoardAndTiles'
 import vClickOutside from 'v-click-outside'
+import EventBus from '@/eventBus'
+import localForage from 'localforage'
+import { scrollToCenter } from '@/helpers/scroll.js'
 
 export default {
   name: 'Menu',
   components: {
     LandscapesAndResources,
     BoardAndTiles,
+  },
+  directives: {
+    clickOutside: vClickOutside.directive,
   },
   data() {
     return {
@@ -74,24 +86,76 @@ export default {
       activeTab: 'landscapesAndResources',
     }
   },
-  directives: {
-    clickOutside: vClickOutside.directive,
-  },
   methods: {
     selectTab(e, name) {
       this.activeTab = name
       e.currentTarget.blur()
     },
     onClickOutside() {
-      this.$emit('close')
+      if (!document.documentElement.classList.contains('swal2-shown')) this.$emit('close')
     },
     generateNewResourceValues() {
       EventBus.$emit('reassignResources')
-      this.$emit('close')
     },
     generateNewTiles() {
       this.$store.dispatch('generateNewTiles')
       scrollToCenter()
+    },
+    async saveSettings() {
+      const dialog = await this.$swal({
+        title: 'Spara nuvarande inställningar',
+        input: 'text',
+        inputAttributes: {
+          autocapitalize: 'off',
+        },
+        inputPlaceholder: 'Ny inställningsprofil',
+        showCancelButton: true,
+        confirmButtonText: 'Spara',
+        cancelButtonText: 'Avbryt',
+        showLoaderOnConfirm: true,
+        allowOutsideClick: true,
+        preConfirm: () => {},
+      })
+
+      if (dialog.isConfirmed) {
+        const saveFileName = dialog.value || 'Ny inställningsprofil'
+        this.$store.dispatch('saveSettings', saveFileName)
+      }
+    },
+    async loadSettings() {
+      const savedSettingsMeta = await localForage.getItem('savedSettingsMeta')
+      const inputOptions = Object.assign(
+        ...savedSettingsMeta
+          .sort((a, b) => a.date - b.date)
+          .map(m => ({ [m.id]: `${m.name} (${m.date.toString().slice(0, 15)})` }))
+      )
+
+      const dialog = await this.$swal({
+        title: 'Ladda sparade inställningar',
+        input: 'select',
+        inputOptions,
+        inputPlaceholder: 'Välj inställning',
+        showCancelButton: true,
+        confirmButtonText: 'Ladda',
+        cancelButtonText: 'Avbryt',
+        showLoaderOnConfirm: true,
+        allowOutsideClick: true,
+        inputValidator: value => {
+          return new Promise(resolve => {
+            if (!!value) {
+              resolve()
+            } else {
+              resolve('Du har inte valt någon sparad inställning')
+            }
+          })
+        },
+      })
+
+      if (dialog.isConfirmed) {
+        const saveFileId = dialog.value
+
+        this.$store.dispatch('loadSettings', saveFileId)
+      }
     },
   },
 }

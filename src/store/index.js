@@ -4,9 +4,11 @@ import { StoreConfig } from './storeConfig'
 
 Vue.use(Vuex)
 
-export const storeConfig = new StoreConfig()
+const storeConfiguration = new StoreConfig()
 
-const store = new Vuex.Store(storeConfig.create())
+export const storeConfig = JSON.parse(JSON.stringify(storeConfiguration))
+
+const store = new Vuex.Store(storeConfiguration.create())
 
 let updateLocalStorageTimer = undefined
 

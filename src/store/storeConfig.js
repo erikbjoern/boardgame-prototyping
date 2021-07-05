@@ -15,7 +15,7 @@ const initialState = {
     hasFocusedInput: false,
     draggableIsBeingDragged: false,
     draggableIsOnDropzone: false,
-  },
+  },  
   board: {
     tileRows: [],
     tileRowsStash: [],
