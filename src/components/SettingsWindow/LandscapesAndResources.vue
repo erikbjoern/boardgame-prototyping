@@ -118,6 +118,7 @@
       </div>
     </div>
     <div class="flex flex-col items-center space-y-6 flex-1 min-h-0">
+      <p class="text-[#9f9f9f]">Inställningar för nytt bräde</p>
       <div class="h-8 w-full flex items-center px-[1.25rem]">
         <div class="flex w-full rounded overflow-hidden">
           <button
@@ -128,12 +129,12 @@
             :key="label"
             class="flex-1 bg-black border h-8"
             :class="[
-              tab == tabName
+              activeTab == tabName
                 ? '!bg-opacity-100 text-[#eeeeee] border-green-500 border hover:!bg-opacity-100'
                 : '!bg-opacity-10 text-[#9f9f9f]',
               tabName == 'landscapes' ? 'rounded-tl rounded-bl' : 'rounded-tr rounded-br',
-              tab == 'landscapes' && index == 1 && 'border-l-0',
-              tab == 'resources' && index == 0 && 'border-r-0',
+              activeTab == 'landscapes' && index == 1 && 'border-l-0',
+              activeTab == 'resources' && index == 0 && 'border-r-0',
             ]"
             @click="e => switchTab(e, tabName)"
           >
@@ -156,10 +157,11 @@
             :class="index !== 0 && 'mt-3'"
             :key="item.name"
             :item="item"
-            :tab="tab"
+            :tab="activeTab"
             :focusAddedItem="focusAddedItem"
             @didFocusAddedItem="focusAddedItem = false"
             :removalMode="removalMode"
+            :expandable="true"
           />
         </transition-group>
       </div>
@@ -202,7 +204,7 @@ export default {
   },
   data() {
     return {
-      tab: 'landscapes',
+      activeTab: 'landscapes',
       focusAddedItem: false,
       removalMode: false,
       renderKey: 0,
@@ -210,7 +212,7 @@ export default {
   },
   computed: {
     currentDataSet() {
-      return this.$store.state[this.tab].data
+      return this.$store.state[this.activeTab].data
     },
   },
   methods: {
@@ -219,26 +221,26 @@ export default {
       e.target.blur()
     },
     switchTab(e, tabName) {
-      this.tab = tabName
+      this.activeTab = tabName
       e?.currentTarget.blur()
       this.renderKey++
     },
     addNew(mutation, tabName) {
       this.$store.commit(mutation)
 
-      if (tabName !== this.tab) {
+      if (tabName !== this.activeTab) {
         this.focusAddedItem = true
         this.switchTab(undefined, tabName)
       }
     },
     resetState() {
-      const action = this.tab == 'landscapes' ? 'resetLandscapes' : 'resetResources'
+      const action = this.activeTab == 'landscapes' ? 'resetLandscapes' : 'resetResources'
       this.$store.dispatch(action)
       this.renderKey++
     },
     async removeAll() {
       const action =
-        this.tab == 'landscapes' ? 'removeAllLandscapes' : 'removeAllResources'
+        this.activeTab == 'landscapes' ? 'removeAllLandscapes' : 'removeAllResources'
       this.$store.dispatch(action)
     },
   },

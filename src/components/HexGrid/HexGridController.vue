@@ -41,7 +41,7 @@ export default {
           resources.push({
             name,
             amount,
-            backgroundColor: this.$store.getters.resourceColors[name],
+            backgroundColor: this.$store.getters.resourceColors.main[name],
           })
         }
       }
@@ -70,20 +70,17 @@ export default {
           const stashedTile = stashedRow ? stashedRow[newRow.length] : null
           let landscapeType
           let resources
-          let color
           let id
 
           if (!stashedTile) {
             landscapeType = this.getLandscapeType()
             resources = this.getResources(landscapeType)
-            color = this.$store.getters.landscapeColors[landscapeType]
             id = cuid()
           }
 
           tile = stashedTile || {
             landscapeType,
             resources,
-            color,
             id,
           }
         }

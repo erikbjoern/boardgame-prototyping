@@ -19,7 +19,7 @@
           @blur="$store.commit('inputBlurred')"
         />
       </div>
-      <div v-if="tab == 'landscapes'" class="grid place-items-center h-full w-8">
+      <div v-if="expandable && tab == 'landscapes'" class="grid place-items-center h-full w-8">
         <svg
           class="transition-all duration-300 select-none cursor-pointer hover:opacity-50 transform"
           :class="expanded ? 'rotate-180 translate-y-px' : '-translate-y-0'"
@@ -81,7 +81,7 @@
       </div>
     </div>
     <div
-      v-if="expanded"
+      v-if="expandable && expanded"
       class="flex flex-col items-stretch space-y-2 p-2 rounded-b"
       :style="{
         backgroundColor: item.color,
@@ -118,8 +118,8 @@
           :key="resource.name + index"
           class="flex justify-between p-2 w-full rounded"
           :style="{
-            backgroundColor: $store.getters.resourceColors[resource.name],
-            color: $store.getters.invertedResourceColors[resource.name],
+            backgroundColor: $store.getters.resourceColors.main[resource.name],
+            color: $store.getters.resourceColors.inverted[resource.name],
           }"
         >
           <span class="inline-block flex-1 font-semibold">{{ resource.name }}</span>
@@ -140,7 +140,7 @@
                       <input
                         class="text-gray-900 font-semibold text-center w-8 bg-transparent"
                         :style="{
-                          color: $store.getters.invertedResourceColors[resource.name],
+                          color: $store.getters.resourceColors.inverted[resource.name],
                         }"
                         type="number"
                         name="min"
@@ -159,7 +159,7 @@
                       <input
                         class="text-gray-900 font-semibold text-center bg-transparent w-8"
                         :style="{
-                          color: $store.getters.invertedResourceColors[resource.name],
+                          color: $store.getters.resourceColors.inverted[resource.name],
                         }"
                         type="number"
                         name="max"
@@ -213,8 +213,8 @@
         </option>
         <option
           :style="{
-            color: $store.getters.invertedResourceColors[resource.name],
-            backgroundColor: $store.getters.resourceColors[resource.name],
+            color: $store.getters.resourceColors.inverted[resource.name],
+            backgroundColor: $store.getters.resourceColors.main[resource.name],
           }"
           v-for="resource of otherAvailableResources"
           :key="resource.name"
@@ -240,7 +240,28 @@ export default {
     StoneIcon,
     WheatIcon,
   },
-  props: ['item', 'tab', 'focusAddedItem', 'removalMode'],
+  props: {
+    item: {
+      type: Object,
+      required: true,
+    },
+    tab: {
+      type: String,
+      required: false,
+    },
+    focusAddedItem: {
+      type: Boolean,
+      default: false,
+    },
+    removalMode: {
+      type: Boolean,
+      default: false,
+    },
+    expandable: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       expanded: false,

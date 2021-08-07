@@ -1,5 +1,9 @@
 import Vue from 'vue'
-import { getRandomHexColor, getInvertedHexColor } from '@/helpers/getDynamicColor.js'
+import {
+  getRandomHexColor,
+  getInvertedHexColor,
+  getInvertedHexcolorGrayscale,
+} from '@/helpers/getDynamicColor.js'
 import { getUniqueDefaultName } from '@/helpers/getUniqueName.js'
 import { storeConfig } from '@/store'
 
@@ -16,13 +20,16 @@ export default {
   getters: {
     resourceColors(state) {
       if (state.data.length) {
-        return Object.assign(...state.data.map(r => ({ [r.name]: r.color })))
-      } else return []
-    },
-    invertedResourceColors(state) {
-      if (state.data.length) {
-        return Object.assign(...state.data.map(r => ({ [r.name]: r.invertedColor })))
-      } else return []
+        return {
+          main: Object.assign(...state.data.map(r => ({ [r.name]: r.color }))),
+          inverted: Object.assign(
+            ...state.data.map(r => ({ [r.name]: r.invertedColor }))
+          ),
+          grayscale: Object.assign(
+            ...state.data.map(r => ({ [r.name]: r.invertedColorGrayscale }))
+          ),
+        }
+      } else return {}
     },
   },
   mutations: {
@@ -45,6 +52,7 @@ export default {
         name,
         color,
         invertedColor: getInvertedHexColor(color),
+        invertedColorGrayscale: getInvertedHexcolorGrayscale(color),
       }
 
       state.data.push(payload)

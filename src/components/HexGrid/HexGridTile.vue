@@ -25,8 +25,8 @@
               :key="resource.name"
               class="resourceItem"
               :style="{
-                backgroundColor: resource.backgroundColor,
-                color: getInvertedHexcolorGrayscale(resource.backgroundColor),
+                backgroundColor: $store.getters.landscapeColors.main[resource.name],
+                color: $store.getters.landscapeColors.grayscale[resource.name],
               }"
             >
               <WoodIcon v-if="resource.name == 'wood' && tileIsLargeEnough" />
@@ -94,7 +94,7 @@ export default {
       return {
         display: 'flex',
         gap: `${1 / 50}vw`,
-        backgroundColor: this.tile.color,
+        backgroundColor: this.$store.getters.landscapeColors.main[this.tile.landscapeType],
         fontSize: `clamp(8px, ${1 / 10}vw, 20px`,
         height: `${100 - this.borderWidth}%`,
         width: `${100 - this.borderWidth}%`,

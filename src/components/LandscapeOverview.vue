@@ -63,8 +63,8 @@
               class="rounded px-2 flex justify-between font-mono space-x-6"
               :class="isExpanded(landscape.name) && 'w-full'"
               :style="{
-                backgroundColor: $store.getters.resourceColors[resource.name],
-                color: $store.getters.invertedResourceColors[resource.name],
+                backgroundColor: $store.getters.resourceColors.main[resource.name],
+                color: $store.getters.resourceColors.inverted[resource.name],
               }"
             >
               <p v-if="isExpanded(landscape.name)" class="font-semibold truncate">

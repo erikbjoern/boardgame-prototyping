@@ -7,8 +7,8 @@
       v-for="(value, name) in totalResources"
       :key="name"
       :style="{
-        backgroundColor: $store.getters.resourceColors[name],
-        color: $store.getters.invertedResourceColors[name],
+        backgroundColor: $store.getters.resourceColors.main[name],
+        color: $store.getters.resourceColors.inverted[name],
       }"
     >
       {{ name }}:

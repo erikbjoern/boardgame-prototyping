@@ -104,7 +104,7 @@ export default {
   data() {
     return {
       mousePosition: { x: 0, y: 0 },
-      settingsAreOpen: false,
+      settingsAreOpen: true,
     }
   },
   methods: {

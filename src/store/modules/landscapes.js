@@ -11,6 +11,7 @@ export default {
         fraction: 0,
         color: '#efefef',
         invertedColor: '#0f0f0f',
+        invertedColorGrayscale: '#0f0f0f',
         resources: [
           {
             name: '',
@@ -31,7 +32,17 @@ export default {
       return fractions.reduce((a, b) => a + b, 0)
     },
     landscapeColors(state) {
-      return Object.assign(...state.data.map(l => ({ [l.name]: l.color })))
+      if (state.data.length) {
+        return {
+          main: Object.assign(...state.data.map(l => ({ [l.name]: l.color }))),
+          inverted: Object.assign(
+            ...state.data.map(l => ({ [l.name]: l.invertedColor }))
+          ),
+          grayscale: Object.assign(
+            ...state.data.map(l => ({ [l.name]: l.invertedColorGrayscale }))
+          ),
+        }
+      } else return {}
     },
   },
   mutations: {
@@ -59,6 +70,7 @@ export default {
         fraction: 1,
         color,
         invertedColor: getInvertedHexColor(color),
+        invertedColorGrayscale: getInvertedHexcolorGrayscale(color),
         resources: [],
       }
 
