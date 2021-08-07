@@ -435,6 +435,9 @@ export default {
         this.itemColor = value
       }, 500)
     },
+    itemColor(value) {
+      this.temporaryItemColor = value
+    }
   },
 }
 </script>
