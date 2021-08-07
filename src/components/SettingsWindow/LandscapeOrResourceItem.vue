@@ -1,30 +1,40 @@
 <template>
   <div class="flex flex-col" style="width: calc(310px - 1.25rem) !important">
     <div
-      class="flex w-full p-2 transition-colors duration-300 rounded"
-      :class="expanded && 'rounded-b-none'"
+      class="flex w-full p-2 rounded"
+      :class="[
+        expanded && 'rounded-b-none',
+        !colorPickerIsOpen && 'transition-colors duration-300',
+      ]"
       :style="{
-        backgroundColor: expanded ? item.invertedColor : item.color,
+        backgroundColor: expanded ? invertedTemporaryItemColor : temporaryItemColor,
       }"
     >
       <div class="flex-shrink w-1/2 relative">
         <input
-          class="font-semibold w-full bg-transparent mr-2 transition-colors duration-300"
+          class="font-semibold w-full bg-transparent mr-2"
+          :class="!colorPickerIsOpen && 'transition-colors duration-300'"
           name="name"
           v-model.lazy="name"
-          :style="{ color: expanded ? item.color : item.invertedColor }"
+          :style="{ color: expanded ? temporaryItemColor : invertedTemporaryItemColor }"
           @keydown.esc="handleEscapeKey"
           :ref="item.name"
           @focus="$store.commit('inputFocused')"
           @blur="$store.commit('inputBlurred')"
         />
       </div>
-      <div v-if="expandable && tab == 'landscapes'" class="grid place-items-center h-full w-8">
+      <div
+        v-if="expandable && tab == 'landscapes'"
+        class="grid place-items-center h-full w-8"
+      >
         <svg
-          class="transition-all duration-300 select-none cursor-pointer hover:opacity-50 transform"
-          :class="expanded ? 'rotate-180 translate-y-px' : '-translate-y-0'"
+          class="select-none cursor-pointer hover:opacity-50 transform"
+          :class="[
+            expanded ? 'rotate-180 translate-y-px' : '-translate-y-0',
+            !colorPickerIsOpen && 'transition-all duration-300',
+          ]"
           :style="{
-            color: expanded ? item.color : item.invertedColor,
+            color: expanded ? temporaryItemColor : invertedTemporaryItemColor,
           }"
           @click="expanded = !expanded"
           viewBox="0 0 24 24"
@@ -41,24 +51,34 @@
       </div>
       <div class="w-1/2 flex-shrink flex items-center">
         <div
-          class="grid place-items-center ml-auto transition-all overflow-hidden"
-          :class="
+          class="grid place-items-center ml-auto overflow-hidden"
+          :class="[
             removalMode
               ? 'cursor-pointer rounded-lg h-5 w-5 shadow'
-              : 'rounded-md h-full w-20'
-          "
-          :style="{ backgroundColor: removalMode ? '#992222' : item.invertedColor }"
+              : 'rounded-md h-full w-20',
+            !colorPickerIsOpen && 'transition-all duration-300',
+          ]"
+          :style="{
+            backgroundColor: removalMode ? '#992222' : invertedTemporaryItemColor,
+          }"
         >
           <transition name="fade" mode="out-in">
             <div v-if="!removalMode" class="w-full">
-              <input v-model="itemColor" type="color" class="absolute opacity-0 ml-5" />
+              <input
+                v-model="temporaryItemColor"
+                type="color"
+                class="absolute opacity-0 ml-5"
+                :id="`color-for-${item.name}`"
+                @click="colorPickerIsOpen = true"
+                v-click-outside="() => (colorPickerIsOpen = false)"
+              />
               <input
                 v-model.lazy="itemColor"
                 type="text"
                 @keydown.esc="handleEscapeKey"
                 name="color"
                 class="bg-transparent text-center w-full font-semibold text-sm"
-                :style="{ color: item.color }"
+                :style="{ color: temporaryItemColor }"
               />
             </div>
             <button v-else @click="remove(item)">
@@ -84,8 +104,8 @@
       v-if="expandable && expanded"
       class="flex flex-col items-stretch space-y-2 p-2 rounded-b"
       :style="{
-        backgroundColor: item.color,
-        color: item.invertedColor,
+        backgroundColor: temporaryItemColor,
+        color: invertedTemporaryItemColor,
       }"
     >
       <label
@@ -95,11 +115,11 @@
         <div class="inline-flex">
           <div
             class="w-8 rounded"
-            :style="{ backgroundColor: `${item.invertedColor}aa` }"
+            :style="{ backgroundColor: `${invertedTemporaryItemColor}aa` }"
           >
             <input
               class="font-semibold text-center w-8 bg-transparent"
-              :style="{ color: item.color }"
+              :style="{ color: temporaryItemColor }"
               type="text"
               name="fraction"
               :value="item.fraction"
@@ -231,6 +251,7 @@
 import WoodIcon from '@/assets/icons/log.svg'
 import StoneIcon from '@/assets/icons/stone-block.svg'
 import WheatIcon from '@/assets/icons/wheat.svg'
+import vClickOutside from 'v-click-outside'
 import { getInvertedHexColor, getRGBValues } from '@/helpers/getDynamicColor'
 
 export default {
@@ -239,6 +260,9 @@ export default {
     WoodIcon,
     StoneIcon,
     WheatIcon,
+  },
+  directives: {
+    vClickOutside,
   },
   props: {
     item: {
@@ -265,9 +289,14 @@ export default {
   data() {
     return {
       expanded: false,
+      temporaryItemColor: '',
+      colorPickerIsOpen: false,
     }
   },
   computed: {
+    invertedTemporaryItemColor() {
+      return getInvertedHexColor(this.temporaryItemColor)
+    },
     name: {
       get() {
         return this.item.name
@@ -312,6 +341,7 @@ export default {
     },
   },
   methods: {
+    getInvertedHexColor,
     submitChange(e, resourceName = null) {
       const item = this.item
       const property = e.target.name
@@ -392,6 +422,19 @@ export default {
         this.$emit('didFocusAddedItem')
       }
     }
+
+    this.temporaryItemColor = this.item.color
+  },
+  watch: {
+    temporaryItemColor(value) {
+      if (this.debounceColorChange) {
+        clearTimeout(this.debounceColorChange)
+      }
+
+      this.debounceColorChange = setTimeout(() => {
+        this.itemColor = value
+      }, 500)
+    },
   },
 }
 </script>

@@ -25,8 +25,8 @@
               :key="resource.name"
               class="resourceItem"
               :style="{
-                backgroundColor: $store.getters.landscapeColors.main[resource.name],
-                color: $store.getters.landscapeColors.grayscale[resource.name],
+                backgroundColor: $store.getters.resourceColors.main[resource.name],
+                color: $store.getters.resourceColors.grayscale[resource.name],
               }"
             >
               <WoodIcon v-if="resource.name == 'wood' && tileIsLargeEnough" />
@@ -109,7 +109,7 @@ export default {
     resources() {
       return [...this.tile.resources]
         .filter(r => r.amount > 0)
-        .sort((a, b) => a.amount - b.amount)
+        .sort((a, b) => b.amount - a.amount)
     },
   },
   methods: {
