@@ -13,18 +13,9 @@
         <button class="btn rounded-full w-full" @click="resetAdjustments">
           Återställ
         </button>
-        <button
-          class="btn w-full !mt-auto"
-          :class="$store.state.preferences.showResourceValues && 'btn-active'"
-          @click="toggleResourceValuesVisibility"
-        >
-          {{ $store.state.preferences.showResourceValues ? 'Visar' : 'Visa' }}
-          resursvärden
-        </button>
       </div>
     </div>
     <div class="flex flex-col items-center space-y-6 flex-1 min-h-0">
-      <p class="text-[#9f9f9f]">Färger på nuvarande bräde</p>
       <div class="h-8 w-full flex items-center px-[1.25rem]">
         <div class="flex w-full rounded overflow-hidden">
           <button
@@ -58,6 +49,8 @@
           :key="item.name"
           :item="item"
           :tab="activeTab"
+          parentTab="adjustBoard"
+          @change="submitChange"
         />
       </div>
     </div>
@@ -70,7 +63,7 @@ import LandscapeOrResourceItem from './LandscapeOrResourceItem'
 import { scrollToCenter } from '@/helpers/scroll.js'
 
 export default {
-  name: 'BoardAndTiles',
+  name: 'AdjustBoard',
   components: {
     GridSettingsItem,
     LandscapeOrResourceItem,
@@ -126,14 +119,12 @@ export default {
   },
   computed: {
     currentDataSet() {
-      return this.$store.state[this.activeTab].data
+      return Object.entries(
+        this.$store.state.board.colors[this.activeTab].main
+      ).map(([key, value]) => ({ name: key, color: value }))
     },
   },
   methods: {
-    toggleResourceValuesVisibility(e) {
-      this.$store.commit('toggleVisibility', 'ResourceValues')
-      e.currentTarget.blur()
-    },
     resetAdjustments() {
       this.$store.dispatch('resetAdjustments')
       scrollToCenter()
@@ -141,6 +132,13 @@ export default {
     switchTab(e, tabName) {
       this.activeTab = tabName
       e.currentTarget.blur()
+    },
+    submitChange(item, property, value) {
+      this.$store.commit('setBoardColor', {
+        dataset: this.activeTab,
+        itemName: item.name,
+        color: value,
+      })
     },
   },
 }

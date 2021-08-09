@@ -12,11 +12,17 @@
       >
         Inställningar
       </div>
-      <div class="p-2 space-y-3 border-[10px] border-r-0 border-black flex-1 min-h-0">
+      <div
+        class="p-2 space-y-3 border-[10px] border-r-0 border-black flex-1 min-h-0 flex flex-col"
+      >
         <button class="btn w-full rounded-full" @click="generateNewResourceValues">
           Generera nya resursvärden
         </button>
-        <button class="btn w-full rounded-full" @click="generateNewTiles">
+        <button
+          class="btn w-full rounded-full"
+          :class="activeTab == 'newBoard' && 'highlighted'"
+          @click="generateNewTiles"
+        >
           Generera nytt bräde
         </button>
         <button class="btn w-full rounded-full" @click="saveSettings">
@@ -24,6 +30,27 @@
         </button>
         <button class="btn w-full rounded-full" @click="loadSettings">
           Ladda
+        </button>
+        <button
+          class="btn w-full !mt-auto"
+          :class="$store.state.preferences.showResourceValues && 'btn-active'"
+          @click="e => toggleVisibility(e, 'ResourceValues')"
+        >
+          {{ $store.state.preferences.showResourceValues ? 'Visar' : 'Visa' }}
+          resursvärden
+        </button>
+        <button
+          class="btn w-full"
+          :class="$store.state.preferences.showOverview && 'btn-active'"
+          @click="e => toggleVisibility(e, 'Overview')"
+        >
+          {{ $store.state.preferences.showOverview ? 'Visar' : 'Visa' }} översikt
+        </button>
+        <button
+          :class="$store.state.preferences.showSummary ? 'btn w-full btn-active' : 'btn'"
+          @click="e => toggleVisibility(e, 'Summary')"
+        >
+          {{ $store.state.preferences.showSummary ? 'Visar' : 'Visa' }} summering
         </button>
       </div>
     </div>
@@ -47,16 +74,16 @@
         class="shadow-inner border-black border-[10px] py-8 flex-1"
         :style="{ height: 'calc(100vh - 200px)', maxHeight: '80vh', minWidth: '40rem' }"
       >
-        <LandscapesAndResources v-if="activeTab == 'landscapesAndResources'" />
-        <BoardAndTiles v-if="activeTab == 'boardAndTiles'" />
+        <NewBoard v-show="activeTab == 'newBoard'" />
+        <AdjustBoard v-show="activeTab == 'adjustBoard'" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import LandscapesAndResources from './LandscapesAndResources'
-import BoardAndTiles from './BoardAndTiles'
+import NewBoard from './NewBoard'
+import AdjustBoard from './AdjustBoard'
 import vClickOutside from 'v-click-outside'
 import EventBus from '@/eventBus'
 import localForage from 'localforage'
@@ -65,8 +92,8 @@ import { scrollToCenter } from '@/helpers/scroll.js'
 export default {
   name: 'Menu',
   components: {
-    LandscapesAndResources,
-    BoardAndTiles,
+    NewBoard,
+    AdjustBoard,
   },
   directives: {
     clickOutside: vClickOutside.directive,
@@ -75,15 +102,15 @@ export default {
     return {
       tabs: [
         {
-          name: 'landscapesAndResources',
-          label: 'Landskap & Resurser',
+          name: 'newBoard',
+          label: 'Nytt Bräde',
         },
         {
-          name: 'boardAndTiles',
-          label: 'Bräde & Brickor',
+          name: 'adjustBoard',
+          label: 'Justera Bräde',
         },
       ],
-      activeTab: 'landscapesAndResources',
+      activeTab: 'newBoard',
     }
   },
   methods: {
@@ -100,6 +127,10 @@ export default {
     generateNewTiles() {
       this.$store.dispatch('generateNewTiles')
       scrollToCenter()
+    },
+    toggleVisibility(e, item) {
+      this.$store.commit('toggleVisibility', item)
+      e.target.blur()
     },
     async saveSettings() {
       const dialog = await this.$swal({

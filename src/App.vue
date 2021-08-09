@@ -148,7 +148,7 @@ export default {
         }
       }
 
-      if (e.keyCode == 93 && this.$store.state.keysPressed.length == 0) {
+      if (e.keyCode == 17 && this.$store.state.keysPressed.length == 0) {
         document.getElementById('board-container').style.cursor = 'pointer'
         this.$store.commit('keydown', e.keyCode)
       }

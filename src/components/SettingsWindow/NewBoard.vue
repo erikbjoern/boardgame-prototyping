@@ -102,23 +102,9 @@
             {{ removalMode ? 'Klar' : 'Ta bort...' }}
           </span>
         </button>
-        <button
-          class="btn w-full !mt-auto"
-          :class="$store.state.preferences.showOverview && 'btn-active'"
-          @click="e => toggleVisibility(e, 'Overview')"
-        >
-          {{ $store.state.preferences.showOverview ? 'Visar' : 'Visa' }} översikt
-        </button>
-        <button
-          :class="$store.state.preferences.showSummary ? 'btn w-full btn-active' : 'btn'"
-          @click="e => toggleVisibility(e, 'Summary')"
-        >
-          {{ $store.state.preferences.showSummary ? 'Visar' : 'Visa' }} summering
-        </button>
       </div>
     </div>
     <div class="flex flex-col items-center space-y-6 flex-1 min-h-0">
-      <p class="text-[#9f9f9f]">Inställningar för nytt bräde</p>
       <div class="h-8 w-full flex items-center px-[1.25rem]">
         <div class="flex w-full rounded overflow-hidden">
           <button
@@ -162,6 +148,7 @@
             @didFocusAddedItem="focusAddedItem = false"
             :removalMode="removalMode"
             :expandable="true"
+            @change="submitChange"
           />
         </transition-group>
       </div>
@@ -198,7 +185,7 @@
 import LandscapeOrResourceItem from './LandscapeOrResourceItem'
 
 export default {
-  name: 'LandscapesAndResources',
+  name: 'NewBoard',
   components: {
     LandscapeOrResourceItem,
   },
@@ -216,10 +203,6 @@ export default {
     },
   },
   methods: {
-    toggleVisibility(e, item) {
-      this.$store.commit('toggleVisibility', item)
-      e.target.blur()
-    },
     switchTab(e, tabName) {
       this.activeTab = tabName
       e?.currentTarget.blur()
@@ -242,6 +225,38 @@ export default {
       const action =
         this.activeTab == 'landscapes' ? 'removeAllLandscapes' : 'removeAllResources'
       this.$store.dispatch(action)
+    },
+    submitChange(item, property, value, resource) {
+      let mutation
+      const resourceName = resource?.name
+
+      if (resource) {
+        mutation = 'setResourceValueOnLandscape'
+  
+        if (
+          (property == 'max' && value < resource.min) ||
+          (property == 'min' && value > resource.max)
+        ) {
+          this.$store.commit(mutation, {
+            name: item.name,
+            property: property == 'max' ? 'min' : 'max',
+            value,
+            resourceName,
+          })
+        }
+      } else {
+        mutation =
+          this.activeTab == 'landscapes'
+            ? 'setLandscapeParameter'
+            : 'setResourceParameter'
+      }
+
+      this.$store.commit(mutation, {
+        name: item.name,
+        property,
+        value,
+        ...(resourceName && { resourceName }),
+      })
     },
   },
 }

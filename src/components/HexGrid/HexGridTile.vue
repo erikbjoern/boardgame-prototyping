@@ -25,8 +25,8 @@
               :key="resource.name"
               class="resourceItem"
               :style="{
-                backgroundColor: $store.getters.resourceColors.main[resource.name],
-                color: $store.getters.resourceColors.grayscale[resource.name],
+                backgroundColor: $store.state.board.colors.resources.main[resource.name],
+                color: $store.state.board.colors.resources.grayscale[resource.name],
               }"
             >
               <WoodIcon v-if="resource.name == 'wood' && tileIsLargeEnough" />
@@ -94,7 +94,7 @@ export default {
       return {
         display: 'flex',
         gap: `${1 / 50}vw`,
-        backgroundColor: this.$store.getters.landscapeColors.main[this.tile.landscapeType],
+        backgroundColor: this.$store.state.board.colors.landscapes.main[this.tile.landscapeType],
         fontSize: `clamp(8px, ${1 / 10}vw, 20px`,
         height: `${100 - this.borderWidth}%`,
         width: `${100 - this.borderWidth}%`,
@@ -115,7 +115,7 @@ export default {
   methods: {
     getInvertedHexcolorGrayscale,
     toggleTileSelection(tile) {
-      if (!this.$store.state.keysPressed.includes(93)) return
+      if (!this.$store.state.keysPressed.includes(17)) return
 
       const foundIndex = this.$store.state.board.selectedTiles.indexOf(tile.id)
 

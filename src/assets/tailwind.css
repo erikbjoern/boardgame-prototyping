@@ -24,6 +24,9 @@ button {
 .btn.rounded-full {
   border-radius: 9999px;
 }
+.btn.highlighted {
+  @apply bg-gray-100 bg-opacity-10 !important;
+}
 
 body {
   @apply font-sans antialiased;

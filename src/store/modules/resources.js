@@ -9,29 +9,8 @@ import { storeConfig } from '@/store'
 
 export default {
   state: () => ({
-    data: [
-      {
-        name: '',
-        color: '#efefef',
-        icon: '',
-      },
-    ],
+    data: [],
   }),
-  getters: {
-    resourceColors(state) {
-      if (state.data.length) {
-        return {
-          main: Object.assign(...state.data.map(r => ({ [r.name]: r.color }))),
-          inverted: Object.assign(
-            ...state.data.map(r => ({ [r.name]: r.invertedColor }))
-          ),
-          grayscale: Object.assign(
-            ...state.data.map(r => ({ [r.name]: r.invertedColorGrayscale }))
-          ),
-        }
-      } else return {}
-    },
-  },
   mutations: {
     setResourceState(state, payload) {
       Object.keys(payload).forEach(property => {

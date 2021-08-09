@@ -10,13 +10,19 @@
         backgroundColor: expanded ? invertedTemporaryItemColor : temporaryItemColor,
       }"
     >
-      <div class="flex-shrink w-1/2 relative">
+      <div
+        class="flex-shrink w-1/2 relative font-semibold"
+        :class="!colorPickerIsOpen && 'transition-colors duration-300'"
+        :style="{ color: expanded ? temporaryItemColor : invertedTemporaryItemColor }"
+      >
+        <span v-if="parentTab == 'adjustBoard'">
+          {{ name }}
+        </span>
         <input
-          class="font-semibold w-full bg-transparent mr-2"
-          :class="!colorPickerIsOpen && 'transition-colors duration-300'"
+          v-else
+          class="w-full bg-transparent mr-2 font-semibold"
           name="name"
           v-model.lazy="name"
-          :style="{ color: expanded ? temporaryItemColor : invertedTemporaryItemColor }"
           @keydown.esc="handleEscapeKey"
           :ref="item.name"
           @focus="$store.commit('inputFocused')"
@@ -73,9 +79,11 @@
                 v-click-outside="() => (colorPickerIsOpen = false)"
               />
               <input
-                v-model.lazy="itemColor"
+                :value="temporaryItemColor"
                 type="text"
                 @keydown.esc="handleEscapeKey"
+                @keydown.enter="submitChange"
+                @change="submitChange"
                 name="color"
                 class="bg-transparent text-center w-full font-semibold text-sm"
                 :style="{ color: temporaryItemColor }"
@@ -138,8 +146,8 @@
           :key="resource.name + index"
           class="flex justify-between p-2 w-full rounded"
           :style="{
-            backgroundColor: $store.getters.resourceColors.main[resource.name],
-            color: $store.getters.resourceColors.inverted[resource.name],
+            backgroundColor: $store.state.board.colors.resources.main[resource.name],
+            color: $store.state.board.colors.resources.inverted[resource.name],
           }"
         >
           <span class="inline-block flex-1 font-semibold">{{ resource.name }}</span>
@@ -160,7 +168,8 @@
                       <input
                         class="text-gray-900 font-semibold text-center w-8 bg-transparent"
                         :style="{
-                          color: $store.getters.resourceColors.inverted[resource.name],
+                          color:
+                            $store.state.board.colors.resources.inverted[resource.name],
                         }"
                         type="number"
                         name="min"
@@ -179,7 +188,8 @@
                       <input
                         class="text-gray-900 font-semibold text-center bg-transparent w-8"
                         :style="{
-                          color: $store.getters.resourceColors.inverted[resource.name],
+                          color:
+                            $store.state.board.colors.resources.inverted[resource.name],
                         }"
                         type="number"
                         name="max"
@@ -233,8 +243,8 @@
         </option>
         <option
           :style="{
-            color: $store.getters.resourceColors.inverted[resource.name],
-            backgroundColor: $store.getters.resourceColors.main[resource.name],
+            color: $store.state.board.colors.resources.inverted[resource.name],
+            backgroundColor: $store.state.board.colors.resources.main[resource.name],
           }"
           v-for="resource of otherAvailableResources"
           :key="resource.name"
@@ -255,7 +265,7 @@ import vClickOutside from 'v-click-outside'
 import { getInvertedHexColor, getRGBValues } from '@/helpers/getDynamicColor'
 
 export default {
-  name: 'ResourceSettingsItem',
+  name: 'LandscapeOrResourceItem',
   components: {
     WoodIcon,
     StoneIcon,
@@ -270,6 +280,10 @@ export default {
       required: true,
     },
     tab: {
+      type: String,
+      required: false,
+    },
+    parentTab: {
       type: String,
       required: false,
     },
@@ -322,68 +336,42 @@ export default {
         r => !this.item.resources.map(res => res.name).includes(r.name)
       )
     },
-    itemColor: {
-      get() {
-        return this.item.color
-      },
-      set(value) {
-        if (value == '#000' || value == '#000000') {
-          const rgbValues = getRGBValues(this.item.color)
-          const max = Math.max(...rgbValues)
-          value =
-            max <= 5
-              ? '#000000'
-              : '#' + rgbValues.map(v => (v == max ? '05' : '00')).join('')
-        }
-        this.item.color = value
-        this.item.invertedColor = getInvertedHexColor(value)
-      },
-    },
   },
   methods: {
     getInvertedHexColor,
     submitChange(e, resourceName = null) {
+      let resource
       const item = this.item
       const property = e.target.name
 
-      let value = parseInt(e.target.value)
-      let resource
+      let value = ['min', 'max', 'fraction'].includes(property)
+        ? parseInt(e.target.value)
+        : e.target.value
 
       if (resourceName) {
         resource = item.resources.find(r => r.name == resourceName)
       }
 
       if ([undefined, null, '', NaN].includes(value)) {
-        return resource ? (e.target.value = resource[property]) : item[property]
+        return (e.target.value = resource ? resource[property] : item[property])
       }
 
-      let mutation
-
-      if (resource) {
-        mutation = 'setResourceValueOnLandscape'
-
-        if (
-          (property == 'max' && value < resource.min) ||
-          (property == 'min' && value > resource.max)
-        ) {
-          this.$store.commit(mutation, {
-            name: item.name,
-            property: property == 'max' ? 'min' : 'max',
-            value,
-            resourceName,
-          })
+      if (property == 'color') {
+        // if user sets value to black, keep a hint of color so that the inverted color is slightly colored
+        // unless the value already is set to minimum, in that case, set it to actual black
+        if (value == '#000' || value == '#000000') {
+          const rgbValues = getRGBValues(item.color)
+          const max = Math.max(...rgbValues)
+          value =
+            max <= 5
+              ? '#000000'
+              : '#' + rgbValues.map(v => (v == max ? '05' : '00')).join('')
         }
-      } else {
-        mutation =
-          this.tab == 'landscapes' ? 'setLandscapeParameter' : 'setResourceParameter'
+
+        this.temporaryItemColor = value
       }
 
-      this.$store.commit(mutation, {
-        name: item.name,
-        property,
-        value,
-        ...(resourceName && { resourceName }),
-      })
+      this.$emit('change', item, property, value, resource)
 
       if (e.type == 'keydown') {
         e.target.blur()
@@ -426,18 +414,17 @@ export default {
     this.temporaryItemColor = this.item.color
   },
   watch: {
-    temporaryItemColor(value) {
+    temporaryItemColor(newValue, oldValue) {
+      if (!oldValue) return
+
       if (this.debounceColorChange) {
         clearTimeout(this.debounceColorChange)
       }
 
       this.debounceColorChange = setTimeout(() => {
-        this.itemColor = value
+        this.$emit('change', this.item, 'color', newValue)
       }, 500)
     },
-    itemColor(value) {
-      this.temporaryItemColor = value
-    }
   },
 }
 </script>

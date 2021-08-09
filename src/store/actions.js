@@ -32,12 +32,18 @@ export default {
   async setInitialLandscapes({ commit }, settings) {
     const savedData = (await localForage.getItem('landscapes')) || null
 
-    commit('setLandscapeState', (settings?.landscapes ?? savedData) || storeConfig.initialState.landscapes)
+    commit(
+      'setLandscapeState',
+      (settings?.landscapes ?? savedData) || storeConfig.initialState.landscapes
+    )
   },
   async setInitialResources({ commit }, settings) {
     const savedData = (await localForage.getItem('resources')) || null
 
-    commit('setResourceState', (settings?.resources ?? savedData) || storeConfig.initialState.resources)
+    commit(
+      'setResourceState',
+      (settings?.resources ?? savedData) || storeConfig.initialState.resources
+    )
   },
   async setInitialBoard({ commit }, settings) {
     const savedData = (await localForage.getItem('board')) || {}
@@ -50,15 +56,23 @@ export default {
         tileRowsStash: savedData.tileRowsStash || [],
         selectedTiles: savedData.selectedTiles || [],
         draggableItems: savedData.draggableItems || [],
+        colors: savedData.colors || {},
+        landscapesAndResources: savedData.landscapesAndResources || [],
       }
     }
 
-    commit('setBoardState', (settings?.board ?? tileData) || storeConfig.initialState.board)
+    commit(
+      'setBoardState',
+      (settings?.board ?? tileData) || storeConfig.initialState.board
+    )
   },
   async setInitialPreferences({ commit }, settings) {
     const savedData = (await localForage.getItem('preferences')) || null
 
-    commit('setPreferencesState', (settings?.preferences ?? savedData) || storeConfig.initialState.preferences)
+    commit(
+      'setPreferencesState',
+      (settings?.preferences ?? savedData) || storeConfig.initialState.preferences
+    )
   },
   async setApplicationState({ dispatch }, settings = null) {
     performTimeStampCheck()
@@ -105,5 +119,5 @@ export default {
     const savedSettings = await localForage.getItem(`savedSettings:${id}`)
 
     dispatch('setApplicationState', savedSettings)
-  }
+  },
 }
