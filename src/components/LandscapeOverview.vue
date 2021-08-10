@@ -35,7 +35,7 @@
               <p class="font-bold truncate mr-1">
                 {{ landscape.name }}
               </p>
-              <span v-if="isExpanded(landscape.name)">
+              <span v-if="isExpanded(landscape.name)" class="whitespace-nowrap">
                 <span
                   class="text-sm font-mono px-[3px]"
                   v-text="
@@ -97,6 +97,9 @@ export default {
     },
     landscapes() {
       return this.$store.state.board.landscapesAndResources
+    },
+    tileRows() {
+      return this.$store.state.board.tileRows
     },
   },
   methods: {

@@ -10,7 +10,15 @@
       :style="`margin: -${borderWidth}`"
     >
       <div class="hex-grid-item__content" :style="{ ...tileContentStyle }">
-        <span :style="`margin-top: ${size / 5}px;`">{{ tile.number }}</span>
+        <span
+          :style="
+            `margin-top: ${size / 5}px; color: ${
+              $store.state.board.colors.landscapes.grayscale[tile.landscapeType]
+            }77`
+          "
+        >
+          {{ tile.number }}
+        </span>
         <transition name="fade" mode="out-in">
           <div
             v-show="$store.state.preferences.showResourceValues"
@@ -94,7 +102,9 @@ export default {
       return {
         display: 'flex',
         gap: `${1 / 50}vw`,
-        backgroundColor: this.$store.state.board.colors.landscapes.main[this.tile.landscapeType],
+        backgroundColor: this.$store.state.board.colors.landscapes.main[
+          this.tile.landscapeType
+        ],
         fontSize: `clamp(8px, ${1 / 10}vw, 20px`,
         height: `${100 - this.borderWidth}%`,
         width: `${100 - this.borderWidth}%`,
@@ -183,7 +193,6 @@ svg {
 .hex-grid-item__content {
   align-items: center;
   clip-path: polygon(75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%, 25% 0);
-  color: rgba(255, 255, 255, 0.6);
   display: flex;
   flex-direction: column;
   font-size: 0.7vw;

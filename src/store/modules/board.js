@@ -131,10 +131,12 @@ export default {
         ? {
             main: Object.assign(...landscapes.map(l => ({ [l.name]: l.color }))),
             inverted: Object.assign(
-              ...landscapes.map(l => ({ [l.name]: l.invertedColor }))
+              ...landscapes.map(l => ({ [l.name]: getInvertedHexColor(l.color) }))
             ),
             grayscale: Object.assign(
-              ...landscapes.map(l => ({ [l.name]: l.invertedColorGrayscale }))
+              ...landscapes.map(l => ({
+                [l.name]: getInvertedHexcolorGrayscale(l.color),
+              }))
             ),
           }
         : {}
