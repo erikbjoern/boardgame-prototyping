@@ -41,7 +41,6 @@ export default {
           resources.push({
             name,
             amount,
-            backgroundColor: this.$store.state.board.colors.resources.main[name],
           })
         }
       }

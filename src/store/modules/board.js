@@ -22,9 +22,11 @@ export default {
       })
     },
     setBoardColor(state, { dataset, itemName, color }) {
-      state.colors[dataset].main[itemName] = color
-      state.colors[dataset].inverted[itemName] = getInvertedHexColor(color)
-      state.colors[dataset].grayscale[itemName] = getInvertedHexcolorGrayscale(color)
+      state.colors[dataset][itemName] = {
+        main: color,
+        inverted: getInvertedHexColor(color),
+        grayscale: getInvertedHexcolorGrayscale(color),
+      }
     },
     addTileRow(state, { row }) {
       state.tileRows.push(row)
@@ -128,30 +130,28 @@ export default {
     setBoardColors({ state, rootState, commit }) {
       const landscapes = rootState.landscapes.data
       const landscapeColors = landscapes.length
-        ? {
-            main: Object.assign(...landscapes.map(l => ({ [l.name]: l.color }))),
-            inverted: Object.assign(
-              ...landscapes.map(l => ({ [l.name]: getInvertedHexColor(l.color) }))
-            ),
-            grayscale: Object.assign(
-              ...landscapes.map(l => ({
-                [l.name]: getInvertedHexcolorGrayscale(l.color),
-              }))
-            ),
-          }
+        ? Object.assign(
+            ...landscapes.map(l => ({
+              [l.name]: {
+                main: l.color,
+                inverted: getInvertedHexColor(l.color),
+                grayscale: getInvertedHexcolorGrayscale(l.color),
+              },
+            }))
+          )
         : {}
 
       const resources = rootState.resources.data
       const resourceColors = resources.length
-        ? {
-            main: Object.assign(...resources.map(r => ({ [r.name]: r.color }))),
-            inverted: Object.assign(
-              ...resources.map(r => ({ [r.name]: r.invertedColor }))
-            ),
-            grayscale: Object.assign(
-              ...resources.map(r => ({ [r.name]: r.invertedColorGrayscale }))
-            ),
-          }
+        ? Object.assign(
+            ...resources.map(r => ({
+              [r.name]: {
+                main: r.color,
+                inverted: getInvertedHexColor(r.color),
+                grayscale: getInvertedHexcolorGrayscale(r.color),
+              },
+            }))
+          )
         : {}
 
       const colors = { landscapes: landscapeColors, resources: resourceColors }

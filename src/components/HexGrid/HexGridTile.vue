@@ -10,13 +10,7 @@
       :style="`margin: -${borderWidth}`"
     >
       <div class="hex-grid-item__content" :style="{ ...tileContentStyle }">
-        <span
-          :style="
-            `margin-top: ${size / 5}px; color: ${
-              $store.state.board.colors.landscapes.grayscale[tile.landscapeType]
-            }77`
-          "
-        >
+        <span :style="`margin-top: ${size / 5}px; color: ${landscapeColors.grayscale}77`">
           {{ tile.number }}
         </span>
         <transition name="fade" mode="out-in">
@@ -33,8 +27,8 @@
               :key="resource.name"
               class="resourceItem"
               :style="{
-                backgroundColor: $store.state.board.colors.resources.main[resource.name],
-                color: $store.state.board.colors.resources.grayscale[resource.name],
+                backgroundColor: resourceColors[resource.name].main,
+                color: resourceColors[resource.name].grayscale,
               }"
             >
               <WoodIcon v-if="resource.name == 'wood' && tileIsLargeEnough" />
@@ -47,7 +41,11 @@
                   @change="e => updateResource(e, resource)"
                   v-show="$store.state.keysPressed.length == 0"
                 />
-                <span class="w-full" v-show="$store.state.keysPressed.length > 0">
+                <span
+                  v-show="$store.state.keysPressed.length > 0"
+                  class="w-full"
+                  :style="{ color: landscapeColors.grayscale }"
+                >
                   {{ resource.amount }}
                 </span>
               </div>
@@ -102,9 +100,7 @@ export default {
       return {
         display: 'flex',
         gap: `${1 / 50}vw`,
-        backgroundColor: this.$store.state.board.colors.landscapes.main[
-          this.tile.landscapeType
-        ],
+        backgroundColor: this.landscapeColors.main,
         fontSize: `clamp(8px, ${1 / 10}vw, 20px`,
         height: `${100 - this.borderWidth}%`,
         width: `${100 - this.borderWidth}%`,
@@ -120,6 +116,12 @@ export default {
       return [...this.tile.resources]
         .filter(r => r.amount > 0)
         .sort((a, b) => b.amount - a.amount)
+    },
+    landscapeColors() {
+      return this.$store.state.board.colors.landscapes[this.tile.landscapeType]
+    },
+    resourceColors() {
+      return this.$store.state.board.colors.resources
     },
   },
   methods: {

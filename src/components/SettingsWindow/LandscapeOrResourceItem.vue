@@ -146,8 +146,8 @@
           :key="resource.name + index"
           class="flex justify-between p-2 w-full rounded"
           :style="{
-            backgroundColor: $store.state.board.colors.resources.main[resource.name],
-            color: $store.state.board.colors.resources.inverted[resource.name],
+            backgroundColor: resourceColors[resource.name].main,
+            color: resourceColors[resource.name].inverted,
           }"
         >
           <span class="inline-block flex-1 font-semibold">{{ resource.name }}</span>
@@ -168,8 +168,7 @@
                       <input
                         class="text-gray-900 font-semibold text-center w-8 bg-transparent"
                         :style="{
-                          color:
-                            $store.state.board.colors.resources.inverted[resource.name],
+                          color: resourceColors[resource.name].inverted,
                         }"
                         type="number"
                         name="min"
@@ -188,8 +187,7 @@
                       <input
                         class="text-gray-900 font-semibold text-center bg-transparent w-8"
                         :style="{
-                          color:
-                            $store.state.board.colors.resources.inverted[resource.name],
+                          color: resourceColors[resource.name].inverted,
                         }"
                         type="number"
                         name="max"
@@ -243,8 +241,8 @@
         </option>
         <option
           :style="{
-            color: $store.state.board.colors.resources.inverted[resource.name],
-            backgroundColor: $store.state.board.colors.resources.main[resource.name],
+            color: resourceColors[resource.name].inverted,
+            backgroundColor: resourceColors[resource.name].main,
           }"
           v-for="resource of otherAvailableResources"
           :key="resource.name"
@@ -263,6 +261,7 @@ import StoneIcon from '@/assets/icons/stone-block.svg'
 import WheatIcon from '@/assets/icons/wheat.svg'
 import vClickOutside from 'v-click-outside'
 import { getInvertedHexColor, getRGBValues } from '@/helpers/getDynamicColor'
+import EventBus from '@/eventBus.js'
 
 export default {
   name: 'LandscapeOrResourceItem',
@@ -335,6 +334,9 @@ export default {
       return this.$store.state.resources.data.filter(
         r => !this.item.resources.map(res => res.name).includes(r.name)
       )
+    },
+    resourceColors() {
+      return this.$store.state.board.colors.resources
     },
   },
   methods: {
@@ -424,6 +426,9 @@ export default {
       this.debounceColorChange = setTimeout(() => {
         this.$emit('change', this.item, 'color', newValue)
       }, 500)
+    },
+    'item.color'(value) {
+      this.temporaryItemColor = value
     },
   },
 }

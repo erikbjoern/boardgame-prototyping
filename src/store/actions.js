@@ -5,7 +5,7 @@ import cuid from 'cuid'
 async function performTimeStampCheck(params) {
   const timeStamp = await localForage.getItem('timeStamp')
 
-  if (new Date(timeStamp) < new Date('2021-08-09T18:32:38.785Z')) {
+  if (new Date(timeStamp) < new Date('2021-08-10T21:32:38.785Z')) {
     const grid = localForage.removeItem('grid')
     const landscapes = localForage.removeItem('landscapes')
     const resources = localForage.removeItem('resources')
