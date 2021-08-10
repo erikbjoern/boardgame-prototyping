@@ -10,7 +10,15 @@
       :style="`margin: -${borderWidth}`"
     >
       <div class="hex-grid-item__content" :style="{ ...tileContentStyle }">
-        <span :style="`margin-top: ${size / 5}px;`">{{ tile.number }}</span>
+        <span
+          :style="
+            `margin-top: ${size / 5}px; color: ${
+              $store.state.board.colors.landscapes.grayscale[tile.landscapeType]
+            }77`
+          "
+        >
+          {{ tile.number }}
+        </span>
         <transition name="fade" mode="out-in">
           <div
             v-show="$store.state.preferences.showResourceValues"
@@ -25,8 +33,8 @@
               :key="resource.name"
               class="resourceItem"
               :style="{
-                backgroundColor: resource.backgroundColor,
-                color: getInvertedHexcolorGrayscale(resource.backgroundColor),
+                backgroundColor: $store.state.board.colors.resources.main[resource.name],
+                color: $store.state.board.colors.resources.grayscale[resource.name],
               }"
             >
               <WoodIcon v-if="resource.name == 'wood' && tileIsLargeEnough" />
@@ -94,7 +102,9 @@ export default {
       return {
         display: 'flex',
         gap: `${1 / 50}vw`,
-        backgroundColor: this.tile.color,
+        backgroundColor: this.$store.state.board.colors.landscapes.main[
+          this.tile.landscapeType
+        ],
         fontSize: `clamp(8px, ${1 / 10}vw, 20px`,
         height: `${100 - this.borderWidth}%`,
         width: `${100 - this.borderWidth}%`,
@@ -109,13 +119,13 @@ export default {
     resources() {
       return [...this.tile.resources]
         .filter(r => r.amount > 0)
-        .sort((a, b) => a.amount - b.amount)
+        .sort((a, b) => b.amount - a.amount)
     },
   },
   methods: {
     getInvertedHexcolorGrayscale,
     toggleTileSelection(tile) {
-      if (!this.$store.state.keysPressed.includes(93)) return
+      if (!this.$store.state.keysPressed.includes(17)) return
 
       const foundIndex = this.$store.state.board.selectedTiles.indexOf(tile.id)
 
@@ -183,7 +193,6 @@ svg {
 .hex-grid-item__content {
   align-items: center;
   clip-path: polygon(75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%, 25% 0);
-  color: rgba(255, 255, 255, 0.6);
   display: flex;
   flex-direction: column;
   font-size: 0.7vw;

@@ -1,9 +1,9 @@
 <template>
   <div class="relative rounded flex h-full items-stretch" id="resource-settings">
     <div class="flex-1">
-      <div class="h-full flex flex-col space-y-3 w-36 mx-auto pt-[3.5rem]">
+      <div class="h-full flex flex-col space-y-3 w-[11rem] mx-auto pt-[3.5rem]">
         <button
-          class="!bg-[#197c4a] text-[#eaffea] !rounded-full flex px-3"
+          class="!bg-[#197c4a] text-[#eaffea] !rounded-full flex px-3 w-full"
           @click="addNew('addLandscape', 'landscapes')"
         >
           <svg
@@ -24,7 +24,7 @@
           </span>
         </button>
         <button
-          class="!bg-[#197c4a] text-[#eaffea] !rounded-full flex px-3"
+          class="!bg-[#197c4a] text-[#eaffea] !rounded-full flex px-3 w-full"
           @click="addNew('addResource', 'resources')"
         >
           <svg
@@ -45,7 +45,7 @@
           </span>
         </button>
         <button
-          class="text-[#eaffea] !rounded-full flex px-3 bg-yellow-600"
+          class="text-[#eaffea] !rounded-full flex px-3 bg-yellow-600 w-full"
           @click="
             e => {
               resetState()
@@ -69,7 +69,7 @@
           <span class="ml-1">Återställ</span>
         </button>
         <button
-          class="text-[#eaffea] !rounded-full flex px-3"
+          class="text-[#eaffea] !rounded-full flex px-3 w-full"
           :class="removalMode ? '!bg-[#369]' : '!bg-[#901312]'"
           @click="
             e => {
@@ -102,28 +102,6 @@
             {{ removalMode ? 'Klar' : 'Ta bort...' }}
           </span>
         </button>
-        <button
-          class="h-8 border rounded  text-sm tracking-wide bg-black !mt-auto"
-          :class="
-            $store.state.preferences.showOverview
-              ? '!border-green-500 text-green-200'
-              : 'border-gray-300 text-gray-300 !bg-opacity-10'
-          "
-          @click="e => toggleVisibility(e, 'Overview')"
-        >
-          {{ $store.state.preferences.showOverview ? 'Visar' : 'Visa' }} översikt
-        </button>
-        <button
-          class="h-8 border rounded  text-sm tracking-wide bg-black"
-          :class="
-            $store.state.preferences.showSummary
-              ? '!border-green-500 text-green-200'
-              : 'border-gray-300 text-gray-300 !bg-opacity-10'
-          "
-          @click="e => toggleVisibility(e, 'Summary')"
-        >
-          {{ $store.state.preferences.showSummary ? 'Visar' : 'Visa' }} summering
-        </button>
       </div>
     </div>
     <div class="flex flex-col items-center space-y-6 flex-1 min-h-0">
@@ -137,12 +115,12 @@
             :key="label"
             class="flex-1 bg-black border h-8"
             :class="[
-              tab == tabName
+              activeTab == tabName
                 ? '!bg-opacity-100 text-[#eeeeee] border-green-500 border hover:!bg-opacity-100'
                 : '!bg-opacity-10 text-[#9f9f9f]',
               tabName == 'landscapes' ? 'rounded-tl rounded-bl' : 'rounded-tr rounded-br',
-              tab == 'landscapes' && index == 1 && 'border-l-0',
-              tab == 'resources' && index == 0 && 'border-r-0',
+              activeTab == 'landscapes' && index == 1 && 'border-l-0',
+              activeTab == 'resources' && index == 0 && 'border-r-0',
             ]"
             @click="e => switchTab(e, tabName)"
           >
@@ -165,10 +143,12 @@
             :class="index !== 0 && 'mt-3'"
             :key="item.name"
             :item="item"
-            :tab="tab"
+            :tab="activeTab"
             :focusAddedItem="focusAddedItem"
             @didFocusAddedItem="focusAddedItem = false"
             :removalMode="removalMode"
+            :expandable="true"
+            @change="submitChange"
           />
         </transition-group>
       </div>
@@ -205,13 +185,13 @@
 import LandscapeOrResourceItem from './LandscapeOrResourceItem'
 
 export default {
-  name: 'LandscapesAndResources',
+  name: 'NewBoard',
   components: {
     LandscapeOrResourceItem,
   },
   data() {
     return {
-      tab: 'landscapes',
+      activeTab: 'landscapes',
       focusAddedItem: false,
       removalMode: false,
       renderKey: 0,
@@ -219,36 +199,64 @@ export default {
   },
   computed: {
     currentDataSet() {
-      return this.$store.state[this.tab].data
+      return this.$store.state[this.activeTab].data
     },
   },
   methods: {
-    toggleVisibility(e, item) {
-      this.$store.commit('toggleVisibility', item)
-      e.target.blur()
-    },
     switchTab(e, tabName) {
-      this.tab = tabName
+      this.activeTab = tabName
       e?.currentTarget.blur()
       this.renderKey++
     },
     addNew(mutation, tabName) {
       this.$store.commit(mutation)
 
-      if (tabName !== this.tab) {
+      if (tabName !== this.activeTab) {
         this.focusAddedItem = true
         this.switchTab(undefined, tabName)
       }
     },
     resetState() {
-      const action = this.tab == 'landscapes' ? 'resetLandscapes' : 'resetResources'
+      const action = this.activeTab == 'landscapes' ? 'resetLandscapes' : 'resetResources'
       this.$store.dispatch(action)
       this.renderKey++
     },
     async removeAll() {
       const action =
-        this.tab == 'landscapes' ? 'removeAllLandscapes' : 'removeAllResources'
+        this.activeTab == 'landscapes' ? 'removeAllLandscapes' : 'removeAllResources'
       this.$store.dispatch(action)
+    },
+    submitChange(item, property, value, resource) {
+      let mutation
+      const resourceName = resource?.name
+
+      if (resource) {
+        mutation = 'setResourceValueOnLandscape'
+  
+        if (
+          (property == 'max' && value < resource.min) ||
+          (property == 'min' && value > resource.max)
+        ) {
+          this.$store.commit(mutation, {
+            name: item.name,
+            property: property == 'max' ? 'min' : 'max',
+            value,
+            resourceName,
+          })
+        }
+      } else {
+        mutation =
+          this.activeTab == 'landscapes'
+            ? 'setLandscapeParameter'
+            : 'setResourceParameter'
+      }
+
+      this.$store.commit(mutation, {
+        name: item.name,
+        property,
+        value,
+        ...(resourceName && { resourceName }),
+      })
     },
   },
 }

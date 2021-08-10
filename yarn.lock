@@ -1172,6 +1172,11 @@
   resolved "https://registry.yarnpkg.com/@soda/get-current-script/-/get-current-script-1.0.2.tgz#a53515db25d8038374381b73af20bb4f2e508d87"
   integrity sha512-T7VNNlYVM1SgQ+VsMYhnDkcGmWhQdL0bDyGm5TlQ3GBXnJscEClUUOKduWTmm2zCnvNLC1hc3JpuXjs/nFOc5w==
 
+"@sweetalert2/theme-bulma@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@sweetalert2/theme-bulma/-/theme-bulma-5.0.1.tgz#8b685816987a01044c4e813e405091c650a8d29c"
+  integrity sha512-sCWUG5ku7645W/t+SAJ9kgM8iWnVQIFEPa2o4tq4SXyt5SqKY3E9Wz+fCJLq3Ypyqvgmmv9/XWNngHCfHuREjQ==
+
 "@types/anymatch@*":
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/@types/anymatch/-/anymatch-1.3.1.tgz#336badc1beecb9dacc38bea2cf32adf627a8421a"
@@ -9253,6 +9258,11 @@ svgo@^1.0.0, svgo@^1.3.2:
     unquote "~1.1.1"
     util.promisify "~1.0.0"
 
+sweetalert2@11.x:
+  version "11.0.18"
+  resolved "https://registry.yarnpkg.com/sweetalert2/-/sweetalert2-11.0.18.tgz#9547859cc1a79815d5d02a6e0d1a3d44da3f8dc1"
+  integrity sha512-sF6huRQqqRGz7p9F8XFKSICl5hOiXjjpmnwAO8vlyJKAyMNZb2fvdok11JIGQjqcqVMIag/VLNWF4eEsIKQKGw==
+
 symbol-tree@^3.2.2:
   version "3.2.4"
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.4.tgz#430637d248ba77e078883951fb9aa0eed7c63fa2"
@@ -9893,6 +9903,13 @@ vue-svg-loader@^0.16.0:
   dependencies:
     loader-utils "^1.2.3"
     svg-to-vue "^0.7.0"
+
+vue-sweetalert2@^5.0.2:
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/vue-sweetalert2/-/vue-sweetalert2-5.0.2.tgz#b34f21f551aaefb88d94991daf7528913f66cefe"
+  integrity sha512-28pcpmvaFxwoXIUkOWwhZhmsV749jXxha8JicwPoSKyFKR5FhIaZU6UHO5WlUCLIVUI6sAWY6WngK2x/iXYwZg==
+  dependencies:
+    sweetalert2 "11.x"
 
 vue-template-compiler@^2.6.12:
   version "2.6.12"

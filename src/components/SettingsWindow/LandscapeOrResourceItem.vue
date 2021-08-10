@@ -1,30 +1,46 @@
 <template>
   <div class="flex flex-col" style="width: calc(310px - 1.25rem) !important">
     <div
-      class="flex w-full p-2 transition-colors duration-300 rounded"
-      :class="expanded && 'rounded-b-none'"
+      class="flex w-full p-2 rounded"
+      :class="[
+        expanded && 'rounded-b-none',
+        !colorPickerIsOpen && 'transition-colors duration-300',
+      ]"
       :style="{
-        backgroundColor: expanded ? item.invertedColor : item.color,
+        backgroundColor: expanded ? invertedTemporaryItemColor : temporaryItemColor,
       }"
     >
-      <div class="flex-shrink w-1/2 relative">
+      <div
+        class="flex-shrink w-1/2 relative font-semibold"
+        :class="!colorPickerIsOpen && 'transition-colors duration-300'"
+        :style="{ color: expanded ? temporaryItemColor : invertedTemporaryItemColor }"
+      >
+        <span v-if="parentTab == 'adjustBoard'">
+          {{ name }}
+        </span>
         <input
-          class="font-semibold w-full bg-transparent mr-2 transition-colors duration-300"
+          v-else
+          class="w-full bg-transparent mr-2 font-semibold"
           name="name"
           v-model.lazy="name"
-          :style="{ color: expanded ? item.color : item.invertedColor }"
           @keydown.esc="handleEscapeKey"
           :ref="item.name"
           @focus="$store.commit('inputFocused')"
           @blur="$store.commit('inputBlurred')"
         />
       </div>
-      <div v-if="tab == 'landscapes'" class="grid place-items-center h-full w-8">
+      <div
+        v-if="expandable && tab == 'landscapes'"
+        class="grid place-items-center h-full w-8"
+      >
         <svg
-          class="transition-all duration-300 select-none cursor-pointer hover:opacity-50 transform"
-          :class="expanded ? 'rotate-180 translate-y-px' : '-translate-y-0'"
+          class="select-none cursor-pointer hover:opacity-50 transform"
+          :class="[
+            expanded ? 'rotate-180 translate-y-px' : '-translate-y-0',
+            !colorPickerIsOpen && 'transition-all duration-300',
+          ]"
           :style="{
-            color: expanded ? item.color : item.invertedColor,
+            color: expanded ? temporaryItemColor : invertedTemporaryItemColor,
           }"
           @click="expanded = !expanded"
           viewBox="0 0 24 24"
@@ -41,24 +57,36 @@
       </div>
       <div class="w-1/2 flex-shrink flex items-center">
         <div
-          class="grid place-items-center ml-auto transition-all overflow-hidden"
-          :class="
+          class="grid place-items-center ml-auto overflow-hidden"
+          :class="[
             removalMode
               ? 'cursor-pointer rounded-lg h-5 w-5 shadow'
-              : 'rounded-md h-full w-20'
-          "
-          :style="{ backgroundColor: removalMode ? '#992222' : item.invertedColor }"
+              : 'rounded-md h-full w-20',
+            !colorPickerIsOpen && 'transition-all duration-300',
+          ]"
+          :style="{
+            backgroundColor: removalMode ? '#992222' : invertedTemporaryItemColor,
+          }"
         >
           <transition name="fade" mode="out-in">
             <div v-if="!removalMode" class="w-full">
-              <input v-model="itemColor" type="color" class="absolute opacity-0 ml-5" />
               <input
-                v-model.lazy="itemColor"
+                v-model="temporaryItemColor"
+                type="color"
+                class="absolute opacity-0 ml-5"
+                :id="`color-for-${item.name}`"
+                @click="colorPickerIsOpen = true"
+                v-click-outside="() => (colorPickerIsOpen = false)"
+              />
+              <input
+                :value="temporaryItemColor"
                 type="text"
                 @keydown.esc="handleEscapeKey"
+                @keydown.enter="submitChange"
+                @change="submitChange"
                 name="color"
                 class="bg-transparent text-center w-full font-semibold text-sm"
-                :style="{ color: item.color }"
+                :style="{ color: temporaryItemColor }"
               />
             </div>
             <button v-else @click="remove(item)">
@@ -81,11 +109,11 @@
       </div>
     </div>
     <div
-      v-if="expanded"
+      v-if="expandable && expanded"
       class="flex flex-col items-stretch space-y-2 p-2 rounded-b"
       :style="{
-        backgroundColor: item.color,
-        color: item.invertedColor,
+        backgroundColor: temporaryItemColor,
+        color: invertedTemporaryItemColor,
       }"
     >
       <label
@@ -95,11 +123,11 @@
         <div class="inline-flex">
           <div
             class="w-8 rounded"
-            :style="{ backgroundColor: `${item.invertedColor}aa` }"
+            :style="{ backgroundColor: `${invertedTemporaryItemColor}aa` }"
           >
             <input
               class="font-semibold text-center w-8 bg-transparent"
-              :style="{ color: item.color }"
+              :style="{ color: temporaryItemColor }"
               type="text"
               name="fraction"
               :value="item.fraction"
@@ -118,8 +146,8 @@
           :key="resource.name + index"
           class="flex justify-between p-2 w-full rounded"
           :style="{
-            backgroundColor: $store.getters.resourceColors[resource.name],
-            color: $store.getters.invertedResourceColors[resource.name],
+            backgroundColor: $store.state.board.colors.resources.main[resource.name],
+            color: $store.state.board.colors.resources.inverted[resource.name],
           }"
         >
           <span class="inline-block flex-1 font-semibold">{{ resource.name }}</span>
@@ -140,7 +168,8 @@
                       <input
                         class="text-gray-900 font-semibold text-center w-8 bg-transparent"
                         :style="{
-                          color: $store.getters.invertedResourceColors[resource.name],
+                          color:
+                            $store.state.board.colors.resources.inverted[resource.name],
                         }"
                         type="number"
                         name="min"
@@ -159,7 +188,8 @@
                       <input
                         class="text-gray-900 font-semibold text-center bg-transparent w-8"
                         :style="{
-                          color: $store.getters.invertedResourceColors[resource.name],
+                          color:
+                            $store.state.board.colors.resources.inverted[resource.name],
                         }"
                         type="number"
                         name="max"
@@ -213,8 +243,8 @@
         </option>
         <option
           :style="{
-            color: $store.getters.invertedResourceColors[resource.name],
-            backgroundColor: $store.getters.resourceColors[resource.name],
+            color: $store.state.board.colors.resources.inverted[resource.name],
+            backgroundColor: $store.state.board.colors.resources.main[resource.name],
           }"
           v-for="resource of otherAvailableResources"
           :key="resource.name"
@@ -231,22 +261,56 @@
 import WoodIcon from '@/assets/icons/log.svg'
 import StoneIcon from '@/assets/icons/stone-block.svg'
 import WheatIcon from '@/assets/icons/wheat.svg'
+import vClickOutside from 'v-click-outside'
 import { getInvertedHexColor, getRGBValues } from '@/helpers/getDynamicColor'
 
 export default {
-  name: 'ResourceSettingsItem',
+  name: 'LandscapeOrResourceItem',
   components: {
     WoodIcon,
     StoneIcon,
     WheatIcon,
   },
-  props: ['item', 'tab', 'focusAddedItem', 'removalMode'],
+  directives: {
+    vClickOutside,
+  },
+  props: {
+    item: {
+      type: Object,
+      required: true,
+    },
+    tab: {
+      type: String,
+      required: false,
+    },
+    parentTab: {
+      type: String,
+      required: false,
+    },
+    focusAddedItem: {
+      type: Boolean,
+      default: false,
+    },
+    removalMode: {
+      type: Boolean,
+      default: false,
+    },
+    expandable: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       expanded: false,
+      temporaryItemColor: '',
+      colorPickerIsOpen: false,
     }
   },
   computed: {
+    invertedTemporaryItemColor() {
+      return getInvertedHexColor(this.temporaryItemColor)
+    },
     name: {
       get() {
         return this.item.name
@@ -272,67 +336,42 @@ export default {
         r => !this.item.resources.map(res => res.name).includes(r.name)
       )
     },
-    itemColor: {
-      get() {
-        return this.item.color
-      },
-      set(value) {
-        if (value == '#000' || value == '#000000') {
-          const rgbValues = getRGBValues(this.item.color)
-          const max = Math.max(...rgbValues)
-          value =
-            max <= 5
-              ? '#000000'
-              : '#' + rgbValues.map(v => (v == max ? '05' : '00')).join('')
-        }
-        this.item.color = value
-        this.item.invertedColor = getInvertedHexColor(value)
-      },
-    },
   },
   methods: {
+    getInvertedHexColor,
     submitChange(e, resourceName = null) {
+      let resource
       const item = this.item
       const property = e.target.name
 
-      let value = parseInt(e.target.value)
-      let resource
+      let value = ['min', 'max', 'fraction'].includes(property)
+        ? parseInt(e.target.value)
+        : e.target.value
 
       if (resourceName) {
         resource = item.resources.find(r => r.name == resourceName)
       }
 
       if ([undefined, null, '', NaN].includes(value)) {
-        return resource ? (e.target.value = resource[property]) : item[property]
+        return (e.target.value = resource ? resource[property] : item[property])
       }
 
-      let mutation
-
-      if (resource) {
-        mutation = 'setResourceValueOnLandscape'
-
-        if (
-          (property == 'max' && value < resource.min) ||
-          (property == 'min' && value > resource.max)
-        ) {
-          this.$store.commit(mutation, {
-            name: item.name,
-            property: property == 'max' ? 'min' : 'max',
-            value,
-            resourceName,
-          })
+      if (property == 'color') {
+        // if user sets value to black, keep a hint of color so that the inverted color is slightly colored
+        // unless the value already is set to minimum, in that case, set it to actual black
+        if (value == '#000' || value == '#000000') {
+          const rgbValues = getRGBValues(item.color)
+          const max = Math.max(...rgbValues)
+          value =
+            max <= 5
+              ? '#000000'
+              : '#' + rgbValues.map(v => (v == max ? '05' : '00')).join('')
         }
-      } else {
-        mutation =
-          this.tab == 'landscapes' ? 'setLandscapeParameter' : 'setResourceParameter'
+
+        this.temporaryItemColor = value
       }
 
-      this.$store.commit(mutation, {
-        name: item.name,
-        property,
-        value,
-        ...(resourceName && { resourceName }),
-      })
+      this.$emit('change', item, property, value, resource)
 
       if (e.type == 'keydown') {
         e.target.blur()
@@ -371,6 +410,21 @@ export default {
         this.$emit('didFocusAddedItem')
       }
     }
+
+    this.temporaryItemColor = this.item.color
+  },
+  watch: {
+    temporaryItemColor(newValue, oldValue) {
+      if (!oldValue) return
+
+      if (this.debounceColorChange) {
+        clearTimeout(this.debounceColorChange)
+      }
+
+      this.debounceColorChange = setTimeout(() => {
+        this.$emit('change', this.item, 'color', newValue)
+      }, 500)
+    },
   },
 }
 </script>

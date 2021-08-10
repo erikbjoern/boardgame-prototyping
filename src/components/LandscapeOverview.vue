@@ -22,8 +22,8 @@
               index !== 0 && 'mt-2',
             ]"
             :style="{
-              backgroundColor: landscape.color,
-              color: landscape.invertedColor,
+              backgroundColor: colors.landscapes.main[landscape.name],
+              color: colors.landscapes.inverted[landscape.name],
               direction: 'ltr',
             }"
             @click="toggleExpanded(landscape.name)"
@@ -35,13 +35,12 @@
               <p class="font-bold truncate mr-1">
                 {{ landscape.name }}
               </p>
-              <span v-if="isExpanded(landscape.name)">
+              <span v-if="isExpanded(landscape.name)" class="whitespace-nowrap">
                 <span
                   class="text-sm font-mono px-[3px]"
                   v-text="
-                    $store.state.board.tileRows
-                      .flat()
-                      .filter(tile => tile.landscapeType == landscape.name).length
+                    tileRows.flat().filter(tile => tile.landscapeType == landscape.name)
+                      .length
                   "
                 />
                 <svg
@@ -63,8 +62,8 @@
               class="rounded px-2 flex justify-between font-mono space-x-6"
               :class="isExpanded(landscape.name) && 'w-full'"
               :style="{
-                backgroundColor: $store.getters.resourceColors[resource.name],
-                color: $store.getters.invertedResourceColors[resource.name],
+                backgroundColor: colors.resources.main[resource.name],
+                color: colors.resources.inverted[resource.name],
               }"
             >
               <p v-if="isExpanded(landscape.name)" class="font-semibold truncate">
@@ -93,8 +92,14 @@ export default {
     }
   },
   computed: {
+    colors() {
+      return this.$store.state.board.colors
+    },
     landscapes() {
-      return this.$store.state.landscapes.data
+      return this.$store.state.board.landscapesAndResources
+    },
+    tileRows() {
+      return this.$store.state.board.tileRows
     },
   },
   methods: {

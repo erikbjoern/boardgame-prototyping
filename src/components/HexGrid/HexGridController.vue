@@ -24,7 +24,7 @@ export default {
   methods: {
     ...mapActions([
       'getRowFromStash',
-      'setInitialState',
+      'setApplicationState',
       'storeTileRow',
       'storeModifiedTileRow',
     ]),
@@ -41,7 +41,7 @@ export default {
           resources.push({
             name,
             amount,
-            backgroundColor: this.$store.getters.resourceColors[name],
+            backgroundColor: this.$store.state.board.colors.resources.main[name],
           })
         }
       }
@@ -70,20 +70,17 @@ export default {
           const stashedTile = stashedRow ? stashedRow[newRow.length] : null
           let landscapeType
           let resources
-          let color
           let id
 
           if (!stashedTile) {
             landscapeType = this.getLandscapeType()
             resources = this.getResources(landscapeType)
-            color = this.$store.getters.landscapeColors[landscapeType]
             id = cuid()
           }
 
           tile = stashedTile || {
             landscapeType,
             resources,
-            color,
             id,
           }
         }
@@ -157,6 +154,12 @@ export default {
 
       this.$store.commit('setBoardState', newBoardState)
     },
+    buildNewBoard() {
+      this.addTileRows()
+
+      this.$store.dispatch('setBoardColors')
+      this.$store.dispatch('setBoardLandscapes')
+    },
   },
   watch: {
     rowCount(newValue, oldValue) {
@@ -179,18 +182,20 @@ export default {
     },
   },
   async created() {
-    await this.setInitialState()
+    await this.setApplicationState()
 
-    const stashedRowsCount = this.tileRows.length
-    this.addTileRows(this.rowCount, stashedRowsCount)
+    if (this.tileRows.length == 0) {
+      this.buildNewBoard()
+    }
 
-    EventBus.$on('buildGrid', this.addTileRows)
+    EventBus.$on('buildNewBoard', this.buildNewBoard)
     EventBus.$on('reassignResources', this.reassignResources)
 
     this.$store.commit('initialised')
   },
   destroyed() {
-    EventBus.$off('buildGrid', this.addTileRows)
+    EventBus.$off('buildNewBoard', this.buildNewBoard)
+    EventBus.$off('reassignResources', this.reassignResources)
   },
 }
 </script>

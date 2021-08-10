@@ -1,30 +1,16 @@
 import Vue from 'vue'
-import { getRandomHexColor, getInvertedHexColor } from '@/helpers/getDynamicColor.js'
+import {
+  getRandomHexColor,
+  getInvertedHexColor,
+  getInvertedHexcolorGrayscale,
+} from '@/helpers/getDynamicColor.js'
 import { getUniqueDefaultName } from '@/helpers/getUniqueName.js'
 import { storeConfig } from '@/store'
 
 export default {
   state: () => ({
-    data: [
-      {
-        name: '',
-        color: '#efefef',
-        icon: '',
-      },
-    ],
+    data: [],
   }),
-  getters: {
-    resourceColors(state) {
-      if (state.data.length) {
-        return Object.assign(...state.data.map(r => ({ [r.name]: r.color })))
-      } else return []
-    },
-    invertedResourceColors(state) {
-      if (state.data.length) {
-        return Object.assign(...state.data.map(r => ({ [r.name]: r.invertedColor })))
-      } else return []
-    },
-  },
   mutations: {
     setResourceState(state, payload) {
       Object.keys(payload).forEach(property => {
@@ -45,6 +31,7 @@ export default {
         name,
         color,
         invertedColor: getInvertedHexColor(color),
+        invertedColorGrayscale: getInvertedHexcolorGrayscale(color),
       }
 
       state.data.push(payload)

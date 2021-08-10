@@ -2,6 +2,7 @@ import EventBus from '@/eventBus'
 import cuid from 'cuid'
 import {
   getRandomHexColor,
+  getInvertedHexColor,
   getInvertedHexcolorGrayscale,
 } from '../../helpers/getDynamicColor'
 
@@ -11,12 +12,19 @@ export default {
     tileRowsStash: [],
     selectedTiles: [],
     draggableItems: [],
+    colors: {},
+    landscapesAndResources: [],
   }),
   mutations: {
     setBoardState(state, payload) {
       Object.keys(payload).forEach(property => {
         state.hasOwnProperty(property) && (state[property] = payload[property])
       })
+    },
+    setBoardColor(state, { dataset, itemName, color }) {
+      state.colors[dataset].main[itemName] = color
+      state.colors[dataset].inverted[itemName] = getInvertedHexColor(color)
+      state.colors[dataset].grayscale[itemName] = getInvertedHexcolorGrayscale(color)
     },
     addTileRow(state, { row }) {
       state.tileRows.push(row)
@@ -115,7 +123,46 @@ export default {
       })
       dispatch('arrangeLandscapePool')
 
-      EventBus.$emit('buildGrid')
+      EventBus.$emit('buildNewBoard')
+    },
+    setBoardColors({ state, rootState, commit }) {
+      const landscapes = rootState.landscapes.data
+      const landscapeColors = landscapes.length
+        ? {
+            main: Object.assign(...landscapes.map(l => ({ [l.name]: l.color }))),
+            inverted: Object.assign(
+              ...landscapes.map(l => ({ [l.name]: getInvertedHexColor(l.color) }))
+            ),
+            grayscale: Object.assign(
+              ...landscapes.map(l => ({
+                [l.name]: getInvertedHexcolorGrayscale(l.color),
+              }))
+            ),
+          }
+        : {}
+
+      const resources = rootState.resources.data
+      const resourceColors = resources.length
+        ? {
+            main: Object.assign(...resources.map(r => ({ [r.name]: r.color }))),
+            inverted: Object.assign(
+              ...resources.map(r => ({ [r.name]: r.invertedColor }))
+            ),
+            grayscale: Object.assign(
+              ...resources.map(r => ({ [r.name]: r.invertedColorGrayscale }))
+            ),
+          }
+        : {}
+
+      const colors = { landscapes: landscapeColors, resources: resourceColors }
+
+      commit('setBoardState', { ...state, colors })
+    },
+    setBoardLandscapes({ state, rootState, commit }) {
+      const landscapesAndResources =
+        JSON.parse(JSON.stringify(rootState.landscapes.data)) || []
+
+      commit('setBoardState', { ...state, landscapesAndResources })
     },
   },
 }

@@ -1,37 +1,21 @@
 import Vue from 'vue'
-import { getRandomHexColor, getInvertedHexColor } from '@/helpers/getDynamicColor.js'
+import {
+  getRandomHexColor,
+  getInvertedHexColor,
+  getInvertedHexcolorGrayscale,
+} from '@/helpers/getDynamicColor.js'
 import { getUniqueDefaultName } from '@/helpers/getUniqueName.js'
 import { storeConfig } from '@/store'
 
 export default {
   state: () => ({
-    data: [
-      {
-        name: '',
-        fraction: 0,
-        color: '#efefef',
-        invertedColor: '#0f0f0f',
-        resources: [
-          {
-            name: '',
-            min: 0,
-            max: 0,
-          },
-        ],
-      },
-    ],
+    data: [],
     landscapePool: [],
   }),
   getters: {
-    landscapeDistributions(state, getters) {
-      return state.data.map(l => l.fraction)
-    },
     landscapeDistributionSum(state) {
       const fractions = state.data.map(l => l.fraction)
       return fractions.reduce((a, b) => a + b, 0)
-    },
-    landscapeColors(state) {
-      return Object.assign(...state.data.map(l => ({ [l.name]: l.color })))
     },
   },
   mutations: {
@@ -59,6 +43,7 @@ export default {
         fraction: 1,
         color,
         invertedColor: getInvertedHexColor(color),
+        invertedColorGrayscale: getInvertedHexcolorGrayscale(color),
         resources: [],
       }
 
