@@ -155,6 +155,18 @@ export default {
     },
     async loadSettings() {
       const savedSettingsMeta = await localForage.getItem('savedSettingsMeta')
+
+      if (!savedSettingsMeta?.length) {
+        await this.$swal({
+          text: 'Inga sparade inställningar att ladda',
+          showCancelButton: false,
+          confirmButtonText: 'OK',
+          allowOutsideClick: true,
+        })
+
+        return
+      }
+
       const inputOptions = Object.assign(
         ...savedSettingsMeta
           .sort((a, b) => a.date - b.date)
