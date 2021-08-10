@@ -119,9 +119,14 @@ export default {
   },
   computed: {
     currentDataSet() {
-      return Object.entries(
-        this.$store.state.board.colors[this.activeTab].main
-      ).map(([key, value]) => ({ name: key, color: value }))
+      const currentDataSet = this.$store.state.board.colors[this.activeTab]?.main
+
+      return currentDataSet
+        ? Object.entries(currentDataSet).map(([key, value]) => ({
+            name: key,
+            color: value,
+          }))
+        : []
     },
   },
   methods: {
