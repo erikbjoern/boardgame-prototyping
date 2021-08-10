@@ -41,7 +41,11 @@
                   @change="e => updateResource(e, resource)"
                   v-show="$store.state.keysPressed.length == 0"
                 />
-                <span class="w-full" v-show="$store.state.keysPressed.length > 0">
+                <span
+                  v-show="$store.state.keysPressed.length > 0"
+                  class="w-full"
+                  :style="{ color: landscapeColors.grayscale }"
+                >
                   {{ resource.amount }}
                 </span>
               </div>
