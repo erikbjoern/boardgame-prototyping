@@ -119,12 +119,12 @@ export default {
   },
   computed: {
     currentDataSet() {
-      const currentDataSet = this.$store.state.board.colors[this.activeTab]?.main
+      const currentDataSet = this.$store.state.board.colors[this.activeTab]
 
       return currentDataSet
         ? Object.entries(currentDataSet).map(([key, value]) => ({
             name: key,
-            color: value,
+            color: value.main,
           }))
         : []
     },

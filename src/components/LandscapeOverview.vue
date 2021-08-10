@@ -22,8 +22,8 @@
               index !== 0 && 'mt-2',
             ]"
             :style="{
-              backgroundColor: colors.landscapes.main[landscape.name],
-              color: colors.landscapes.inverted[landscape.name],
+              backgroundColor: colors.landscapes[landscape.name].main,
+              color: colors.landscapes[landscape.name].inverted,
               direction: 'ltr',
             }"
             @click="toggleExpanded(landscape.name)"
@@ -62,8 +62,8 @@
               class="rounded px-2 flex justify-between font-mono space-x-6"
               :class="isExpanded(landscape.name) && 'w-full'"
               :style="{
-                backgroundColor: colors.resources.main[resource.name],
-                color: colors.resources.inverted[resource.name],
+                backgroundColor: colors.resources[resource.name].main,
+                color: colors.resources[resource.name].inverted,
               }"
             >
               <p v-if="isExpanded(landscape.name)" class="font-semibold truncate">
