@@ -31,9 +31,6 @@
                 color: resourceColors[resource.name].grayscale,
               }"
             >
-              <WoodIcon v-if="resource.name == 'wood' && tileIsLargeEnough" />
-              <StoneIcon v-if="resource.name == 'stone' && tileIsLargeEnough" />
-              <WheatIcon v-if="resource.name == 'wheat' && tileIsLargeEnough" />
               <div class="w-8 text-center">
                 <input
                   class="w-full bg-transparent text-center"
@@ -60,17 +57,9 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import { getInvertedHexcolorGrayscale } from '@/helpers/getDynamicColor.js'
-import WoodIcon from '@/assets/icons/log.svg'
-import StoneIcon from '@/assets/icons/stone-block.svg'
-import WheatIcon from '@/assets/icons/wheat.svg'
 
 export default {
   name: 'HexGridTile',
-  components: {
-    WoodIcon,
-    StoneIcon,
-    WheatIcon,
-  },
   props: {
     tile: {
       number: {
@@ -111,9 +100,6 @@ export default {
         width: `${100 - this.borderWidth}%`,
       }
     },
-    tileIsLargeEnough() {
-      return 1 > 6 && this.viewportWidth > 800
-    },
     isSelected() {
       return this.selectedTiles.includes(this.tile.id)
     },
@@ -147,16 +133,6 @@ export default {
 </script>
 
 <style scoped>
-svg path:last-child {
-  fill: #eee !important;
-}
-
-svg {
-  width: inherit !important;
-  height: inherit !important;
-  fill: transparent;
-}
-
 .resourceContainer {
   align-content: flex-start;
   display: flex;

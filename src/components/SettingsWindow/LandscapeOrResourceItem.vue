@@ -256,20 +256,11 @@
 </template>
 
 <script>
-import WoodIcon from '@/assets/icons/log.svg'
-import StoneIcon from '@/assets/icons/stone-block.svg'
-import WheatIcon from '@/assets/icons/wheat.svg'
 import vClickOutside from 'v-click-outside'
 import { getInvertedHexColor, getRGBValues } from '@/helpers/getDynamicColor'
-import EventBus from '@/eventBus.js'
 
 export default {
   name: 'LandscapeOrResourceItem',
-  components: {
-    WoodIcon,
-    StoneIcon,
-    WheatIcon,
-  },
   directives: {
     vClickOutside,
   },
