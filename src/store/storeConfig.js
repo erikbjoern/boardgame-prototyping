@@ -29,7 +29,6 @@ const initialState = {
     rowCount: 13,
     columnCount: 13,
     gap: 0,
-    tileSize: 6,
     tileBorderWidth: 6,
     scale: 1,
   },

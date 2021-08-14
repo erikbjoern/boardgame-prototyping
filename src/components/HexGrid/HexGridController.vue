@@ -56,7 +56,6 @@ export default {
     },
     buildTileRow(row, rowIndex, direction) {
       const tileCount = this.getTileCount(rowIndex, direction)
-      debugger
       let newRow = []
 
       for (let t = 0; t < tileCount; t++) {
@@ -162,7 +161,6 @@ export default {
   },
   watch: {
     rowCount(newValue, oldValue) {
-      debugger
       if (oldValue == null) return
 
       if (newValue > oldValue) {
@@ -172,7 +170,6 @@ export default {
       }
     },
     columnCount(newValue, oldValue) {
-      debugger
       if (oldValue == null) return
 
       if (newValue > oldValue) {

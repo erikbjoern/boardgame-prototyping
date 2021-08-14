@@ -1,51 +1,51 @@
 <template>
   <div
-    class="hex-grid__item"
+    class="h-full relative drop-shadow-lg"
     :style="{ zIndex: tile.number }"
     @click="toggleTileSelection(tile)"
   >
     <div
-      class="hex-grid-item__background"
+      class="h-full w-full grid place-items-center clip-hexagon"
       :class="isSelected ? 'bg-green-500' : 'bg-white'"
       :style="`margin: -${borderWidth}`"
     >
-      <div class="hex-grid-item__content" :style="{ ...tileContentStyle }">
-        <span :style="`margin-top: ${size / 5}px; color: ${landscapeColors.grayscale}77`">
+      <div
+        class="flex flex-col items-center clip-hexagon"
+        :style="{ ...tileContentStyle }"
+      >
+        <span
+          :style="{
+            color: `${landscapeColors.grayscale}77`,
+            fontSize: `0.4rem`,
+          }"
+          :class="scale < 1.125 && 'opacity-0'"
+        >
           {{ tile.number }}
         </span>
         <transition name="fade" mode="out-in">
           <div
             v-show="$store.state.preferences.showResourceValues"
-            class="resourceContainer"
-            :style="{
-              fontSize: `clamp(10px, ${size / 10}vw, 40px`,
-              gap: `${size / 40}vw`,
-            }"
+            class="grid gap-[2px] grid-flow-row grid-cols-2 w-2/3 py-px px-1"
+            :style="{ fontSize: `clamp(0.2rem, ${0.8 - scale / 6}vw, 0.7rem)` }"
           >
             <div
               v-for="resource in resources"
               :key="resource.name"
-              class="resourceItem"
+              class="flex items-center justify-evenly shadow rounded text-center py-px"
               :style="{
                 backgroundColor: resourceColors[resource.name].main,
                 color: resourceColors[resource.name].grayscale,
               }"
             >
-              <div class="w-8 text-center">
-                <input
-                  class="w-full bg-transparent text-center"
-                  :value="resource.amount"
-                  @change="e => updateResource(e, resource)"
-                  v-show="$store.state.keysPressed.length == 0"
-                />
-                <span
-                  v-show="$store.state.keysPressed.length > 0"
-                  class="w-full"
-                  :style="{ color: landscapeColors.grayscale }"
-                >
-                  {{ resource.amount }}
-                </span>
-              </div>
+              <input
+                class="w-full bg-transparent text-center"
+                :value="resource.amount"
+                @change="e => updateResource(e, resource)"
+                v-show="$store.state.keysPressed.length == 0"
+              />
+              <span v-show="$store.state.keysPressed.length > 0" class="mx-auto">
+                {{ resource.amount }}
+              </span>
             </div>
           </div>
         </transition>
@@ -83,13 +83,13 @@ export default {
     ...mapState({
       borderWidth: state => state.grid.tileBorderWidth,
       viewportWidth: state => state.viewportWidth,
+      scale: state => state.grid.scale,
       selectedTiles: state => state.board.selectedTiles,
       resourceColors: state => state.board.colors.resources,
       landscapeColors(state) {
         return state.board.colors.landscapes[this.tile.landscapeType]
       },
     }),
-    ...mapGetters({ size: 'tileSize' }),
     tileContentStyle() {
       return {
         display: 'flex',
@@ -131,48 +131,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-.resourceContainer {
-  align-content: flex-start;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  width: 66%;
-}
-
-.resourceItem {
-  align-items: center;
-  border-radius: 5px;
-  box-shadow: 0.5px 0.5px 2px #44444499;
-  display: flex;
-  justify-content: space-evenly;
-  line-height: 1rem;
-}
-
-.hex-grid__item {
-  filter: drop-shadow(2px 2px 5px rgba(22, 22, 22, 0.2));
-  height: 100%;
-  margin: 0 auto;
-  position: relative;
-  width: 66.6666%;
-}
-
-.hex-grid-item__background {
-  clip-path: polygon(75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%, 25% 0);
-  display: grid;
-  height: 100%;
-  place-items: center;
-  width: 100%;
-}
-
-.hex-grid-item__content {
-  align-items: center;
-  clip-path: polygon(75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%, 25% 0);
-  display: flex;
-  flex-direction: column;
-  font-size: 0.7vw;
-  justify-content: flex-start;
-}
-</style>

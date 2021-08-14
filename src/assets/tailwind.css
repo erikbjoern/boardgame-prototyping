@@ -60,3 +60,11 @@ body {
 .swal2-confirm {
   background-color: #197c4a !important;
 }
+
+.clip-hexagon {
+  clip-path: polygon(75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%, 25% 0);
+}
+
+.text-clamp-sm {
+  font-size: clamp(0.5rem, 0.7vw, 1rem);
+}
