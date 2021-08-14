@@ -13,6 +13,19 @@ const store = new Vuex.Store(storeConfiguration.create())
 let updateLocalStorageTimer = undefined
 
 store.subscribe((mutation, state) => {
+  if (mutation.type == 'vuexfire/SET_VALUE' && mutation.payload?.path == 'appState') {
+    const appState = mutation.payload.data
+
+    if (appState.board) {
+      appState.board.tileRows = appState.board.tileRows?.map(row => Object.values(row))
+      appState.board.tileRowsStash = appState.board.tileRowsStash?.map(row =>
+        Object.values(row)
+      )
+    }
+
+    store.dispatch('setApplicationState', appState)
+  }
+
   if (!state.initialised) return
 
   if (updateLocalStorageTimer) {

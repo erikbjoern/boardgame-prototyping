@@ -1,4 +1,7 @@
+import { vuexfireMutations } from 'vuexfire'
+
 export default {
+  ...vuexfireMutations,
   initialised(state) {
     state.initialised = true
   },

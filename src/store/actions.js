@@ -2,6 +2,7 @@ import db from '@/db'
 import localForage from 'localforage'
 import cuid from 'cuid'
 import { storeConfig } from '@/store'
+import { firestoreAction } from 'vuexfire'
 
 async function performTimeStampCheck(params) {
   const timeStamp = await localForage.getItem('timeStamp')
@@ -18,8 +19,24 @@ async function performTimeStampCheck(params) {
   }
 }
 
+const firestoreId = 'EkKBOQjjJk6Bz4zJUIAs' || localForage.getItem('firestoreId')
+
 export default {
+  bindStore: firestoreAction(async ({ bindFirestoreRef }, id) => {
+    return bindFirestoreRef('appState', db.collection(id).doc('appState'))
+  }),
+  async initFirebase({ dispatch }) {
+    if (firestoreId) {
+      dispatch('bindStore', firestoreId)
+    } else {
+      console.log('Todo')
+    }
+  },
   async setInitialGrid({ commit }, settings) {
+    if (settings?.grid) {
+      return commit('setGridState', settings.grid)
+    }
+
     const savedData = (await localForage.getItem('grid')) || {}
 
     let gridData = {}
@@ -28,25 +45,31 @@ export default {
       gridData[key] = savedData[key] || value
     })
 
-    commit('setGridState', (settings?.grid ?? gridData) || storeConfig.initialState.grid)
+    commit('setGridState', gridData || storeConfig.initialState.grid)
   },
   async setInitialLandscapes({ commit }, settings) {
+    if (settings?.landscapes) {
+      return commit('setLandscapeState', settings.landscapes)
+    }
+
     const savedData = (await localForage.getItem('landscapes')) || null
 
-    commit(
-      'setLandscapeState',
-      (settings?.landscapes ?? savedData) || storeConfig.initialState.landscapes
-    )
+    commit('setLandscapeState', savedData || storeConfig.initialState.landscapes)
   },
   async setInitialResources({ commit }, settings) {
+    if (settings?.resources) {
+      return commit('setResourceState', settings.resources)
+    }
+
     const savedData = (await localForage.getItem('resources')) || null
 
-    commit(
-      'setResourceState',
-      (settings?.resources ?? savedData) || storeConfig.initialState.resources
-    )
+    commit('setResourceState', savedData || storeConfig.initialState.resources)
   },
   async setInitialBoard({ commit }, settings) {
+    if (settings?.board) {
+      return commit('setBoardState', settings.board)
+    }
+
     const savedData = (await localForage.getItem('board')) || {}
     // let savedData
 
@@ -69,18 +92,16 @@ export default {
       }
     }
 
-    commit(
-      'setBoardState',
-      (settings?.board ?? tileData) || storeConfig.initialState.board
-    )
+    commit('setBoardState', tileData || storeConfig.initialState.board)
   },
   async setInitialPreferences({ commit }, settings) {
+    if (settings?.preferences) {
+      return commit('setPreferencesState', settings.preferences)
+    }
+
     const savedData = (await localForage.getItem('preferences')) || null
 
-    commit(
-      'setPreferencesState',
-      (settings?.preferences ?? savedData) || storeConfig.initialState.preferences
-    )
+    commit('setPreferencesState', savedData || storeConfig.initialState.preferences)
   },
   async setApplicationState({ dispatch }, settings = null) {
     performTimeStampCheck()
@@ -98,13 +119,38 @@ export default {
 
     dispatch('arrangeLandscapePool')
   },
+  // updateApplicationState() {},
   updateLocalStorage({ state }) {
-    localForage.setItem('preferences', state.preferences)
-    localForage.setItem('grid', state.grid)
-    localForage.setItem('landscapes', state.landscapes)
-    localForage.setItem('resources', state.resources)
-    localForage.setItem('board', state.board)
-    localForage.setItem('timeStamp', new Date())
+    const appState = {
+      ...Object.assign(
+        ...Object.entries(state)
+          .filter(
+            ([k, v]) =>
+              !Object.keys(storeConfig.initialState.root).includes(k) && k !== 'appState'
+          )
+          .map(([k, v]) => ({ [k]: v }))
+      ),
+      board: {
+        ...state.board,
+        tileRows: state.board.tileRows?.map(row =>
+          row.length ? Object.assign(...row.map((tile, i) => ({ [i]: tile }))) : {}
+        ),
+        tileRowsStash: state.board.tileRowsStash?.map(row =>
+          row.length ? Object.assign(...row.map((tile, i) => ({ [i]: tile }))) : {}
+        ),
+      },
+    }
+
+    db.collection(firestoreId)
+      .doc('appState')
+      .set(appState)
+
+    // localForage.setItem('preferences', state.preferences)
+    // localForage.setItem('grid', state.grid)
+    // localForage.setItem('landscapes', state.landscapes)
+    // localForage.setItem('resources', state.resources)
+    // localForage.setItem('board', state.board)
+    // localForage.setItem('timeStamp', new Date())
   },
   async saveSettings({ state }, name) {
     const id = cuid()

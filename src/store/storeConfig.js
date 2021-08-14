@@ -15,6 +15,7 @@ const initialState = {
     draggableIsBeingDragged: false,
     draggableIsOnDropzone: false,
   },
+  appState: {},
   board: {
     tileRows: [[]],
     tileRowsStash: [[]],
