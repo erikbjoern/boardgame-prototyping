@@ -10,7 +10,7 @@ import { storeConfig } from '@/store'
 export default {
   state: () => ({
     data: [],
-    landscapePool: [],
+    pool: [],
   }),
   getters: {
     landscapeDistributionSum(state) {
@@ -84,7 +84,7 @@ export default {
       targetLandscape.resources.splice(targetResourceIndex, 1)
     },
     setLandscapePool(state, payload) {
-      state.landscapePool = payload
+      state.pool = payload
     },
   },
   actions: {

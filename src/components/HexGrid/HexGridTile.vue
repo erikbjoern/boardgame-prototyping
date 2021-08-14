@@ -94,6 +94,11 @@ export default {
     ...mapState({
       borderWidth: state => state.grid.tileBorderWidth,
       viewportWidth: state => state.viewportWidth,
+      selectedTiles: state => state.board.selectedTiles,
+      resourceColors: state => state.board.colors.resources,
+      landscapeColors(state) {
+        return state.board.colors.landscapes[this.tile.landscapeType]
+      },
     }),
     ...mapGetters({ size: 'tileSize' }),
     tileContentStyle() {
@@ -110,18 +115,12 @@ export default {
       return 1 > 6 && this.viewportWidth > 800
     },
     isSelected() {
-      return this.$store.state.board.selectedTiles.includes(this.tile.id)
+      return this.selectedTiles.includes(this.tile.id)
     },
     resources() {
-      return [...this.tile.resources]
-        .filter(r => r.amount > 0)
+      return this.tile.resources
+        ?.filter(r => r.amount > 0)
         .sort((a, b) => b.amount - a.amount)
-    },
-    landscapeColors() {
-      return this.$store.state.board.colors.landscapes[this.tile.landscapeType]
-    },
-    resourceColors() {
-      return this.$store.state.board.colors.resources
     },
   },
   methods: {
@@ -129,7 +128,7 @@ export default {
     toggleTileSelection(tile) {
       if (!this.$store.state.keysPressed.includes(17)) return
 
-      const foundIndex = this.$store.state.board.selectedTiles.indexOf(tile.id)
+      const foundIndex = this.selectedTiles.indexOf(tile.id)
 
       if (foundIndex !== -1) {
         this.$store.commit('removeTileFromSelection', foundIndex)

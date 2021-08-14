@@ -1,7 +1,7 @@
 <template></template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import cuid from 'cuid'
 import EventBus from '@/eventBus'
 
@@ -19,17 +19,13 @@ export default {
       tileRows: state => state.board.tileRows,
       tileRowsStash: state => state.board.tileRowsStash,
       landscapeParameters: state => state.landscapes.data,
+      landscapePool: state => state.landscapes.pool,
     }),
   },
   methods: {
-    ...mapActions([
-      'getRowFromStash',
-      'setApplicationState',
-      'storeTileRow',
-      'storeModifiedTileRow',
-    ]),
+    // use as method instead of computed property to ensure data is up-to-date
     getCurrentHexTotal() {
-      return [...this.$store.state.board.tileRows].flat().length
+      return this.tileRows.flat().length
     },
     getResources(landscapeType) {
       const resources = []
@@ -48,7 +44,7 @@ export default {
       return resources
     },
     getLandscapeType() {
-      const landscapePool = this.$store.state.landscapes.landscapePool
+      const landscapePool = this.landscapePool
       return landscapePool[Math.floor(Math.random() * landscapePool.length)]
     },
     getTileCount(rowIndex) {
@@ -109,22 +105,22 @@ export default {
       this.hexNumber = 0
 
       for (let index = 0; index < rowCount; index++) {
-        const targetRow = tileRows[index]
+        const targetRow = tileRows[index] || []
         const extendedRow = this.buildTileRow([...targetRow], index)
 
-        this.storeModifiedTileRow({ row: extendedRow, index })
+        this.$store.dispatch('storeModifiedTileRow', { row: extendedRow, index })
       }
     },
     async addTileRows(newTotal = this.rowCount, oldTotal = 0) {
       this.hexNumber = this.getCurrentHexTotal()
 
       for (let index = oldTotal; index < newTotal; index++) {
-        const stashedRow = await this.getRowFromStash(index)
+        const stashedRow = await this.$store.dispatch('getRowFromStash', index)
         const row = stashedRow
           ? this.buildTileRow([...stashedRow], index)
           : this.buildTileRow([], index)
 
-        this.storeTileRow({ row, index })
+        this.$store.dispatch('storeTileRow', { row, index })
       }
     },
     removeTileColumns() {
@@ -134,7 +130,7 @@ export default {
         const targetRow = this.tileRows[index]
         const reducedRow = this.reduceTileRow(targetRow, index)
 
-        this.storeModifiedTileRow({ row: reducedRow, index })
+        this.$store.dispatch('storeModifiedTileRow', { row: reducedRow, index })
       }
     },
     removeTileRows(difference) {
@@ -155,7 +151,7 @@ export default {
     },
     buildNewBoard() {
       this.addTileRows()
-
+      
       this.$store.dispatch('setBoardColors')
       this.$store.dispatch('setBoardLandscapes')
     },
@@ -181,7 +177,7 @@ export default {
     },
   },
   async created() {
-    await this.setApplicationState()
+    await this.$store.dispatch('setApplicationState')
 
     if (this.tileRows.length == 0) {
       this.buildNewBoard()
