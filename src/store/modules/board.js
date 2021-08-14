@@ -108,7 +108,7 @@ export default {
       }
     },
     storeModifiedTileRow({ commit, state }, { row, index }) {
-      const stashedCopyOfRow = state.tileRowsStash[index]
+      const stashedCopyOfRow = state.tileRowsStash[index] || []
 
       if (row.length > stashedCopyOfRow.length) {
         commit('replaceTileRow', { row, index })

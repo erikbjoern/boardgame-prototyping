@@ -27,6 +27,9 @@ button {
 .btn.highlighted {
   @apply bg-gray-100 bg-opacity-10 !important;
 }
+.btn:disabled {
+  @apply opacity-25 !important;
+}
 
 body {
   @apply font-sans antialiased;
@@ -59,4 +62,8 @@ body {
 }
 .swal2-confirm {
   background-color: #197c4a !important;
+}
+
+.clip-hexagon {
+  clip-path: polygon(75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%, 25% 0);
 }
