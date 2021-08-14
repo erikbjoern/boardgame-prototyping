@@ -200,7 +200,13 @@ export default {
   },
   computed: {
     currentDataSet() {
-      return this.$store.state[this.activeTab].data
+      const currentDataSet = this.$store.state[this.activeTab].data
+
+      if (currentDataSet.length == 0) {
+        this.removalMode = false
+      }
+
+      return currentDataSet
     },
   },
   methods: {
@@ -227,6 +233,8 @@ export default {
       const action =
         this.activeTab == 'landscapes' ? 'removeAllLandscapes' : 'removeAllResources'
       this.$store.dispatch(action)
+
+      this.removalMode = false
     },
     submitChange(item, property, value, resource) {
       let mutation
