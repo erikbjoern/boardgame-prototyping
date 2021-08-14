@@ -10,7 +10,7 @@
       :style="`margin: -${borderWidth}`"
     >
       <div
-        class="flex flex-col items-center clip-hexagon"
+        class="flex flex-col items-center clip-hexagon overflow-hidden"
         :style="{ ...tileContentStyle }"
       >
         <span
@@ -26,7 +26,7 @@
           <div
             v-show="$store.state.preferences.showResourceValues"
             class="grid gap-[2px] grid-flow-row grid-cols-2 w-2/3 py-px px-1"
-            :style="{ fontSize: `clamp(0.2rem, ${0.8 - scale / 6}vw, 0.7rem)` }"
+            :style="{ fontSize: `clamp(0.2rem, ${0.8 - scale / 6}rem, 0.7rem)` }"
           >
             <div
               v-for="resource in resources"
@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import { getInvertedHexcolorGrayscale } from '@/helpers/getDynamicColor.js'
 
 export default {

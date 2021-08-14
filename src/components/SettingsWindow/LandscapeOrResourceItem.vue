@@ -327,7 +327,7 @@ export default {
       )
     },
     resourceColors() {
-      return this.$store.state.board.colors.resources
+      return this.parentTab == 'newBoard' ? this.$store.getters.resourceColors : this.$store.state.board.colors.resources
     },
   },
   methods: {

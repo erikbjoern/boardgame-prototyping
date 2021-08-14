@@ -11,6 +11,21 @@ export default {
   state: () => ({
     data: [],
   }),
+  getters: {
+    resourceColors(state) {
+      return state.data.length
+        ? Object.assign(
+            ...state.data.map(r => ({
+              [r.name]: {
+                main: r.color,
+                inverted: getInvertedHexColor(r.color),
+                grayscale: getInvertedHexcolorGrayscale(r.color),
+              },
+            }))
+          )
+        : {}
+    },
+  },
   mutations: {
     setResourceState(state, payload) {
       Object.keys(payload).forEach(property => {
@@ -22,18 +37,7 @@ export default {
       const object = state.data.find(r => r.name == name)
       Vue.set(object, property, value)
     },
-    addResource(state, name) {
-      const color = getRandomHexColor([0, 0, 0], [55, 55, 55])
-
-      name ||= getUniqueDefaultName(`resurs #${state.data.length + 1}`, state.data)
-
-      const payload = {
-        name,
-        color,
-        invertedColor: getInvertedHexColor(color),
-        invertedColorGrayscale: getInvertedHexcolorGrayscale(color),
-      }
-
+    addResource(state, payload) {
       state.data.push(payload)
     },
     removeResource(state, { name }) {
@@ -43,6 +47,18 @@ export default {
     },
   },
   actions: {
+    addResource({ state, commit, dispatch }, name) {
+      const color = getRandomHexColor([0, 0, 0], [55, 55, 55])
+
+      name ||= getUniqueDefaultName(`resurs #${state.data.length + 1}`, state.data)
+
+      const payload = {
+        name,
+        color,
+      }
+
+      commit('addResource', payload)
+    },
     resetResources({ commit }) {
       commit('setResourceState', storeConfig.initialState.resources)
     },
@@ -55,10 +71,10 @@ export default {
 
       state.data = []
     },
-    addMissingResources({ state, commit }, resourcesOnLandscapes) {
+    addMissingResources({ state, dispatch }, resourcesOnLandscapes) {
       resourcesOnLandscapes.forEach(resourceName => {
         if (!state.data.some(r => r.name == resourceName)) {
-          commit('addResource', resourceName)
+          dispatch('addResource', resourceName)
         }
       })
     },
