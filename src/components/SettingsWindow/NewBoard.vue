@@ -144,6 +144,7 @@
             :key="item.name"
             :item="item"
             :tab="activeTab"
+            parentTab="newBoard"
             :focusAddedItem="focusAddedItem"
             @didFocusAddedItem="focusAddedItem = false"
             :removalMode="removalMode"
@@ -199,7 +200,13 @@ export default {
   },
   computed: {
     currentDataSet() {
-      return this.$store.state[this.activeTab].data
+      const currentDataSet = this.$store.state[this.activeTab].data
+
+      if (currentDataSet.length == 0) {
+        this.removalMode = false
+      }
+
+      return currentDataSet
     },
   },
   methods: {
@@ -208,11 +215,12 @@ export default {
       e?.currentTarget.blur()
       this.renderKey++
     },
-    addNew(mutation, tabName) {
-      this.$store.commit(mutation)
+    addNew(action, tabName) {
+      this.$store.dispatch(action)
+
+      this.focusAddedItem = true
 
       if (tabName !== this.activeTab) {
-        this.focusAddedItem = true
         this.switchTab(undefined, tabName)
       }
     },
@@ -225,6 +233,8 @@ export default {
       const action =
         this.activeTab == 'landscapes' ? 'removeAllLandscapes' : 'removeAllResources'
       this.$store.dispatch(action)
+
+      this.removalMode = false
     },
     submitChange(item, property, value, resource) {
       let mutation
@@ -232,7 +242,7 @@ export default {
 
       if (resource) {
         mutation = 'setResourceValueOnLandscape'
-  
+
         if (
           (property == 'max' && value < resource.min) ||
           (property == 'min' && value > resource.max)
@@ -261,17 +271,3 @@ export default {
   },
 }
 </script>
-
-<style>
-.height-enter-active,
-.height-leave-active {
-  transition: max-height 0.3s;
-  max-height: 5rem !important;
-  overflow: hidden;
-}
-
-.height-enter,
-.height-leave-to {
-  max-height: 0 !important;
-}
-</style>

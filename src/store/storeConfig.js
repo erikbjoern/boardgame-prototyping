@@ -5,7 +5,6 @@ import resources from './modules/resources'
 import landscapes from './modules/landscapes'
 import board from './modules/board'
 import preferences from './modules/preferences'
-import { getInvertedHexColor } from '@/helpers/getDynamicColor.js'
 
 const initialState = {
   root: {
@@ -21,12 +20,15 @@ const initialState = {
     tileRowsStash: [],
     selectedTiles: [],
     draggableItems: [],
+    colors: {
+      landscapes: [],
+      resources: [],
+    }
   },
   grid: {
     rowCount: 13,
     columnCount: 13,
     gap: 0,
-    tileSize: 6,
     tileBorderWidth: 6,
     scale: 1,
   },
@@ -35,17 +37,14 @@ const initialState = {
       {
         name: 'sten',
         color: '#252627',
-        invertedColor: getInvertedHexColor('#252627'),
       },
       {
         name: 'trä',
         color: '#47352c',
-        invertedColor: getInvertedHexColor('#47352c'),
       },
       {
         name: 'mat',
         color: '#681717',
-        invertedColor: getInvertedHexColor('#681717'),
       },
     ],
   },
@@ -54,7 +53,6 @@ const initialState = {
       {
         name: 'skog',
         color: '#455B37',
-        invertedColor: getInvertedHexColor('#455B37'),
         fraction: 2,
         resources: [
           {
@@ -77,7 +75,6 @@ const initialState = {
       {
         name: 'fält',
         color: '#81996D',
-        invertedColor: getInvertedHexColor('#81996D'),
         fraction: 3,
         resources: [
           {
@@ -100,7 +97,6 @@ const initialState = {
       {
         name: 'berg',
         color: '#919191',
-        invertedColor: getInvertedHexColor('#919191'),
         fraction: 1,
         resources: [
           {

@@ -22,6 +22,7 @@
           class="btn w-full rounded-full"
           :class="activeTab == 'newBoard' && 'highlighted'"
           @click="generateNewTiles"
+          :disabled="$store.state.landscapes.data.length == 0"
         >
           Generera nytt bräde
         </button>

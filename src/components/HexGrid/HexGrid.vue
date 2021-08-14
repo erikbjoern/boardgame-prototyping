@@ -22,18 +22,22 @@ export default {
   components: {
     HexGridTile,
   },
+  data() {
+    return {
+      tileSize: 6,
+    }
+  },
   computed: {
     ...mapState({
       gap: state => state.grid.gap,
       columnCount: state => state.grid.columnCount,
       tileRows: state => state.board.tileRows,
     }),
-    ...mapGetters(['tileSize']),
     gridRowsStyle() {
       return {
         display: 'grid',
         gridAutoRows: `${this.tileSize * 0.866}vw`,
-        columnGap: `${this.gapValue * 2}vw`,
+        columnGap: `${this.gapValue * 2 + this.tileSize / 2}vw`,
         rowGap: `${this.gapValue}vw`,
         gridColumnStart: 1,
         gridRowStart: 1,
@@ -41,13 +45,13 @@ export default {
     },
     gridRowsOddStyle() {
       return {
-        gridTemplateColumns: `repeat(${this.rowsOddLength}, ${this.tileSpaceX}vw)`,
-        marginLeft: `${this.tileSpaceX / 2 + this.gapValue}vw`,
+        gridTemplateColumns: `repeat(${this.rowsOddLength}, ${this.tileSize}vw)`,
+        marginLeft: `${this.tileSize * 0.75 + this.gapValue}vw`,
       }
     },
     gridRowsEvenStyle() {
       return {
-        gridTemplateColumns: `repeat(${this.rowsEvenLength}, ${this.tileSpaceX}vw)`,
+        gridTemplateColumns: `repeat(${this.rowsEvenLength}, ${this.tileSize}vw)`,
         marginTop: `${(this.tileSize * 0.866) / 2 + this.gapValue / 2}vw`,
       }
     },
@@ -59,9 +63,6 @@ export default {
     },
     gapValue() {
       return this.gap * this.tileSize
-    },
-    tileSpaceX() {
-      return this.tileSize * 1.5
     },
   },
   methods: {

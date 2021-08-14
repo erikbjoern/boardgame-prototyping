@@ -211,15 +211,4 @@ body::-webkit-scrollbar {
   padding-top: calc(3vw + 35px);
   width: 200vw;
 }
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s;
-  opacity: 1;
-}
-
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
 </style>

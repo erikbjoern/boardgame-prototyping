@@ -10,7 +10,7 @@ import { storeConfig } from '@/store'
 export default {
   state: () => ({
     data: [],
-    landscapePool: [],
+    pool: [],
   }),
   getters: {
     landscapeDistributionSum(state) {
@@ -30,23 +30,7 @@ export default {
       const object = state.data.find(l => l.name == name)
       Vue.set(object, property, value)
     },
-    addLandscape(state) {
-      const color = getRandomHexColor([1, 1, 0], [60, 60, 30])
-
-      const defaultName = getUniqueDefaultName(
-        `landskap #${state.data.length + 1}`,
-        state.data
-      )
-
-      const payload = {
-        name: defaultName,
-        fraction: 1,
-        color,
-        invertedColor: getInvertedHexColor(color),
-        invertedColorGrayscale: getInvertedHexcolorGrayscale(color),
-        resources: [],
-      }
-
+    addLandscape(state, payload) {
       state.data.push(payload)
     },
     removeLandscape(state, { name }) {
@@ -84,10 +68,27 @@ export default {
       targetLandscape.resources.splice(targetResourceIndex, 1)
     },
     setLandscapePool(state, payload) {
-      state.landscapePool = payload
+      state.pool = payload
     },
   },
   actions: {
+    addLandscape({ state, commit }) {
+      const color = getRandomHexColor([1, 1, 0], [60, 60, 30])
+
+      const defaultName = getUniqueDefaultName(
+        `landskap #${state.data.length + 1}`,
+        state.data
+      )
+
+      const payload = {
+        name: defaultName,
+        fraction: 1,
+        color,
+        resources: [],
+      }
+
+      commit('addLandscape', payload)
+    },
     arrangeLandscapePool({ state, getters, commit }, payload) {
       const landscapes = state.data
 

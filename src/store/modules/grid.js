@@ -5,20 +5,9 @@ export default {
     rowCount: null,
     columnCount: null,
     gap: null,
-    tileSize: null,
     tileBorderWidth: null,
     scale: null,
   }),
-  getters: {
-    tileSize(state, getter, rootState) {
-      const thresholdInPx = 45
-      if (state.tileSize * (rootState.viewportWidth / 100) > thresholdInPx) {
-        return state.tileSize
-      } else {
-        return (thresholdInPx / rootState.viewportWidth) * 100
-      }
-    },
-  },
   mutations: {
     setGridState(state, payload) {
       Object.keys(payload).forEach(property => {
