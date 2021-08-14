@@ -261,17 +261,3 @@ export default {
   },
 }
 </script>
-
-<style>
-.height-enter-active,
-.height-leave-active {
-  transition: max-height 0.3s;
-  max-height: 5rem !important;
-  overflow: hidden;
-}
-
-.height-enter,
-.height-leave-to {
-  max-height: 0 !important;
-}
-</style>
