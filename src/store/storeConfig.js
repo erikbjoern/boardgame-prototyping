@@ -14,10 +14,10 @@ const initialState = {
     hasFocusedInput: false,
     draggableIsBeingDragged: false,
     draggableIsOnDropzone: false,
-  },  
+  },
   board: {
-    tileRows: [],
-    tileRowsStash: [],
+    tileRows: [[]],
+    tileRowsStash: [[]],
     selectedTiles: [],
     draggableItems: [],
     colors: {

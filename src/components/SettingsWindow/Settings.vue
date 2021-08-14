@@ -87,7 +87,7 @@ import NewBoard from './NewBoard'
 import AdjustBoard from './AdjustBoard'
 import vClickOutside from 'v-click-outside'
 import EventBus from '@/eventBus'
-import localForage from 'localforage'
+import db from '@/db'
 import { scrollToCenter } from '@/helpers/scroll.js'
 
 export default {
@@ -155,9 +155,10 @@ export default {
       }
     },
     async loadSettings() {
-      const savedSettingsMeta = await localForage.getItem('savedSettingsMeta')
+      const savedStateMetaDocs = await db.collection('savedStateMeta').get()
+      const savedStateMeta = savedStateMetaDocs.docs.map(d => d.data())
 
-      if (!savedSettingsMeta?.length) {
+      if (!savedStateMeta?.length) {
         await this.$swal({
           text: 'Inga sparade inställningar att ladda',
           showCancelButton: false,
@@ -169,9 +170,13 @@ export default {
       }
 
       const inputOptions = Object.assign(
-        ...savedSettingsMeta
+        ...savedStateMeta
           .sort((a, b) => a.date - b.date)
-          .map(m => ({ [m.id]: `${m.name} (${m.date.toString().slice(0, 15)})` }))
+          .map(m => ({
+            [m.id]: `${m.name} (${new Date(m.date?.seconds * 1000)
+              ?.toString()
+              .slice(0, 15)})`,
+          }))
       )
 
       const dialog = await this.$swal({

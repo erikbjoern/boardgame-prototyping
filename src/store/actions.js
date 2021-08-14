@@ -1,6 +1,7 @@
+import db from '@/db'
 import localForage from 'localforage'
-import { storeConfig } from '@/store'
 import cuid from 'cuid'
+import { storeConfig } from '@/store'
 
 async function performTimeStampCheck(params) {
   const timeStamp = await localForage.getItem('timeStamp')
@@ -47,6 +48,13 @@ export default {
   },
   async setInitialBoard({ commit }, settings) {
     const savedData = (await localForage.getItem('board')) || {}
+    // let savedData
+
+    // const savedDataF = await db.collection('savedState').get()
+
+    // if (savedDataF) {
+    //   savedData = savedDataF.docs[0].data()
+    // }
 
     let tileData
 
@@ -100,24 +108,52 @@ export default {
   },
   async saveSettings({ state }, name) {
     const id = cuid()
-    const settings = Object.assign(
+    const newMetaEntry = { id, name, date: new Date() }
+    const currentState = Object.assign(
       ...Object.entries(state)
         .filter(([k, v]) => !Object.keys(storeConfig.initialState.root).includes(k))
         .map(([k, v]) => ({ [k]: v }))
     )
 
-    const newMetaEntry = { id, name, date: new Date() }
-    const allMetaEntries = [newMetaEntry]
-    const savedSettingsMeta = await localForage.getItem('savedSettingsMeta')
+    currentState.board.tileRows.forEach(
+      (row, index) =>
+        (currentState.board.tileRows[index] = Object.assign(
+          ...row.map((tile, i) => ({ [i]: tile }))
+        ))
+    )
 
-    if (savedSettingsMeta?.length) allMetaEntries.push(...savedSettingsMeta)
+    currentState.board.tileRowsStash.forEach(
+      (row, index) =>
+        (currentState.board.tileRowsStash[index] = Object.assign(
+          ...row.map((tile, i) => ({ [i]: tile }))
+        ))
+    )
 
-    localForage.setItem(`savedSettings:${id}`, settings)
-    localForage.setItem('savedSettingsMeta', allMetaEntries)
+    db.collection('savedState')
+      .doc(id)
+      .set(currentState)
+    db.collection('savedStateMeta').add(newMetaEntry)
   },
   async loadSettings({ dispatch }, id) {
-    const savedSettings = await localForage.getItem(`savedSettings:${id}`)
+    db.collection('savedState')
+      .doc(id)
+      .get()
+      .then(doc => {
+        const savedState = doc.data()
 
-    dispatch('setApplicationState', savedSettings)
+        if (savedState.board?.tileRows?.length) {
+          savedState.board.tileRows.forEach(
+            (row, index) => (savedState.board.tileRows[index] = Object.values(row))
+          )
+        }
+
+        if (savedState.board?.tileRowsStash?.length) {
+          savedState.board.tileRowsStash.forEach(
+            (row, index) => (savedState.board.tileRowsStash[index] = Object.values(row))
+          )
+        }
+
+        dispatch('setApplicationState', savedState)
+      })
   },
 }
