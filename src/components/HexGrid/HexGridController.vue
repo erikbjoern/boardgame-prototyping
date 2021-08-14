@@ -47,12 +47,16 @@ export default {
       const landscapePool = this.landscapePool
       return landscapePool[Math.floor(Math.random() * landscapePool.length)]
     },
-    getTileCount(rowIndex) {
+    getTileCount(rowIndex, direction) {
+      if (direction == 'rows' && this.tileRows.length > 2) {
+        return this.tileRows[rowIndex - 2].length
+      }
       const { columnCount } = this
       return Math.floor(columnCount / 2) + (columnCount % 2) * (rowIndex % 2)
     },
-    buildTileRow(row, rowIndex) {
-      const tileCount = this.getTileCount(rowIndex)
+    buildTileRow(row, rowIndex, direction) {
+      const tileCount = this.getTileCount(rowIndex, direction)
+      debugger
       let newRow = []
 
       for (let t = 0; t < tileCount; t++) {
@@ -101,12 +105,12 @@ export default {
       return reducedRow
     },
     addTileColumns() {
-      const { rowCount, tileRows } = this
       this.hexNumber = 0
+      const rowCount = this.tileRows.length
 
       for (let index = 0; index < rowCount; index++) {
-        const targetRow = tileRows[index] || []
-        const extendedRow = this.buildTileRow([...targetRow], index)
+        const targetRow = this.tileRows[index] || []
+        const extendedRow = this.buildTileRow([...targetRow], index, 'columns')
 
         this.$store.dispatch('storeModifiedTileRow', { row: extendedRow, index })
       }
@@ -117,8 +121,8 @@ export default {
       for (let index = oldTotal; index < newTotal; index++) {
         const stashedRow = await this.$store.dispatch('getRowFromStash', index)
         const row = stashedRow
-          ? this.buildTileRow([...stashedRow], index)
-          : this.buildTileRow([], index)
+          ? this.buildTileRow([...stashedRow], index, 'rows')
+          : this.buildTileRow([], index, 'rows')
 
         this.$store.dispatch('storeTileRow', { row, index })
       }
@@ -151,13 +155,14 @@ export default {
     },
     buildNewBoard() {
       this.addTileRows()
-      
+
       this.$store.dispatch('setBoardColors')
       this.$store.dispatch('setBoardLandscapes')
     },
   },
   watch: {
     rowCount(newValue, oldValue) {
+      debugger
       if (oldValue == null) return
 
       if (newValue > oldValue) {
@@ -167,6 +172,7 @@ export default {
       }
     },
     columnCount(newValue, oldValue) {
+      debugger
       if (oldValue == null) return
 
       if (newValue > oldValue) {
