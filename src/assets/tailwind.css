@@ -27,6 +27,9 @@ button {
 .btn.highlighted {
   @apply bg-gray-100 bg-opacity-10 !important;
 }
+.btn:disabled {
+  @apply opacity-25 !important;
+}
 
 body {
   @apply font-sans antialiased;
