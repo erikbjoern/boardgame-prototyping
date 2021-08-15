@@ -123,7 +123,6 @@ export default {
         tileRowsStash: [],
         selectedTiles: [],
       })
-      dispatch('arrangeLandscapePool')
 
       EventBus.$emit('buildNewBoard')
     },

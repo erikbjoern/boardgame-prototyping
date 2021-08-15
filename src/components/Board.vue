@@ -1,6 +1,6 @@
 <template>
   <div id="board-container" class="cursor-default relative">
-    <HexGrid />
+    <HexGrid v-if="$store.state.board.tileRows.length > 0" />
     <HexGridController />
     <DraggableItemsController />
   </div>

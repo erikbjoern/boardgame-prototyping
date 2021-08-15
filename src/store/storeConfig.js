@@ -8,7 +8,9 @@ import preferences from './modules/preferences'
 
 const initialState = {
   root: {
-    initialised: false,
+    firestoreId: '',
+    firstGridIsBuilt: false,
+    useInitialState: false,
     viewportWidth: window.visualViewport?.width || 1400,
     keysPressed: [],
     hasFocusedInput: false,
@@ -17,8 +19,8 @@ const initialState = {
   },
   appState: {},
   board: {
-    tileRows: [[]],
-    tileRowsStash: [[]],
+    tileRows: [],
+    tileRowsStash: [],
     selectedTiles: [],
     draggableItems: [],
     colors: {

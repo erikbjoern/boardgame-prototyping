@@ -1,126 +1,66 @@
 import db from '@/db'
-import localForage from 'localforage'
 import cuid from 'cuid'
+import EventBus from '@/eventBus'
 import { storeConfig } from '@/store'
 import { firestoreAction } from 'vuexfire'
 
-async function performTimeStampCheck(params) {
-  const timeStamp = await localForage.getItem('timeStamp')
+async function performTimeStampCheck() {
+  const timeStamp = await localStorage.getItem('timeStamp')
 
-  if (new Date(timeStamp) < new Date('2021-08-10T21:32:38.785Z')) {
-    const grid = localForage.removeItem('grid')
-    const landscapes = localForage.removeItem('landscapes')
-    const resources = localForage.removeItem('resources')
-    const board = localForage.removeItem('board')
-
-    localForage.setItem('timeStamp', new Date())
-
-    await Promise.all([grid, landscapes, resources, board])
+  if (new Date(timeStamp) < new Date('2021-08-14T21:32:38.785Z')) {
+    localStorage.setItem('timeStamp', new Date())
+    return true
   }
-}
 
-const firestoreId = 'EkKBOQjjJk6Bz4zJUIAs' || localForage.getItem('firestoreId')
+  return false
+}
 
 export default {
   bindStore: firestoreAction(async ({ bindFirestoreRef }, id) => {
     return bindFirestoreRef('appState', db.collection(id).doc('appState'))
   }),
-  async initFirebase({ dispatch }) {
-    if (firestoreId) {
-      dispatch('bindStore', firestoreId)
+  async setFirestoreId({ commit }) {
+    let firestoreId
+
+    const dataIsStale = await performTimeStampCheck()
+
+    if (dataIsStale) {
+      firestoreId = cuid()
+      commit('useInitialState', true)
     } else {
-      console.log('Todo')
-    }
-  },
-  async setInitialGrid({ commit }, settings) {
-    if (settings?.grid) {
-      return commit('setGridState', settings.grid)
+      firestoreId = (await localStorage.getItem('firestoreId')) || 'EkKBOQjjJk6Bz4zJUIAs'
     }
 
-    const savedData = (await localForage.getItem('grid')) || {}
-
-    let gridData = {}
-
-    Object.entries(storeConfig.initialState.grid).forEach(([key, value]) => {
-      gridData[key] = savedData[key] || value
-    })
-
-    commit('setGridState', gridData || storeConfig.initialState.grid)
+    localStorage.setItem('firestoreId', firestoreId)
+    commit('setFirestoreId', firestoreId)
   },
-  async setInitialLandscapes({ commit }, settings) {
-    if (settings?.landscapes) {
-      return commit('setLandscapeState', settings.landscapes)
+  async initFirebase({ state, dispatch }) {
+    await dispatch('setFirestoreId')
+
+    dispatch('bindStore', state.firestoreId)
+  },
+  async setApplicationState({ state, commit }, savedState) {
+    function setState(appState) {
+      commit('setResourceState', appState.resources)
+      commit('setGridState', appState.grid)
+      commit('setBoardState', appState.board)
+      commit('setLandscapeState', appState.landscapes)
+      commit('setPreferencesState', appState.preferences)
     }
 
-    const savedData = (await localForage.getItem('landscapes')) || null
+    if (state.useInitialState) {
+      setState(storeConfig.initialState)
 
-    commit('setLandscapeState', savedData || storeConfig.initialState.landscapes)
-  },
-  async setInitialResources({ commit }, settings) {
-    if (settings?.resources) {
-      return commit('setResourceState', settings.resources)
+      EventBus.$emit('buildNewBoard')
+
+      return commit('useInitialState', false)
+    } else {
+      setState(savedState)
     }
-
-    const savedData = (await localForage.getItem('resources')) || null
-
-    commit('setResourceState', savedData || storeConfig.initialState.resources)
   },
-  async setInitialBoard({ commit }, settings) {
-    if (settings?.board) {
-      return commit('setBoardState', settings.board)
-    }
+  writeToDatabase({ state }) {
+    if (!state.firestoreId || !state.firstGridIsBuilt) return
 
-    const savedData = (await localForage.getItem('board')) || {}
-    // let savedData
-
-    // const savedDataF = await db.collection('savedState').get()
-
-    // if (savedDataF) {
-    //   savedData = savedDataF.docs[0].data()
-    // }
-
-    let tileData
-
-    if (savedData.tileRows?.length) {
-      tileData = {
-        tileRows: savedData.tileRows,
-        tileRowsStash: savedData.tileRowsStash || [],
-        selectedTiles: savedData.selectedTiles || [],
-        draggableItems: savedData.draggableItems || [],
-        colors: savedData.colors || {},
-        landscapesAndResources: savedData.landscapesAndResources || [],
-      }
-    }
-
-    commit('setBoardState', tileData || storeConfig.initialState.board)
-  },
-  async setInitialPreferences({ commit }, settings) {
-    if (settings?.preferences) {
-      return commit('setPreferencesState', settings.preferences)
-    }
-
-    const savedData = (await localForage.getItem('preferences')) || null
-
-    commit('setPreferencesState', savedData || storeConfig.initialState.preferences)
-  },
-  async setApplicationState({ dispatch }, settings = null) {
-    performTimeStampCheck()
-
-    await dispatch('setInitialResources', settings)
-
-    const promises = [
-      'setInitialGrid',
-      'setInitialLandscapes',
-      'setInitialBoard',
-      'setInitialPreferences',
-    ].map(action => dispatch(action, settings))
-
-    await Promise.all(promises)
-
-    dispatch('arrangeLandscapePool')
-  },
-  // updateApplicationState() {},
-  updateLocalStorage({ state }) {
     const appState = {
       ...Object.assign(
         ...Object.entries(state)
@@ -141,16 +81,9 @@ export default {
       },
     }
 
-    db.collection(firestoreId)
+    db.collection(state.firestoreId)
       .doc('appState')
       .set(appState)
-
-    // localForage.setItem('preferences', state.preferences)
-    // localForage.setItem('grid', state.grid)
-    // localForage.setItem('landscapes', state.landscapes)
-    // localForage.setItem('resources', state.resources)
-    // localForage.setItem('board', state.board)
-    // localForage.setItem('timeStamp', new Date())
   },
   async saveSettings({ state }, name) {
     const id = cuid()

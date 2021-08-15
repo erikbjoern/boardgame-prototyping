@@ -2,8 +2,14 @@ import { vuexfireMutations } from 'vuexfire'
 
 export default {
   ...vuexfireMutations,
-  initialised(state) {
-    state.initialised = true
+  firstGridIsBuilt(state) {
+    state.firstGridIsBuilt = true
+  },
+  setFirestoreId(state, payload) {
+    state.firestoreId = payload
+  },
+  useInitialState(state, payload) {
+    state.useInitialState = !!payload
   },
   updateViewportWidth(state) {
     state.viewportWidth = visualViewport.width

@@ -73,5 +73,10 @@ export default {
       return this.tileRows.filter((a, index) => index % 2 == 1)
     },
   },
+  created() {
+    // HexGrid is conditionally rendered when there exists tileRows in store
+    // After initial render it is OK to update database
+    this.$store.commit('firstGridIsBuilt')
+  },
 }
 </script>
