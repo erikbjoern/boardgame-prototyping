@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import HexGridTile from '@/components/HexGrid/HexGridTile.vue'
 
 export default {
@@ -76,7 +76,7 @@ export default {
   created() {
     // HexGrid is conditionally rendered when there exists tileRows in store
     // After initial render it is OK to update database
-    this.$store.commit('firstGridIsBuilt')
+    this.$store.commit('isAwaitingFirstGridBuild', false)
   },
 }
 </script>

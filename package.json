@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "set TAILWIND_MODE=watch&& vue-cli-service serve && set TAILWIND_MODE=",
     "serve:mac": "TAILWIND_MODE=watch vue-cli-service serve",
     "build": "vue-cli-service build",
     "jest": "vue-cli-service test:unit"

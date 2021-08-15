@@ -1,19 +1,35 @@
 <template>
   <div
-    :class="
-      `h-[80vh] rounded overflow-hidden bg-black bg-opacity-95 
-      fixed right-0 mr-12 top-1/2 transform -translate-y-1/2 z-[1100] flex`
-    "
+    class="h-[80vh] rounded overflow-hidden bg-black bg-opacity-95 fixed 
+           right-0 mr-12 top-1/2 transform -translate-y-1/2 z-[1100] flex flex-col"
     v-click-outside="onClickOutside"
   >
-    <div class="h-full flex flex-col">
+    <div class="flex">
       <div
-        class="h-10 w-full flex items-center justify-center text-white text-opacity-30 tracking-wide font-semibold"
+        class="h-10 w-64 flex items-center justify-center text-white text-opacity-30 tracking-wide font-semibold"
       >
         Inställningar
       </div>
+
+      <div class="flex border-b-2 border-black mx-px px-2 h-10 flex-1">
+        <button
+          class="flex-1 hover:bg-black bg-opacity-100 hover:!opacity-100 border-b-2"
+          :class="
+            activeTab == tab.name
+              ? 'border-green-500 text-white'
+              : 'border-transparent text-gray-500 hover:!text-gray-400'
+          "
+          v-for="tab in tabs"
+          :key="tab.name"
+          @click="e => selectTab(e, tab.name)"
+        >
+          {{ tab.label }}
+        </button>
+      </div>
+    </div>
+    <div class="flex flex-1 min-h-0">
       <div
-        class="p-2 space-y-3 border-[10px] border-r-0 border-black flex-1 min-h-0 flex flex-col"
+        class="p-2 space-y-3 border-[10px] border-r-0 border-b-0 border-black flex-1 min-h-0 flex flex-col w-64"
       >
         <button class="btn w-full rounded-full" @click="generateNewResourceValues">
           Generera nya resursvärden
@@ -54,30 +70,26 @@
           {{ $store.state.preferences.showSummary ? 'Visar' : 'Visa' }} summering
         </button>
       </div>
-    </div>
-    <div class="flex flex-col">
-      <div class="flex border-b-2 border-black mx-px h-10">
-        <button
-          class="flex-1 hover:bg-black bg-opacity-100 hover:!opacity-100 border-b-2"
-          :class="
-            activeTab == tab.name
-              ? 'border-green-500 text-white'
-              : 'border-transparent text-gray-500 hover:!text-gray-400'
-          "
-          v-for="tab in tabs"
-          :key="tab.name"
-          @click="e => selectTab(e, tab.name)"
-        >
-          {{ tab.label }}
-        </button>
-      </div>
       <div
-        class="shadow-inner border-black border-[10px] py-8 flex-1"
+        class="shadow-inner border-black border-[10px] border-b-0 py-8 flex-1"
         :style="{ height: 'calc(100vh - 200px)', maxHeight: '80vh', minWidth: '40rem' }"
       >
         <NewBoard v-show="activeTab == 'newBoard'" />
         <AdjustBoard v-show="activeTab == 'adjustBoard'" />
       </div>
+    </div>
+    <div
+      class="bg-black w-full h-8 flex-none pl-[0.6rem] text-white text-xs flex items-center"
+    >
+      <label>Firestore ID:</label>
+      <input
+        type="text"
+        class="ml-2 px-1 w-[11rem] bg-transparent border border-gray-700 rounded-sm"
+        :value="$store.state.firestoreId"
+        @keydown.enter="rebindStore"
+        @keydown.esc="e => e.target.blur()"
+        @blur="e => (e.target.value = $store.state.firestoreId)"
+      />
     </div>
   </div>
 </template>
@@ -115,6 +127,13 @@ export default {
     }
   },
   methods: {
+    rebindStore(e) {
+      const firestoreId = e.target.value
+
+      this.$store.commit('setFirestoreId', firestoreId)
+      this.$store.dispatch('bindStore', firestoreId)
+      e.target.blur()
+    },
     selectTab(e, name) {
       this.activeTab = name
       e.currentTarget.blur()

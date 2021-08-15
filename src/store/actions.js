@@ -16,7 +16,11 @@ async function performTimeStampCheck() {
 }
 
 export default {
-  bindStore: firestoreAction(async ({ bindFirestoreRef }, id) => {
+  bindStore: firestoreAction(async ({ commit, bindFirestoreRef }, id) => {
+    // safely reset state to know when new state is loaded
+    commit('isAwaitingFirstGridBuild', true)
+    commit('setBoardState', storeConfig.initialState.board)
+    
     return bindFirestoreRef('appState', db.collection(id).doc('appState'))
   }),
   async setFirestoreId({ commit }) {
@@ -59,7 +63,7 @@ export default {
     }
   },
   writeToDatabase({ state }) {
-    if (!state.firestoreId || !state.firstGridIsBuilt) return
+    if (!state.firestoreId || state.isAwaitingFirstGridBuild) return
 
     const appState = {
       ...Object.assign(

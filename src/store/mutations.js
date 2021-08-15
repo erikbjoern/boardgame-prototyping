@@ -2,8 +2,8 @@ import { vuexfireMutations } from 'vuexfire'
 
 export default {
   ...vuexfireMutations,
-  firstGridIsBuilt(state) {
-    state.firstGridIsBuilt = true
+  isAwaitingFirstGridBuild(state, payload) {
+    state.isAwaitingFirstGridBuild = payload
   },
   setFirestoreId(state, payload) {
     state.firestoreId = payload
