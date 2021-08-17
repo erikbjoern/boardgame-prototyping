@@ -79,17 +79,26 @@
       </div>
     </div>
     <div
-      class="bg-black w-full h-8 flex-none pl-[0.6rem] text-white text-xs flex items-center"
+      class="bg-black w-full h-8 flex-none px-[0.6rem] text-white text-xs flex items-center"
     >
-      <label>Firestore ID:</label>
+      <label class="flex-none">Firestore ID:</label>
       <input
         type="text"
-        class="ml-2 px-1 w-[11rem] bg-transparent border border-gray-700 rounded-sm"
+        class="ml-2 px-1 w-[11rem] flex-none bg-transparent border border-gray-700 rounded-sm font-mono"
         :value="$store.state.firestoreId"
-        @keydown.enter="rebindStore"
+        @keydown.enter="e => rebindStore(e.target.value)"
         @keydown.esc="e => e.target.blur()"
         @blur="e => (e.target.value = $store.state.firestoreId)"
       />
+      <div class="flex space-x-3 ml-3 text-gray-500 w-full">
+        <span v-if="$store.state.previousFirestoreIds.length">Tidigare ID:n</span>
+        <span class="font-mono">
+          {{ $store.state.previousFirestoreIds.join(", ") }}
+        </span>
+        <button class="py-0 border rounded px-1 inline-block !ml-auto" @click="bindStoreToNewConnection">
+          Ny databasanslutning
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -100,6 +109,7 @@ import AdjustBoard from './AdjustBoard'
 import vClickOutside from 'v-click-outside'
 import EventBus from '@/eventBus'
 import db from '@/db'
+import cuid from 'cuid'
 import { scrollToCenter } from '@/helpers/scroll.js'
 
 export default {
@@ -127,12 +137,24 @@ export default {
     }
   },
   methods: {
-    rebindStore(e) {
-      const firestoreId = e.target.value
+    async rebindStore(firestoreId) {
+      if (
+        (firestoreId.length == 25 && firestoreId[0] == 'c') ||
+        firestoreId == 'TheGlobalRoom'
+      ) {
+        await this.$store.dispatch('setFirestoreId', firestoreId)
+        this.$store.dispatch('bindStore')
+      } else {
+        e.target.value = this.$store.state.firestoreId
+      }
 
-      this.$store.commit('setFirestoreId', firestoreId)
-      this.$store.dispatch('bindStore', firestoreId)
       e.target.blur()
+    },
+    bindStoreToNewConnection() {
+      const newFirestoreId = cuid()
+
+      this.$store.commit('useInitialState', true)
+      this.rebindStore(newFirestoreId)
     },
     selectTab(e, name) {
       this.activeTab = name

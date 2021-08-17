@@ -16,44 +16,72 @@ async function performTimeStampCheck() {
 }
 
 export default {
-  bindStore: firestoreAction(async ({ commit, bindFirestoreRef }, id) => {
-    // safely reset state to know when new state is loaded
+  bindStore: firestoreAction(async ({ state, commit, bindFirestoreRef }) => {
+    // when rebinding - safely reset state to know when new state is loaded
     commit('isAwaitingFirstGridBuild', true)
-    commit('setBoardState', storeConfig.initialState.board)
-    
-    return bindFirestoreRef('appState', db.collection(id).doc('appState'))
+    commit('setBoardState', {
+      ...storeConfig.initialState.board,
+    })
+
+    return bindFirestoreRef('appState', db.collection(state.firestoreId).doc('appState'))
   }),
-  async setFirestoreId({ commit }) {
+  async setFirestoreId({ state, commit }, firestoreId) {
+    if (state.firestoreId) {
+      const previousFirestoreId =
+        state.previousFirestoreIds[0] ||
+        (await localStorage.getItem('previousFirestoreId1'))
+
+      localStorage.setItem('firestoreId', firestoreId)
+      localStorage.setItem('previousFirestoreId1', state.firestoreId)
+
+      if (previousFirestoreId) {
+        localStorage.setItem('previousFirestoreId2', previousFirestoreId)
+      }
+      
+      commit('setPreviousFirestoreIds', [state.firestoreId])
+    }
+
+    commit('setFirestoreId', firestoreId)
+  },
+  async initFirebase({ state, commit, dispatch }) {
     let firestoreId
+    let previousFirestoreIds = []
 
     const dataIsStale = await performTimeStampCheck()
 
-    if (dataIsStale) {
-      firestoreId = cuid()
-      commit('useInitialState', true)
-    } else {
-      firestoreId = (await localStorage.getItem('firestoreId')) || 'EkKBOQjjJk6Bz4zJUIAs'
+    if (!dataIsStale) {
+      await Promise.all([
+        (firestoreId = localStorage.getItem('firestoreId')),
+        previousFirestoreIds.push(
+          localStorage.getItem('previousFirestoreId1'),
+          localStorage.getItem('previousFirestoreId2')
+        ),
+      ])
+
+      previousFirestoreIds = previousFirestoreIds.filter(v => !!v)
     }
 
-    localStorage.setItem('firestoreId', firestoreId)
-    commit('setFirestoreId', firestoreId)
-  },
-  async initFirebase({ state, dispatch }) {
-    await dispatch('setFirestoreId')
+    if (!firestoreId || firestoreId == 'undefined') {
+      firestoreId = cuid()
+      commit('useInitialState', true)
+    }
 
-    dispatch('bindStore', state.firestoreId)
+    await dispatch('setFirestoreId', firestoreId)
+    dispatch('bindStore')
+    commit('setPreviousFirestoreIds', previousFirestoreIds)
   },
   async setApplicationState({ state, commit }, savedState) {
     function setState(appState) {
-      commit('setResourceState', appState.resources)
-      commit('setGridState', appState.grid)
-      commit('setBoardState', appState.board)
-      commit('setLandscapeState', appState.landscapes)
-      commit('setPreferencesState', appState.preferences)
+      commit('setResourceState', appState?.resources || {})
+      commit('setGridState', appState?.grid || {})
+      commit('setBoardState', appState?.board || {})
+      commit('setLandscapeState', appState?.landscapes || {})
+      commit('setPreferencesState', appState?.preferences || {})
     }
 
     if (state.useInitialState) {
-      setState(storeConfig.initialState)
+      const initialStateCopy = JSON.parse(JSON.stringify(storeConfig.initialState))
+      setState(initialStateCopy)
 
       EventBus.$emit('buildNewBoard')
 

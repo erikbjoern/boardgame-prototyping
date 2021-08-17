@@ -9,6 +9,7 @@ import preferences from './modules/preferences'
 const initialState = {
   root: {
     firestoreId: '',
+    previousFirestoreIds: [],
     isAwaitingFirstGridBuild: true,
     useInitialState: false,
     viewportWidth: window.visualViewport?.width || 1400,

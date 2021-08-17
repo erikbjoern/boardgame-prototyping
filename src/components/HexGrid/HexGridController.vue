@@ -181,7 +181,7 @@ export default {
       }
     },
   },
-  async created() {
+  created() {
     EventBus.$on('buildNewBoard', this.buildNewBoard)
     EventBus.$on('reassignResources', this.reassignResources)
   },

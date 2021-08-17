@@ -8,6 +8,10 @@ export default {
   setFirestoreId(state, payload) {
     state.firestoreId = payload
   },
+  setPreviousFirestoreIds(state, previousIds) {
+    previousIds.forEach(id => state.previousFirestoreIds.unshift(id))
+    state.previousFirestoreIds = state.previousFirestoreIds.slice(0, 2)
+  },
   useInitialState(state, payload) {
     state.useInitialState = !!payload
   },
