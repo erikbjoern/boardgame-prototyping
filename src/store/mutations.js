@@ -12,6 +12,9 @@ export default {
     previousIds.forEach(id => state.previousFirestoreIds.unshift(id))
     state.previousFirestoreIds = state.previousFirestoreIds.slice(0, 2)
   },
+  setSaveFileId(state, id) {
+    state.saveFileId = id
+  },
   useInitialState(state, payload) {
     state.useInitialState = !!payload
   },

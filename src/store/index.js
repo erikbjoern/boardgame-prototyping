@@ -10,6 +10,8 @@ export const storeConfig = JSON.parse(JSON.stringify(storeConfiguration))
 
 const store = new Vuex.Store(storeConfiguration.create())
 
+let debouncedWriteToDatabase = undefined
+
 store.subscribe((mutation, state) => {
   if (mutation.type == 'vuexfire/SET_VALUE' && mutation.payload?.path == 'appState') {
     // the mutation is passing incoming data from firestore
@@ -25,8 +27,6 @@ store.subscribe((mutation, state) => {
     store.dispatch('setApplicationState', appState)
   } else {
     // the mutation is internal - update firestore
-    let debouncedWriteToDatabase = undefined
-
     if (debouncedWriteToDatabase) {
       clearTimeout(debouncedWriteToDatabase)
     }

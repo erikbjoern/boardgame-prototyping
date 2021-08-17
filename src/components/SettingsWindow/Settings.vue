@@ -92,10 +92,13 @@
       />
       <div class="flex space-x-3 ml-3 text-gray-500 w-full">
         <span v-if="$store.state.previousFirestoreIds.length">Tidigare ID:n</span>
-        <span class="font-mono">
-          {{ $store.state.previousFirestoreIds.join(", ") }}
+        <span class="font-mono select-text">
+          {{ $store.state.previousFirestoreIds.join(', ') }}
         </span>
-        <button class="py-0 border rounded px-1 inline-block !ml-auto" @click="bindStoreToNewConnection">
+        <button
+          class="py-0 border rounded px-1 inline-block !ml-auto"
+          @click="bindStoreToNewConnection"
+        >
           Ny databasanslutning
         </button>
       </div>
@@ -150,11 +153,12 @@ export default {
 
       e.target.blur()
     },
-    bindStoreToNewConnection() {
+    async bindStoreToNewConnection() {
       const newFirestoreId = cuid()
 
       this.$store.commit('useInitialState', true)
-      this.rebindStore(newFirestoreId)
+      await this.$store.dispatch('setFirestoreId', newFirestoreId)
+      this.$store.dispatch('bindStore')
     },
     selectTab(e, name) {
       this.activeTab = name
@@ -176,12 +180,12 @@ export default {
     },
     async saveSettings() {
       const dialog = await this.$swal({
-        title: 'Spara nuvarande inställningar',
+        title: 'Spara nuvarande session',
         input: 'text',
         inputAttributes: {
           autocapitalize: 'off',
         },
-        inputPlaceholder: 'Ny inställningsprofil',
+        inputPlaceholder: 'Ny session',
         showCancelButton: true,
         confirmButtonText: 'Spara',
         cancelButtonText: 'Avbryt',
@@ -191,17 +195,19 @@ export default {
       })
 
       if (dialog.isConfirmed) {
-        const saveFileName = dialog.value || 'Ny inställningsprofil'
+        const saveFileName = dialog.value || 'Ny session'
         this.$store.dispatch('saveSettings', saveFileName)
       }
     },
     async loadSettings() {
-      const savedStateMetaDocs = await db.collection('savedStateMeta').get()
+      const savedStateMetaDocs = await db
+        .collection(`Rooms/SaveFiles/MetaEntries`)
+        .get()
       const savedStateMeta = savedStateMetaDocs.docs.map(d => d.data())
 
       if (!savedStateMeta?.length) {
         await this.$swal({
-          text: 'Inga sparade inställningar att ladda',
+          text: 'Inga sparade sessioner att ladda',
           showCancelButton: false,
           confirmButtonText: 'OK',
           allowOutsideClick: true,
@@ -214,17 +220,17 @@ export default {
         ...savedStateMeta
           .sort((a, b) => a.date - b.date)
           .map(m => ({
-            [m.id]: `${m.name} (${new Date(m.date?.seconds * 1000)
+            [`${m.roomId}-${m.fileId}`]: `${m.name} (${new Date(m.date?.seconds * 1000)
               ?.toString()
               .slice(0, 15)})`,
           }))
       )
 
       const dialog = await this.$swal({
-        title: 'Ladda sparade inställningar',
+        title: 'Ladda sparade sessioner',
         input: 'select',
         inputOptions,
-        inputPlaceholder: 'Välj inställning',
+        inputPlaceholder: 'Välj session',
         showCancelButton: true,
         confirmButtonText: 'Ladda',
         cancelButtonText: 'Avbryt',
@@ -235,16 +241,30 @@ export default {
             if (!!value) {
               resolve()
             } else {
-              resolve('Du har inte valt någon sparad inställning')
+              resolve('Du har inte valt någon sparad session')
             }
           })
         },
       })
 
       if (dialog.isConfirmed) {
-        const saveFileId = dialog.value
+        const [roomId, fileId] = dialog.value.split('-')
+        let stayOnThisConnection = false
 
-        this.$store.dispatch('loadSettings', saveFileId)
+        if (roomId !== this.$store.state.firestoreId) {
+          const stayOnThisConnectionDialog = await this.$swal({
+            title: 'Vill du ladda in datan på nuvarande databasuppkoppling?',
+            text: 'Din nuvarande session auto-sparas på denna uppkoppling',
+            showDenyButton: true,
+            confirmButtonText: 'Ja - stanna',
+            denyButtonText: 'Nej - gå till sparad uppkoppling',
+            allowOutsideClick: false,
+          })
+
+          stayOnThisConnection = stayOnThisConnectionDialog.isConfirmed
+        }
+
+        this.$store.dispatch('loadSettings', { roomId, fileId, stayOnThisConnection })
       }
     },
   },

@@ -9,6 +9,7 @@ import preferences from './modules/preferences'
 const initialState = {
   root: {
     firestoreId: '',
+    saveFileId: '',
     previousFirestoreIds: [],
     isAwaitingFirstGridBuild: true,
     useInitialState: false,
