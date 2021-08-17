@@ -42,10 +42,10 @@
         >
           Generera nytt bräde
         </button>
-        <button class="btn w-full rounded-full" @click="saveSettings">
+        <button class="btn w-full rounded-full" @click="saveState">
           Spara
         </button>
-        <button class="btn w-full rounded-full" @click="loadSettings">
+        <button class="btn w-full rounded-full" @click="loadState">
           Ladda
         </button>
         <button
@@ -178,7 +178,7 @@ export default {
       this.$store.commit('toggleVisibility', item)
       e.target.blur()
     },
-    async saveSettings() {
+    async saveState() {
       const dialog = await this.$swal({
         title: 'Spara nuvarande session',
         input: 'text',
@@ -196,10 +196,10 @@ export default {
 
       if (dialog.isConfirmed) {
         const saveFileName = dialog.value || 'Ny session'
-        this.$store.dispatch('saveSettings', saveFileName)
+        this.$store.dispatch('saveState', saveFileName)
       }
     },
-    async loadSettings() {
+    async loadState() {
       const savedStateMetaDocs = await db
         .collection(`Rooms/SaveFiles/MetaEntries`)
         .get()
@@ -264,7 +264,7 @@ export default {
           stayOnThisConnection = stayOnThisConnectionDialog.isConfirmed
         }
 
-        this.$store.dispatch('loadSettings', { roomId, fileId, stayOnThisConnection })
+        this.$store.dispatch('loadState', { roomId, fileId, stayOnThisConnection })
       }
     },
   },

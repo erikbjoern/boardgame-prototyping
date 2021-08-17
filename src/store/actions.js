@@ -129,7 +129,7 @@ export default {
 
     db.doc(`Rooms/${roomId}/AppStates/${fileId}`).set(appState)
   },
-  saveSettings({ state, dispatch }, name) {
+  saveState({ state, dispatch }, name) {
     const fileId = cuid()
     const newMetaEntry = { roomId: state.firestoreId, fileId, name, date: new Date() }
 
@@ -137,9 +137,9 @@ export default {
 
     db.collection(`Rooms/SaveFiles/MetaEntries`).add(newMetaEntry)
   },
-  async loadSettings({ state, dispatch }, { roomId, fileId, stayOnThisConnection }) {
+  async loadState({ state, dispatch }, { roomId, fileId, stayOnThisConnection }) {
     if (stayOnThisConnection) {
-      dispatch('saveSettings', 'Auto-save')
+      dispatch('saveState', 'Auto-save')
 
       // fetch the desired save and write to a new fileId on *this* connection
       // then bind to that connection
@@ -156,14 +156,14 @@ export default {
         })
 
       dispatch('setSaveFileId', newFileId)
-      dispatch('bindStore')
     } else {
       if (roomId !== state.firestoreId) {
         await dispatch('setFirestoreId', roomId)
       }
 
       dispatch('setSaveFileId', fileId)
-      dispatch('bindStore')
     }
+
+    dispatch('bindStore')
   },
 }
