@@ -23,7 +23,7 @@ export default {
     return {
       temporaryPosition: null,
       originalPosition: null,
-      originalPositionOnPage: null,
+      originalPositionOnPage: { x: 0, y: 0 },
       itemBeingDragged: null,
     }
   },
@@ -54,7 +54,7 @@ export default {
 
       const screenHeight = visualViewport.height
 
-      if (e.screenX < 100 && e.screenY > screenHeight - 100) {
+      if (e.clientX < 120 && e.clientY > screenHeight - 120) {
         if (!this.$store.state.draggableIsOnDropzone) {
           this.$store.commit('draggableIsOnDropzone', true)
         }
@@ -83,7 +83,7 @@ export default {
       this.$store.commit('draggableIsBeingDragged', false)
 
       this.temporaryPosition = null
-      this.originalPosition = null
+      this.originalPosition = { x: 0, y: 0 }
       this.itemBeingDragged = null
 
       document.removeEventListener('mousemove', this.onDrag)
