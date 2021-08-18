@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "set TAILWIND_MODE=watch&& vue-cli-service serve && set TAILWIND_MODE=",
     "serve:mac": "TAILWIND_MODE=watch vue-cli-service serve",
     "build": "vue-cli-service build",
     "jest": "vue-cli-service test:unit"
@@ -13,12 +13,14 @@
     "autoprefixer": "^9",
     "core-js": "^3.6.5",
     "cuid": "^2.1.8",
-    "localforage": "^1.9.0",
+    "firebase": "^8.9.1",
     "postcss": "7",
     "v-click-outside": "^3.1.2",
     "vue": "^2.6.11",
     "vue-sweetalert2": "^5.0.2",
-    "vuex": "^3.4.0"
+    "vuefire": "^2.2.5",
+    "vuex": "^3.4.0",
+    "vuexfire": "^3.2.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

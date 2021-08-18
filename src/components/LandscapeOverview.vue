@@ -2,7 +2,7 @@
   <div
     class="max-h-[80vh] fixed left-2 top-5 z-[1000] p-2 bg-[#efefef] bg-opacity-20 rounded overflow-hidden"
     style="direction: rtl"
-    v-if="$store.state.initialised"
+    v-if="!$store.state.isAwaitingFirstGridBuild"
   >
     <div
       class="overflow-auto pl-2"

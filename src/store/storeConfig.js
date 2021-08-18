@@ -8,13 +8,18 @@ import preferences from './modules/preferences'
 
 const initialState = {
   root: {
-    initialised: false,
+    firestoreId: '',
+    saveFileId: '',
+    previousFirestoreIds: [],
+    isAwaitingFirstGridBuild: true,
+    useInitialState: false,
     viewportWidth: window.visualViewport?.width || 1400,
     keysPressed: [],
     hasFocusedInput: false,
     draggableIsBeingDragged: false,
     draggableIsOnDropzone: false,
-  },  
+  },
+  appState: {},
   board: {
     tileRows: [],
     tileRowsStash: [],

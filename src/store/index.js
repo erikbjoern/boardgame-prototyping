@@ -10,18 +10,31 @@ export const storeConfig = JSON.parse(JSON.stringify(storeConfiguration))
 
 const store = new Vuex.Store(storeConfiguration.create())
 
-let updateLocalStorageTimer = undefined
+let debouncedWriteToDatabase = undefined
 
 store.subscribe((mutation, state) => {
-  if (!state.initialised) return
+  if (mutation.type == 'vuexfire/SET_VALUE' && mutation.payload?.path == 'appState') {
+    // the mutation is passing incoming data from firestore
+    const appState = mutation.payload.data
 
-  if (updateLocalStorageTimer) {
-    clearTimeout(updateLocalStorageTimer)
+    if (appState?.board) {
+      appState.board.tileRows = appState.board.tileRows?.map(row => Object.values(row))
+      appState.board.tileRowsStash = appState.board.tileRowsStash?.map(row =>
+        Object.values(row)
+      )
+    }
+
+    store.dispatch('setApplicationState', appState)
+  } else {
+    // the mutation is internal - update firestore
+    if (debouncedWriteToDatabase) {
+      clearTimeout(debouncedWriteToDatabase)
+    }
+
+    debouncedWriteToDatabase = setTimeout(() => {
+      store.dispatch('writeToDatabase')
+    }, 1000)
   }
-
-  updateLocalStorageTimer = setTimeout(() => {
-    store.dispatch('updateLocalStorage')
-  }, 1000)
 })
 
 export default store

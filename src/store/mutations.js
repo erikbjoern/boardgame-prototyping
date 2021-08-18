@@ -1,6 +1,22 @@
+import { vuexfireMutations } from 'vuexfire'
+
 export default {
-  initialised(state) {
-    state.initialised = true
+  ...vuexfireMutations,
+  isAwaitingFirstGridBuild(state, payload) {
+    state.isAwaitingFirstGridBuild = payload
+  },
+  setFirestoreId(state, payload) {
+    state.firestoreId = payload
+  },
+  setPreviousFirestoreIds(state, previousIds) {
+    previousIds.forEach(id => state.previousFirestoreIds.unshift(id))
+    state.previousFirestoreIds = state.previousFirestoreIds.slice(0, 2)
+  },
+  setSaveFileId(state, id) {
+    state.saveFileId = id
+  },
+  useInitialState(state, payload) {
+    state.useInitialState = !!payload
   },
   updateViewportWidth(state) {
     state.viewportWidth = visualViewport.width

@@ -168,6 +168,9 @@ export default {
       this.$store.dispatch('addDraggableItem')
     },
   },
+  created() {
+    this.$store.dispatch('initFirebase')
+  },
   mounted() {
     const mainContainer = this.$refs.mainContainer
 

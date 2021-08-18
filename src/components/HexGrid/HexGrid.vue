@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import HexGridTile from '@/components/HexGrid/HexGridTile.vue'
 
 export default {
@@ -72,6 +72,11 @@ export default {
     rowsEven() {
       return this.tileRows.filter((a, index) => index % 2 == 1)
     },
+  },
+  created() {
+    // HexGrid is conditionally rendered when there exists tileRows in store
+    // After initial render it is OK to update database
+    this.$store.commit('isAwaitingFirstGridBuild', false)
   },
 }
 </script>

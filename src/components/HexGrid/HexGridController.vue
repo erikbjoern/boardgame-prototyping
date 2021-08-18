@@ -153,6 +153,8 @@ export default {
       this.$store.commit('setBoardState', newBoardState)
     },
     buildNewBoard() {
+      this.$store.dispatch('arrangeLandscapePool')
+
       this.addTileRows()
 
       this.$store.dispatch('setBoardColors')
@@ -179,17 +181,9 @@ export default {
       }
     },
   },
-  async created() {
-    await this.$store.dispatch('setApplicationState')
-
-    if (this.tileRows.length == 0) {
-      this.buildNewBoard()
-    }
-
+  created() {
     EventBus.$on('buildNewBoard', this.buildNewBoard)
     EventBus.$on('reassignResources', this.reassignResources)
-
-    this.$store.commit('initialised')
   },
   destroyed() {
     EventBus.$off('buildNewBoard', this.buildNewBoard)
