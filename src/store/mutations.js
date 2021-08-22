@@ -9,11 +9,13 @@ export default {
     state.firestoreId = payload
   },
   setPreviousFirestoreIds(state, previousIds) {
-    previousIds.forEach(id => state.previousFirestoreIds.unshift(id))
-    state.previousFirestoreIds = state.previousFirestoreIds.slice(0, 2)
-  },
-  setSaveFileId(state, id) {
-    state.saveFileId = id
+    const lastTwoUniqueRooms = Array.from(
+      new Set([...previousIds, ...state.previousFirestoreIds])
+    )
+      .filter(id => id !== state.firestoreId)
+      .slice(0, 2)
+
+    state.previousFirestoreIds = lastTwoUniqueRooms
   },
   useInitialState(state, payload) {
     state.useInitialState = !!payload

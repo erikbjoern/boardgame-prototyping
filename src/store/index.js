@@ -22,6 +22,8 @@ store.subscribe((mutation, state) => {
       appState.board.tileRowsStash = appState.board.tileRowsStash?.map(row =>
         Object.values(row)
       )
+    } else {
+      store.commit('useInitialState', true)
     }
 
     store.dispatch('setApplicationState', appState)
@@ -32,7 +34,7 @@ store.subscribe((mutation, state) => {
     }
 
     debouncedWriteToDatabase = setTimeout(() => {
-      store.dispatch('writeToDatabase')
+      store.dispatch('writeStateToDatabase', 'CurrentState')
     }, 1000)
   }
 })

@@ -25,7 +25,7 @@ export default {
 
     return bindFirestoreRef(
       'appState',
-      db.doc(`Rooms/${state.firestoreId}/AppStates/${state.saveFileId}`)
+      db.doc(`Rooms/${state.firestoreId}/AppStates/CurrentState`)
     )
   }),
   async setSaveFileId({ state, commit }, saveFileId) {
@@ -33,43 +33,31 @@ export default {
     commit('setSaveFileId', saveFileId)
   },
   async setFirestoreId({ state, commit }, firestoreId) {
-    if (state.firestoreId) {
-      const previousFirestoreId =
-        state.previousFirestoreIds[0] ||
-        (await localStorage.getItem('previousFirestoreId1'))
-
-      localStorage.setItem('firestoreId', firestoreId)
-      localStorage.setItem('previousFirestoreId1', state.firestoreId)
-
-      if (previousFirestoreId) {
-        localStorage.setItem('previousFirestoreId2', previousFirestoreId)
-      }
-
-      commit('setPreviousFirestoreIds', [state.firestoreId])
-    }
+    const currentFirestoreId = state.firestoreId
 
     commit('setFirestoreId', firestoreId)
+
+    if (currentFirestoreId) {
+      commit('setPreviousFirestoreIds', [currentFirestoreId])
+    } else {
+      const previousIds =
+        (await localStorage
+          .getItem('previousFirestoreIds')
+          ?.split(',')
+          .filter(v => !!v)) || []
+
+      commit('setPreviousFirestoreIds', previousIds)
+    }
+
+    localStorage.setItem('firestoreId', firestoreId)
+    localStorage.setItem('previousFirestoreIds', state.previousFirestoreIds)
   },
   async initFirebase({ state, commit, dispatch }) {
-    let firestoreId
-    let previousFirestoreIds = []
-
+    let firestoreId = await localStorage.getItem('firestoreId')
     const dataIsStale = await performTimeStampCheck()
 
-    if (!dataIsStale) {
-      await Promise.all([
-        (firestoreId = localStorage.getItem('firestoreId')),
-        previousFirestoreIds.push(
-          localStorage.getItem('previousFirestoreId1'),
-          localStorage.getItem('previousFirestoreId2')
-        ),
-      ])
-
-      previousFirestoreIds = previousFirestoreIds.filter(v => !!v)
-
-      const saveFileId = (await localStorage.getItem('saveFileId')) || cuid()
-
-      commit('setSaveFileId', saveFileId)
+    if (dataIsStale) {
+      commit('useInitialState', true)
     }
 
     if (!firestoreId || firestoreId == 'undefined') {
@@ -79,7 +67,6 @@ export default {
 
     await dispatch('setFirestoreId', firestoreId)
     dispatch('bindStore')
-    commit('setPreviousFirestoreIds', previousFirestoreIds)
   },
   async setApplicationState({ state, commit }, savedState) {
     function setState(appState) {
@@ -101,11 +88,8 @@ export default {
       setState(savedState)
     }
   },
-  writeToDatabase({ state }, { roomId, fileId } = {}) {
+  writeStateToDatabase({ state }, documentId) {
     if (!state.firestoreId || state.isAwaitingFirstGridBuild) return
-
-    roomId ??= state.firestoreId
-    fileId ??= state.saveFileId
 
     const appState = {
       ...Object.assign(
@@ -127,43 +111,36 @@ export default {
       },
     }
 
-    db.doc(`Rooms/${roomId}/AppStates/${fileId}`).set(appState)
+    db.doc(`Rooms/${state.firestoreId}/AppStates/${documentId}`).set(appState)
   },
   saveState({ state, dispatch }, name) {
     const fileId = cuid()
     const newMetaEntry = { roomId: state.firestoreId, fileId, name, date: new Date() }
 
-    dispatch('writeToDatabase', { roomId: state.firestoreId, fileId })
+    dispatch('writeStateToDatabase', fileId)
 
-    db.collection(`Rooms/SaveFiles/MetaEntries`).add(newMetaEntry)
+    db.collection(`GlobalSaveFilesMeta`).add(newMetaEntry)
   },
   async loadState({ state, dispatch }, { roomId, fileId, stayOnThisConnection }) {
+    let rebindStore = false
+
     if (stayOnThisConnection) {
       dispatch('saveState', 'Auto-save')
-
-      // fetch the desired save and write to a new fileId on *this* connection
-      // then bind to that connection
-      const newFileId = cuid()
-
-      db.doc(`Rooms/${roomId}/AppStates/${fileId}`)
-        .get()
-        .then(doc => {
-          const savedState = doc.data()
-
-          if (savedState) {
-            db.doc(`Rooms/${state.firestoreId}/AppStates/${newFileId}`).set(savedState)
-          }
-        })
-
-      dispatch('setSaveFileId', newFileId)
-    } else {
-      if (roomId !== state.firestoreId) {
-        await dispatch('setFirestoreId', roomId)
-      }
-
-      dispatch('setSaveFileId', fileId)
+    } else if (roomId !== state.firestoreId) {
+      rebindStore = true
+      await dispatch('setFirestoreId', roomId)
     }
 
-    dispatch('bindStore')
+    db.doc(`Rooms/${roomId}/AppStates/${fileId}`)
+      .get()
+      .then(doc => {
+        const savedState = doc.data()
+
+        if (savedState) {
+          db.doc(`Rooms/${state.firestoreId}/AppStates/CurrentState`).set(savedState)
+        }
+      })
+
+    rebindStore && dispatch('bindStore')
   },
 }

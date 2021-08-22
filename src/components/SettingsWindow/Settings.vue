@@ -200,9 +200,7 @@ export default {
       }
     },
     async loadState() {
-      const savedStateMetaDocs = await db
-        .collection(`Rooms/SaveFiles/MetaEntries`)
-        .get()
+      const savedStateMetaDocs = await db.collection(`GlobalSaveFilesMeta`).get()
       const savedStateMeta = savedStateMetaDocs.docs.map(d => d.data())
 
       if (!savedStateMeta?.length) {
@@ -222,7 +220,7 @@ export default {
           .map(m => ({
             [`${m.roomId}-${m.fileId}`]: `${m.name} (${new Date(m.date?.seconds * 1000)
               ?.toString()
-              .slice(0, 15)})`,
+              .slice(0, 21)})`,
           }))
       )
 
