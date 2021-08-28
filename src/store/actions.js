@@ -127,6 +127,29 @@ export default {
     if (stayOnThisConnection) {
       dispatch('saveState', 'Auto-save')
     } else if (roomId !== state.firestoreId) {
+      // create backup of the current state of the other room
+
+      db.doc(`Rooms/${roomId}/AppStates/CurrentState`)
+        .get()
+        .then(doc => {
+          const savedState = doc.data()
+
+          if (savedState) {
+            const autoSaveId = cuid()
+            
+            db.doc(`Rooms/${roomId}/AppStates/${autoSaveId}`).set(savedState)
+            
+            const newMetaEntry = {
+              roomId,
+              fileId: autoSaveId,
+              name: 'Auto-save',
+              date: new Date(),
+            }
+
+            db.collection(`GlobalSaveFilesMeta`).add(newMetaEntry)
+          }
+        })
+
       rebindStore = true
       await dispatch('setFirestoreId', roomId)
     }
@@ -141,6 +164,6 @@ export default {
         }
       })
 
-    rebindStore && dispatch('bindStore')
+    if (rebindStore) dispatch('bindStore')
   },
 }
