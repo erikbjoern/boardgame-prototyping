@@ -86,7 +86,7 @@
         type="text"
         class="ml-2 px-1 w-[11rem] flex-none bg-transparent border border-gray-700 rounded-sm font-mono"
         :value="$store.state.firestoreId"
-        @keydown.enter="e => rebindStore(e.target.value)"
+        @keydown.enter="rebindStore"
         @keydown.esc="e => e.target.blur()"
         @blur="e => (e.target.value = $store.state.firestoreId)"
       />
@@ -140,7 +140,9 @@ export default {
     }
   },
   methods: {
-    async rebindStore(firestoreId) {
+    async rebindStore(e) {
+      const firestoreId = e.target.value
+
       if (
         (firestoreId.length == 25 && firestoreId[0] == 'c') ||
         firestoreId == 'TheGlobalRoom'
