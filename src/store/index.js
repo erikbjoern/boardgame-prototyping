@@ -22,11 +22,17 @@ store.subscribe((mutation, state) => {
       appState.board.tileRowsStash = appState.board.tileRowsStash?.map(row =>
         Object.values(row)
       )
-    } else {
-      store.commit('useInitialState', true)
-    }
 
-    store.dispatch('setApplicationState', appState)
+      store.dispatch('setApplicationState', appState)
+    } else {
+      // the first connection to firestore returns null - await potential second result
+      setTimeout(() => {
+        if (state.board.tileRows.length == 0) {
+          store.commit('useInitialState', true)
+          store.dispatch('setApplicationState', appState)
+        }
+      }, 2000)
+    }
   } else {
     // the mutation is internal - update firestore
     if (debouncedWriteToDatabase) {
