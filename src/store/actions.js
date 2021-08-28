@@ -3,6 +3,7 @@ import cuid from 'cuid'
 import EventBus from '@/eventBus'
 import { storeConfig } from '@/store'
 import { firestoreAction } from 'vuexfire'
+import isEqual from 'lodash/isEqual';
 
 async function performTimeStampCheck() {
   const timeStamp = await localStorage.getItem('timeStamp')
@@ -124,21 +125,23 @@ export default {
   async loadState({ state, dispatch }, { roomId, fileId, stayOnThisConnection }) {
     let rebindStore = false
 
+    const savedDoc = await db.doc(`Rooms/${roomId}/AppStates/${fileId}`).get()
+    const stateToBeLoaded = savedDoc.data()
+
     if (stayOnThisConnection) {
       dispatch('saveState', 'Auto-save')
     } else if (roomId !== state.firestoreId) {
       // create backup of the current state of the other room
-
       db.doc(`Rooms/${roomId}/AppStates/CurrentState`)
         .get()
         .then(doc => {
-          const savedState = doc.data()
+          const roomState = doc.data()
 
-          if (savedState) {
+          if (roomState && !isEqual(roomState, stateToBeLoaded)) {
             const autoSaveId = cuid()
-            
-            db.doc(`Rooms/${roomId}/AppStates/${autoSaveId}`).set(savedState)
-            
+
+            db.doc(`Rooms/${roomId}/AppStates/${autoSaveId}`).set(stateToBeLoaded)
+
             const newMetaEntry = {
               roomId,
               fileId: autoSaveId,
@@ -154,15 +157,9 @@ export default {
       await dispatch('setFirestoreId', roomId)
     }
 
-    db.doc(`Rooms/${roomId}/AppStates/${fileId}`)
-      .get()
-      .then(doc => {
-        const savedState = doc.data()
-
-        if (savedState) {
-          db.doc(`Rooms/${state.firestoreId}/AppStates/CurrentState`).set(savedState)
-        }
-      })
+    if (stateToBeLoaded) {
+      db.doc(`Rooms/${state.firestoreId}/AppStates/CurrentState`).set(stateToBeLoaded)
+    }
 
     if (rebindStore) dispatch('bindStore')
   },
